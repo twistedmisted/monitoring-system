@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://dpg-cfhsa5o2i3murcboajk0-a.frankfurt-postgres.render.com/monitoring_system_dev
+    username: mister
+    password: VIF2T42VtOlwGGzwhpU2RhI9MExYQ85X
+    driver-class-name: org.postgresql.Driver
