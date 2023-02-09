@@ -7,9 +7,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "fuel_oil_consumption_volumes")
-public class FuelOilConsumptionVolumesEntity extends ParametersEntity {
+public class FuelOilConsumptionVolumesEntity extends ParameterBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "unit_id", nullable = false)
-    private UnitsEntity unit;
+    private UnitEntity unit;
 }

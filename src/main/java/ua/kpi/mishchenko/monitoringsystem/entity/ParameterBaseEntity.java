@@ -9,7 +9,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @Getter
 @MappedSuperclass
-public class ParametersEntity {
+public class ParameterBaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
