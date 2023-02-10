@@ -19,6 +19,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         ParameterEntity entity = new ParameterEntity();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
+        entity.setBeanName(dto.getBeanName());
         return entity;
     }
 
@@ -30,6 +31,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         ParameterDTO dto = new ParameterDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
+        dto.setBeanName(entity.getBeanName());
         return dto;
     }
 

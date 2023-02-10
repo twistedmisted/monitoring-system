@@ -27,6 +27,9 @@ public class ParameterEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "bean_name", nullable = false)
+    private String beanName;
+
     @ManyToMany(mappedBy = "parameters")
     private List<UnitEntity> units = new ArrayList<>();
 }

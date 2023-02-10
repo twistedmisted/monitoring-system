@@ -5,9 +5,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -41,7 +43,6 @@ public class UnitController {
 
     @GetMapping("/enterprises/{id}/departments")
     public String getCreateDepartmentPage(@PathVariable(name = "id") Long enterpriseId, Model model) {
-        // TODO: check if it's enterprise
         if (unitService.isEnterpriseById(enterpriseId)) {
             model.addAttribute("enterpriseId", enterpriseId);
             model.addAttribute("department", new UnitDTO());
@@ -56,5 +57,28 @@ public class UnitController {
         department.setParentId(enterpriseId);
         unitService.createDepartment(department);
         return "redirect:/units";
+    }
+
+    @GetMapping("/enterprise/{enterpriseId}/departments/{departmentId}/parameters")
+    public String getDepartmentParametersPage(@PathVariable Long enterpriseId,
+                                              @PathVariable Long departmentId,
+                                              Model model) {
+        UnitDTO department = unitService.getUnitById(departmentId);
+        if (department == null) {
+            model.addAttribute("message", "Відділу не знайдено!");
+        } else {
+            model.addAttribute("department", department);
+            model.addAttribute("enterpriseId", enterpriseId);
+            model.addAttribute("parameters", new SetParametersRequest());
+        }
+        return "parameters";
+    }
+
+    @PostMapping("/enterprise/{enterpriseId}/departments/{departmentId}/parameters")
+    public String setDepartmentParameters(@PathVariable Long enterpriseId,
+                                          @PathVariable Long departmentId,
+                                          @ModelAttribute SetParametersRequest setParametersRequest) {
+        unitService.setDepartmentParameters(departmentId, setParametersRequest);
+        return "redirect:/home";
     }
 }

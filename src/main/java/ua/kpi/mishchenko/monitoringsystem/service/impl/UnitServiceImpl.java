@@ -3,6 +3,7 @@ package ua.kpi.mishchenko.monitoringsystem.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.impl.UnitMapper;
@@ -20,6 +21,11 @@ public class UnitServiceImpl implements UnitService {
 
     private final UnitRepository unitRepository;
     private final UnitMapper unitMapper;
+
+    @Override
+    public UnitDTO getUnitById(Long id) {
+        return unitMapper.entityToDto(unitRepository.findById(id).orElse(null));
+    }
 
     @Override
     public UnitDTO createEnterprise(UnitDTO unitDTO) {
@@ -62,12 +68,21 @@ public class UnitServiceImpl implements UnitService {
         return enterprises;
     }
 
-    private static boolean hasParent(UnitDTO unitDTO) {
-        return unitDTO.getParentId() != 0;
+    @Override
+    public void setDepartmentParameters(Long departmentId, SetParametersRequest setParametersRequest) {
+        UnitEntity unit = unitRepository.findById(departmentId).orElse(null);
+        if (isNull(unit)) {
+            return;
+        }
+
+        // TODO: need continue
+        if (setParametersRequest.isVolumesElectricityConsumption()) {
+            unit.getParameters()
+        }
     }
 
-    private UnitDTO getUnitById(Long id) {
-        return unitMapper.entityToDto(unitRepository.findById(id).orElse(null));
+    private static boolean hasParent(UnitDTO unitDTO) {
+        return unitDTO.getParentId() != 0;
     }
 
     private UnitDTO saveUnit(UnitDTO unitDTO) {
