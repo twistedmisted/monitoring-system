@@ -6,6 +6,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -24,21 +25,43 @@ public class UnitMapper implements Mapper<UnitEntity, UnitDTO> {
         entity.setParentId(dto.getParentId());
         entity.setName(dto.getName());
         entity.setParameters(parameterMapper.dtosToEntities(dto.getParameters()));
-        return null;
+        return entity;
     }
 
     @Override
     public UnitDTO entityToDto(UnitEntity entity) {
-        return null;
+        if (entity == null) {
+            return null;
+        }
+        UnitDTO dto = new UnitDTO();
+        dto.setId(entity.getId());
+        dto.setParentId(entity.getParentId());
+        dto.setName(entity.getName());
+        dto.setParameters(parameterMapper.entitiesToDtos(entity.getParameters()));
+        return dto;
     }
 
     @Override
     public List<UnitEntity> dtosToEntities(List<UnitDTO> dtos) {
-        return null;
+        if (dtos == null || dtos.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<UnitEntity> entities = new ArrayList<>();
+        for (UnitDTO dto : dtos) {
+            entities.add(dtoToEntity(dto));
+        }
+        return entities;
     }
 
     @Override
     public List<UnitDTO> entitiesToDtos(List<UnitEntity> entities) {
-        return null;
+        if (entities == null || entities.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<UnitDTO> dtos = new ArrayList<>();
+        for (UnitEntity entity : entities) {
+            dtos.add(entityToDto(entity));
+        }
+        return dtos;
     }
 }

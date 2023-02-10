@@ -75,7 +75,7 @@ public class UnitServiceImpl implements UnitService {
     }
 
     private boolean existsByName(String name) {
-        return unitRepository.existsByName(name);
+        return unitRepository.existsByNameAndParentId(name, 0L);
     }
 
     private boolean existsByParentIdAndName(Long parentId, String name) {

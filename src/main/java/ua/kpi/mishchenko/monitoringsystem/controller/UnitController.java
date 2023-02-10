@@ -3,10 +3,7 @@ package ua.kpi.mishchenko.monitoringsystem.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
@@ -34,8 +31,7 @@ public class UnitController {
     }
 
     @PostMapping("/enterprises")
-    public String createEnterprise(Model model) {
-        UnitDTO enterprise = (UnitDTO) model.getAttribute("enterprise");
+    public String createEnterprise(@ModelAttribute UnitDTO enterprise) {
         if (enterprise != null) {
             enterprise.setParentId(0L);
             unitService.createEnterprise(enterprise);
@@ -55,9 +51,9 @@ public class UnitController {
         return "create-department";
     }
 
-    @PostMapping("/enterprises/{id}/departments")
-    public String createDepartment(@PathVariable(name = "id") Long enterpriseId, Model model) {
-        UnitDTO department = (UnitDTO) model.getAttribute("department");
+    @PostMapping("/enterprises/{enterpriseId}/departments")
+    public String createDepartment(@PathVariable(name = "enterpriseId") Long enterpriseId, @ModelAttribute UnitDTO department) {
+        department.setParentId(enterpriseId);
         unitService.createDepartment(department);
         return "redirect:/units";
     }

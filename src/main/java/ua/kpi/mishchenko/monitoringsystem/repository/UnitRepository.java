@@ -15,4 +15,6 @@ public interface UnitRepository extends CrudRepository<UnitEntity, Long> {
     boolean existsByParentIdAndName(Long parentId, String name);
 
     List<UnitEntity> findAllByParentId(Long parentId);
+
+    boolean existsByNameAndParentId(String name, Long parentId);
 }
