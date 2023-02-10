@@ -13,19 +13,29 @@
     <div class="left">
         <div>
             <ol>
-                <li><a href="#">First enterprise</a> <a href="#"><img class="setting-img"
-                                                                      src="../static/images/settings.png"/></a>
+                <li th:each="enterprise : ${enterprises}">
+                    <a href="#" th:text="${enterprise.name}">Enterprise name</a> <a href="#"><img class="setting-img"
+                                                                                                  src="../static/images/settings.png"/></a>
                     <ul>
-                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"
-                                                                        src="../static/images/settings.png"/></a></li>
-                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"
-                                                                        src="../static/images/settings.png"/></a></li>
-                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"
-                                                                        src="../static/images/settings.png"/></a></li>
+                        <li th:each="department : ${enterprise.departments}"><a href="#" th:text="${department.name}">Department
+                            name</a> <a href="#"><img class="setting-img" src="../static/images/settings.png"/></a></li>
                         <li class="hide-bullet"><a href="#" class="button">Додати відділ</a></li>
                     </ul>
                 </li>
                 <li class="hide-bullet"><a href="#" class="button">Додати підприємство</a></li>
+                <!--                <li><a href="#">First enterprise</a> <a href="#"><img class="setting-img"-->
+                <!--                                                                      src="../static/images/settings.png"/></a>-->
+                <!--                    <ul>-->
+                <!--                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"-->
+                <!--                                                                        src="../static/images/settings.png"/></a></li>-->
+                <!--                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"-->
+                <!--                                                                        src="../static/images/settings.png"/></a></li>-->
+                <!--                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"-->
+                <!--                                                                        src="../static/images/settings.png"/></a></li>-->
+                <!--                        <li class="hide-bullet"><a href="#" class="button">Додати відділ</a></li>-->
+                <!--                    </ul>-->
+                <!--                </li>-->
+                <!--                <li class="hide-bullet"><a href="#" class="button">Додати підприємство</a></li>-->
             </ol>
         </div>
     </div>
