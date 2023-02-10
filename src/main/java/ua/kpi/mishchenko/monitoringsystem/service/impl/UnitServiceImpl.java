@@ -6,12 +6,19 @@ import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitEntity;
+import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.impl.UnitMapper;
+import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
+import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.repository.UnitRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
 
@@ -20,6 +27,8 @@ import static java.util.Objects.isNull;
 public class UnitServiceImpl implements UnitService {
 
     private final UnitRepository unitRepository;
+    private final UnitParameterRepository unitParameterRepository;
+    private final ParameterRepository parameterRepository;
     private final UnitMapper unitMapper;
 
     @Override
@@ -70,14 +79,49 @@ public class UnitServiceImpl implements UnitService {
 
     @Override
     public void setDepartmentParameters(Long departmentId, SetParametersRequest setParametersRequest) {
-        UnitEntity unit = unitRepository.findById(departmentId).orElse(null);
-        if (isNull(unit)) {
-            return;
-        }
+        setDepartmentParameter(departmentId, "volumes_electricity_consumption", setParametersRequest::isVolumesElectricityConsumption);
+        setDepartmentParameter(departmentId, "electricity_costs", setParametersRequest::isElectricityCosts);
+        setDepartmentParameter(departmentId, "volumes_electricity_production", setParametersRequest::isVolumesElectricityProduction);
+        setDepartmentParameter(departmentId, "costs_electricity_production", setParametersRequest::isCostsElectricityProduction);
+        setDepartmentParameter(departmentId, "volumes_thermal_energy_productionSale", setParametersRequest::isVolumesThermalEnergyProductionSale);
+        setDepartmentParameter(departmentId, "volumes_thermal_energySales", setParametersRequest::isVolumesThermalEnergySales);
+        setDepartmentParameter(departmentId, "volumes_thermal_energy_consumption", setParametersRequest::isVolumesThermalEnergyConsumption);
+        setDepartmentParameter(departmentId, "heat_energy_costs_own_needs", setParametersRequest::isHeatEnergyCostsOwnNeeds);
+        setDepartmentParameter(departmentId, "volumes_gas_consumption", setParametersRequest::isVolumesGasConsumption);
+        setDepartmentParameter(departmentId, "gas_expenses", setParametersRequest::isGasExpenses);
+        setDepartmentParameter(departmentId, "volumes_water_consumption", setParametersRequest::isVolumesWaterConsumption);
+        setDepartmentParameter(departmentId, "water_costs", setParametersRequest::isWaterCosts);
+        setDepartmentParameter(departmentId, "volumes_coal_consumption", setParametersRequest::isVolumesCoalConsumption);
+        setDepartmentParameter(departmentId, "coal_costs", setParametersRequest::isCoalCosts);
+        setDepartmentParameter(departmentId, "fuel_oil_consumption_volumes", setParametersRequest::isFuelOilConsumptionVolumes);
+        setDepartmentParameter(departmentId, "costs_fuel_oil", setParametersRequest::isCostsFuelOil);
+        setDepartmentParameter(departmentId, "volumes_diesel_fuel_consumption", setParametersRequest::isVolumesDieselFuelConsumption);
+        setDepartmentParameter(departmentId, "diesel_fuel_costs", setParametersRequest::isDieselFuelCosts);
+        setDepartmentParameter(departmentId, "volumes_gasoline_consumption", setParametersRequest::isVolumesGasolineConsumption);
+        setDepartmentParameter(departmentId, "gasoline_expenses", setParametersRequest::isGasolineExpenses);
+        setDepartmentParameter(departmentId, "volumes_consumption_lubricants", setParametersRequest::isVolumesConsumptionLubricants);
+        setDepartmentParameter(departmentId, "costs_lubricants", setParametersRequest::isCostsLubricants);
+        setDepartmentParameter(departmentId, "drainage_volumes", setParametersRequest::isDrainageVolumes);
+        setDepartmentParameter(departmentId, "drainage_costs", setParametersRequest::isDrainageCosts);
+        setDepartmentParameter(departmentId, "volumes_solid_household_waste", setParametersRequest::isVolumesSolidHouseholdWaste);
+        setDepartmentParameter(departmentId, "costs_disposal_solid_household_waste", setParametersRequest::isCostsDisposalSolidHouseholdWaste);
+        setDepartmentParameter(departmentId, "ambient_temperature", setParametersRequest::isAmbientTemperature);
+        setDepartmentParameter(departmentId, "volumes_production_products_and_services", setParametersRequest::isVolumesProductionProductsAndServices);
+        setDepartmentParameter(departmentId, "CO_emissions", setParametersRequest::isCOEmissions);
+    }
 
-        // TODO: need continue
-        if (setParametersRequest.isVolumesElectricityConsumption()) {
-            unit.getParameters()
+    private void setDepartmentParameter(Long departmentId, String beanName, Supplier<Boolean> isParameterChecked) {
+        if (unitParameterRepository.existsByUnitIdAndParameterBeanName(departmentId, beanName)) {
+            if (!isParameterChecked.get()) {
+                unitParameterRepository.removeByUnitIdAndParameterBeanName(departmentId, beanName);
+            }
+        } else {
+            if (isParameterChecked.get()) {
+                UnitParameterEntity up = new UnitParameterEntity();
+                up.setUnit(unitRepository.findById(departmentId).orElseThrow());
+                up.setParameter(parameterRepository.findByBeanName(beanName).orElseThrow());
+                unitParameterRepository.save(up);
+            }
         }
     }
 

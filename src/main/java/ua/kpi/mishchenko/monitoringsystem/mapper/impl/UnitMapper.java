@@ -24,7 +24,7 @@ public class UnitMapper implements Mapper<UnitEntity, UnitDTO> {
         entity.setId(dto.getId());
         entity.setParentId(dto.getParentId());
         entity.setName(dto.getName());
-        entity.setParameters(parameterMapper.dtosToEntities(dto.getParameters()));
+//        entity.setParameters(parameterMapper.dtosToEntities(dto.getParameters()));
         return entity;
     }
 
@@ -37,7 +37,7 @@ public class UnitMapper implements Mapper<UnitEntity, UnitDTO> {
         dto.setId(entity.getId());
         dto.setParentId(entity.getParentId());
         dto.setName(entity.getName());
-        dto.setParameters(parameterMapper.entitiesToDtos(entity.getParameters()));
+//        dto.setParameters(parameterMapper.entitiesToDtos(entity.getParameters()));
         return dto;
     }
 

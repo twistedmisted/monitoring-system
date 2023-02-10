@@ -3,6 +3,7 @@ package ua.kpi.mishchenko.monitoringsystem.mapper.impl;
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterEntity;
+import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
 
 import java.util.ArrayList;
@@ -35,6 +36,17 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         return dto;
     }
 
+    public ParameterDTO entityToDto(UnitParameterEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        ParameterDTO dto = new ParameterDTO();
+        dto.setId(entity.getParameter().getId());
+        dto.setName(entity.getParameter().getName());
+        dto.setBeanName(entity.getParameter().getBeanName());
+        return dto;
+    }
+
     @Override
     public List<ParameterEntity> dtosToEntities(List<ParameterDTO> dtos) {
         if (dtos == null || dtos.isEmpty()) {
@@ -57,5 +69,16 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
             dtos.add(entityToDto(entity));
         }
         return dtos;
+    }
+
+    public List<String> upEntitiesToBeanNameString(List<UnitParameterEntity> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return null;
+        }
+        List<String> beanNames = new ArrayList<>();
+        for (UnitParameterEntity entity : entities) {
+            beanNames.add(entity.getParameter().getBeanName());
+        }
+        return beanNames;
     }
 }

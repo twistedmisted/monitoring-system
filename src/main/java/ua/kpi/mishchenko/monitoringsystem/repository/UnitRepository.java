@@ -12,8 +12,6 @@ import java.util.Optional;
 @Repository
 public interface UnitRepository extends CrudRepository<UnitEntity, Long> {
 
-    Optional<UnitEntity> findByIdWithParameters(Long id);
-
     boolean existsByName(String name);
 
     boolean existsByParentIdAndName(Long parentId, String name);

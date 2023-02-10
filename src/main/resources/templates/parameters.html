@@ -8,186 +8,335 @@
 <div>
     <form name="parameters"
           th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
-          method="post" th:object="${parameters}">
+          method="post" th:object="${setParameters}">
 
         <p th:text="${department.name}">Department name</p>
 
-        <th:block th:each="parameter : ${department.parameters}">
+        <div th:if="${parameters.isEmpty()}">
             <label for="volumes_electricity_consumption">Обсяги споживання електроенергії (кВт·год)</label>
             <input type="checkbox"
                    id="volumes_electricity_consumption"
-                   th:checked="${parameter.beanName == 'volumes_electricity_consumption'}"
                    th:field="*{volumesElectricityConsumption}">
-
+            <br>
             <label for="electricity_costs">Витрати на електроенергію (грн.)</label>
             <input type="checkbox"
                    id="electricity_costs"
-                   th:checked="${parameter.beanName == 'electricity_costs'}"
                    th:field="*{electricityCosts}">
-
+            <br>
             <label for="volumes_electricity_production">Обсяги виробництва електроенергії (кВт·год)</label>
             <input type="checkbox"
                    id="volumes_electricity_production"
-                   th:checked="${parameter.beanName == 'volumes_electricity_production'}"
                    th:field="*{volumesElectricityProduction}">
-
+            <br>
             <label for="costs_electricity_production">Витрати на виробництво електроенергію (грн.)</label>
             <input type="checkbox"
                    id="costs_electricity_production"
-                   th:checked="${parameter.beanName == 'costs_electricity_production'}"
                    th:field="*{costsElectricityProduction}">
-
+            <br>
             <label for="volumes_thermal_energy_production_sale">Обсяги виробництва теплової енергії на продаж
                 (Гкал)</label>
             <input type="checkbox"
                    id="volumes_thermal_energy_production_sale"
-                   th:checked="${parameter.beanName == 'volumes_thermal_energy_production_sale'}"
                    th:field="*{volumesThermalEnergyProductionSale}">
-
+            <br>
             <label for="volumes_thermal_energy_sales">Обсяги продажів теплової енергії (грн.)</label>
             <input type="checkbox"
                    id="volumes_thermal_energy_sales"
-                   th:checked="${parameter.beanName == 'volumes_thermal_energy_sales'}"
                    th:field="*{volumesThermalEnergySales}">
-
+            <br>
             <label for="volumes_thermal_energy_consumption">Обсяги споживання теплової енергії (Гкал)</label>
             <input type="checkbox"
                    id="volumes_thermal_energy_consumption"
-                   th:checked="${parameter.beanName == 'volumes_thermal_energy_consumption'}"
                    th:field="*{volumesThermalEnergyConsumption}">
-
+            <br>
             <label for="heat_energy_costs_own_needs">Витрати на теплову енергію на власні потреби (грн.)</label>
             <input type="checkbox"
                    id="heat_energy_costs_own_needs"
-                   th:checked="${parameter.beanName == 'heat_energy_costs_own_needs'}"
                    th:field="*{heatEnergyCostsOwnNeeds}">
-
+            <br>
             <label for="volumes_gas_consumption">Обсяги споживання газу (тис. м3)</label>
             <input type="checkbox"
                    id="volumes_gas_consumption"
-                   th:checked="${parameter.beanName == 'volumes_gas_consumption'}"
                    th:field="*{volumesGasConsumption}">
-
+            <br>
             <label for="gas_expenses">Витрати на газ (грн.)</label>
             <input type="checkbox"
                    id="gas_expenses"
-                   th:checked="${parameter.beanName == 'gas_expenses'}"
                    th:field="*{gasExpenses}">
-
+            <br>
             <label for="volumes_water_consumption">Обсяги споживання води (тис. м3)</label>
             <input type="checkbox"
                    id="volumes_water_consumption"
-                   th:checked="${parameter.beanName == 'volumes_water_consumption'}"
                    th:field="*{volumesWaterConsumption}">
-
+            <br>
             <label for="water_costs">Витрати на воду (грн.)</label>
             <input type="checkbox"
                    id="water_costs"
-                   th:checked="${parameter.beanName == 'water_costs'}"
                    th:field="*{waterCosts}">
-
+            <br>
             <label for="volumes_coal_consumption">Обсяги споживання вугілля (тон)</label>
             <input type="checkbox"
                    id="volumes_coal_consumption"
-                   th:checked="${parameter.beanName == 'volumes_coal_consumption'}"
                    th:field="*{volumesCoalConsumption}">
-
+            <br>
             <label for="coal_costs">Витрати на вугілля (грн.)</label>
             <input type="checkbox"
                    id="coal_costs"
-                   th:checked="${parameter.beanName == 'coal_costs'}"
                    th:field="*{coalCosts}">
-
+            <br>
             <label for="fuel_oil_consumption_volumes">Обсяги споживання мазуту (тон)</label>
             <input type="checkbox"
                    id="fuel_oil_consumption_volumes"
-                   th:checked="${parameter.beanName == 'fuel_oil_consumption_volumes'}"
                    th:field="*{fuelOilConsumptionVolumes}">
-
+            <br>
             <label for="costs_fuel_oil">Витрати на мазут (грн.)</label>
             <input type="checkbox"
                    id="costs_fuel_oil"
-                   th:checked="${parameter.beanName == 'costs_fuel_oil'}"
                    th:field="*{costsFuelOil}">
-
+            <br>
             <label for="volumes_diesel_fuel_consumption">Обсяги споживання дизельного палива (тон)</label>
             <input type="checkbox"
                    id="volumes_diesel_fuel_consumption"
-                   th:checked="${parameter.beanName == 'volumes_diesel_fuel_consumption'}"
                    th:field="*{volumesDieselFuelConsumption}">
-
+            <br>
             <label for="diesel_fuel_costs">Витрати на дизельне паливо (грн.)</label>
             <input type="checkbox"
                    id="diesel_fuel_costs"
-                   th:checked="${parameter.beanName == 'diesel_fuel_costs'}"
                    th:field="*{dieselFuelCosts}">
-
+            <br>
             <label for="volumes_gasoline_consumption">Обсяги споживання бензину (тон)</label>
             <input type="checkbox"
                    id="volumes_gasoline_consumption"
-                   th:checked="${parameter.beanName == 'volumes_gasoline_consumption'}"
                    th:field="*{volumesGasolineConsumption}">
-
+            <br>
             <label for="gasoline_expenses">Витрати на бензин (грн.)</label>
             <input type="checkbox"
                    id="gasoline_expenses"
-                   th:checked="${parameter.beanName == 'gasoline_expenses'}"
                    th:field="*{gasolineExpenses}">
-
+            <br>
             <label for="volumes_consumption_lubricants">Обсяги споживання мастильних матеріалів (тон)</label>
             <input type="checkbox"
                    id="volumes_consumption_lubricants"
-                   th:checked="${parameter.beanName == 'volumes_consumption_lubricants'}"
                    th:field="*{volumesConsumptionLubricants}">
-
+            <br>
             <label for="costs_lubricants">Витрати на мастильні матеріали (грн.)</label>
             <input type="checkbox"
                    id="costs_lubricants"
-                   th:checked="${parameter.beanName == 'costs_lubricants'}"
                    th:field="*{costsLubricants}">
-
+            <br>
             <label for="drainage_volumes">Обсяги водовідведення (тис. м3)</label>
             <input type="checkbox"
                    id="drainage_volumes"
-                   th:checked="${parameter.beanName == 'drainage_volumes'}"
                    th:field="*{drainageVolumes}">
-
+            <br>
             <label for="drainage_costs">Витрати на водовідведення (грн.)</label>
             <input type="checkbox"
                    id="drainage_costs"
-                   th:checked="${parameter.beanName == 'drainage_costs'}"
                    th:field="*{drainageCosts}">
-
+            <br>
             <label for="volumes_solid_household_waste">Обсяги твердих побутових відходів (тис. м3 / тон)</label>
             <input type="checkbox"
                    id="volumes_solid_household_waste"
-                   th:checked="${parameter.beanName == 'volumes_solid_household_waste'}"
                    th:field="*{volumesSolidHouseholdWaste}">
-
+            <br>
             <label for="costs_disposal_solid_household_waste">Витрати на утилізацію твердих побутових відходів
                 (грн.)</label>
             <input type="checkbox"
                    id="costs_disposal_solid_household_waste"
-                   th:checked="${parameter.beanName == 'costs_disposal_solid_household_waste'}"
                    th:field="*{costsDisposalSolidHouseholdWaste}">
-
+            <br>
             <label for="ambient_temperature">Температура довкілля (0С)</label>
             <input type="checkbox"
                    id="ambient_temperature"
-                   th:checked="${parameter.beanName == 'ambient_temperature'}"
                    th:field="*{ambientTemperature}">
-
+            <br>
             <label for="volumes_production_products_and_services">Обсяги виробництва продукції та послуг (грн. з
                 ПДВ)</label>
             <input type="checkbox"
                    id="volumes_production_products_and_services"
-                   th:checked="${parameter.beanName == 'volumes_production_products_and_services'}"
                    th:field="*{volumesProductionProductsAndServices}">
-
+            <br>
             <label for="CO_emissions">Викиди СО</label>
             <input type="checkbox"
                    id="CO_emissions"
-                   th:checked="${parameter.beanName == 'CO_emissions'}"
+                   th:field="*{COEmissions}">
+        </div>
+        <th:block th:unless="${parameters.isEmpty()}">
+            <label for="volumes_electricity_consumption">Обсяги споживання електроенергії (кВт·год)123</label>
+            <input type="checkbox"
+                   id="volumes_electricity_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_electricity_consumption')}"
+                   th:field="*{volumesElectricityConsumption}">
+            <br>
+            <label for="electricity_costs">Витрати на електроенергію (грн.)</label>
+            <input type="checkbox"
+                   id="electricity_costs"
+                   th:checked="${#lists.contains(parameters, 'electricity_costs')}"
+                   th:field="*{electricityCosts}">
+            <br>
+            <label for="volumes_electricity_production">Обсяги виробництва електроенергії (кВт·год)</label>
+            <input type="checkbox"
+                   id="volumes_electricity_production"
+                   th:checked="${#lists.contains(parameters, 'volumes_electricity_production')}"
+                   th:field="*{volumesElectricityProduction}">
+            <br>
+            <label for="costs_electricity_production">Витрати на виробництво електроенергію (грн.)</label>
+            <input type="checkbox"
+                   id="costs_electricity_production"
+                   th:checked="${#lists.contains(parameters, 'costs_electricity_production')}"
+                   th:field="*{costsElectricityProduction}">
+            <br>
+            <label for="volumes_thermal_energy_production_sale">Обсяги виробництва теплової енергії на продаж
+                (Гкал)</label>
+            <input type="checkbox"
+                   id="volumes_thermal_energy_production_sale"
+                   th:checked="${#lists.contains(parameters, 'volumes_thermal_energy_production_sale')}"
+                   th:field="*{volumesThermalEnergyProductionSale}">
+            <br>
+            <label for="volumes_thermal_energy_sales">Обсяги продажів теплової енергії (грн.)</label>
+            <input type="checkbox"
+                   id="volumes_thermal_energy_sales"
+                   th:checked="${#lists.contains(parameters, 'volumes_thermal_energy_sales')}"
+                   th:field="*{volumesThermalEnergySales}">
+            <br>
+            <label for="volumes_thermal_energy_consumption">Обсяги споживання теплової енергії (Гкал)</label>
+            <input type="checkbox"
+                   id="volumes_thermal_energy_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_thermal_energy_consumption')}"
+                   th:field="*{volumesThermalEnergyConsumption}">
+            <br>
+            <label for="heat_energy_costs_own_needs">Витрати на теплову енергію на власні потреби (грн.)</label>
+            <input type="checkbox"
+                   id="heat_energy_costs_own_needs"
+                   th:checked="${#lists.contains(parameters, 'heat_energy_costs_own_needs')}"
+                   th:field="*{heatEnergyCostsOwnNeeds}">
+            <br>
+            <label for="volumes_gas_consumption">Обсяги споживання газу (тис. м3)</label>
+            <input type="checkbox"
+                   id="volumes_gas_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_gas_consumption')}"
+                   th:field="*{volumesGasConsumption}">
+            <br>
+            <label for="gas_expenses">Витрати на газ (грн.)</label>
+            <input type="checkbox"
+                   id="gas_expenses"
+                   th:checked="${#lists.contains(parameters, 'gas_expenses')}"
+                   th:field="*{gasExpenses}">
+            <br>
+            <label for="volumes_water_consumption">Обсяги споживання води (тис. м3)</label>
+            <input type="checkbox"
+                   id="volumes_water_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_water_consumption')}"
+                   th:field="*{volumesWaterConsumption}">
+            <br>
+            <label for="water_costs">Витрати на воду (грн.)</label>
+            <input type="checkbox"
+                   id="water_costs"
+                   th:checked="${#lists.contains(parameters, 'water_costs')}"
+                   th:field="*{waterCosts}">
+            <br>
+            <label for="volumes_coal_consumption">Обсяги споживання вугілля (тон)</label>
+            <input type="checkbox"
+                   id="volumes_coal_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_coal_consumption')}"
+                   th:field="*{volumesCoalConsumption}">
+            <br>
+            <label for="coal_costs">Витрати на вугілля (грн.)</label>
+            <input type="checkbox"
+                   id="coal_costs"
+                   th:checked="${#lists.contains(parameters, 'coal_costs')}"
+                   th:field="*{coalCosts}">
+            <br>
+            <label for="fuel_oil_consumption_volumes">Обсяги споживання мазуту (тон)</label>
+            <input type="checkbox"
+                   id="fuel_oil_consumption_volumes"
+                   th:checked="${#lists.contains(parameters, 'fuel_oil_consumption_volumes')}"
+                   th:field="*{fuelOilConsumptionVolumes}">
+            <br>
+            <label for="costs_fuel_oil">Витрати на мазут (грн.)</label>
+            <input type="checkbox"
+                   id="costs_fuel_oil"
+                   th:checked="${#lists.contains(parameters, 'costs_fuel_oil')}"
+                   th:field="*{costsFuelOil}">
+            <br>
+            <label for="volumes_diesel_fuel_consumption">Обсяги споживання дизельного палива (тон)</label>
+            <input type="checkbox"
+                   id="volumes_diesel_fuel_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_diesel_fuel_consumption')}"
+                   th:field="*{volumesDieselFuelConsumption}">
+            <br>
+            <label for="diesel_fuel_costs">Витрати на дизельне паливо (грн.)</label>
+            <input type="checkbox"
+                   id="diesel_fuel_costs"
+                   th:checked="${#lists.contains(parameters, 'diesel_fuel_costs')}"
+                   th:field="*{dieselFuelCosts}">
+            <br>
+            <label for="volumes_gasoline_consumption">Обсяги споживання бензину (тон)</label>
+            <input type="checkbox"
+                   id="volumes_gasoline_consumption"
+                   th:checked="${#lists.contains(parameters, 'volumes_gasoline_consumption')}"
+                   th:field="*{volumesGasolineConsumption}">
+            <br>
+            <label for="gasoline_expenses">Витрати на бензин (грн.)</label>
+            <input type="checkbox"
+                   id="gasoline_expenses"
+                   th:checked="${#lists.contains(parameters, 'gasoline_expenses')}"
+                   th:field="*{gasolineExpenses}">
+            <br>
+            <label for="volumes_consumption_lubricants">Обсяги споживання мастильних матеріалів (тон)</label>
+            <input type="checkbox"
+                   id="volumes_consumption_lubricants"
+                   th:checked="${#lists.contains(parameters, 'volumes_consumption_lubricants')}"
+                   th:field="*{volumesConsumptionLubricants}">
+            <br>
+            <label for="costs_lubricants">Витрати на мастильні матеріали (грн.)</label>
+            <input type="checkbox"
+                   id="costs_lubricants"
+                   th:checked="${#lists.contains(parameters, 'costs_lubricants')}"
+                   th:field="*{costsLubricants}">
+            <br>
+            <label for="drainage_volumes">Обсяги водовідведення (тис. м3)</label>
+            <input type="checkbox"
+                   id="drainage_volumes"
+                   th:checked="${#lists.contains(parameters, 'drainage_volumes')}"
+                   th:field="*{drainageVolumes}">
+            <br>
+            <label for="drainage_costs">Витрати на водовідведення (грн.)</label>
+            <input type="checkbox"
+                   id="drainage_costs"
+                   th:checked="${#lists.contains(parameters, 'drainage_costs')}"
+                   th:field="*{drainageCosts}">
+            <br>
+            <label for="volumes_solid_household_waste">Обсяги твердих побутових відходів (тис. м3 / тон)</label>
+            <input type="checkbox"
+                   id="volumes_solid_household_waste"
+                   th:checked="${#lists.contains(parameters, 'volumes_solid_household_waste')}"
+                   th:field="*{volumesSolidHouseholdWaste}">
+            <br>
+            <label for="costs_disposal_solid_household_waste">Витрати на утилізацію твердих побутових відходів
+                (грн.)</label>
+            <input type="checkbox"
+                   id="costs_disposal_solid_household_waste"
+                   th:checked="${#lists.contains(parameters, 'costs_disposal_solid_household_waste')}"
+                   th:field="*{costsDisposalSolidHouseholdWaste}">
+            <br>
+            <label for="ambient_temperature">Температура довкілля (0С)</label>
+            <input type="checkbox"
+                   id="ambient_temperature"
+                   th:checked="${#lists.contains(parameters, 'ambient_temperature')}"
+                   th:field="*{ambientTemperature}">
+            <br>
+            <label for="volumes_production_products_and_services">Обсяги виробництва продукції та послуг (грн. з
+                ПДВ)</label>
+            <input type="checkbox"
+                   id="volumes_production_products_and_services"
+                   th:checked="${#lists.contains(parameters, 'volumes_production_products_and_services')}"
+                   th:field="*{volumesProductionProductsAndServices}">
+            <br>
+            <label for="CO_emissions">Викиди СО</label>
+            <input type="checkbox"
+                   id="CO_emissions"
+                   th:checked="${#lists.contains(parameters, 'CO_emissions')}"
                    th:field="*{COEmissions}">
         </th:block>
 
