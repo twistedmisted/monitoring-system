@@ -146,6 +146,7 @@ public class UnitController {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
         InputDTO inputDTO = new InputDTO();
         inputDTO.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+        // TODO: get active parameter and show values
         model.addAttribute("tableData", inputDTO);
         model.addAttribute("departmentParameters", departmentParameters);
         model.addAttribute("activeParameter", parameterName);
@@ -158,6 +159,7 @@ public class UnitController {
                                @RequestParam(name = "parameter-name", required = false) String parameterName,
                                @ModelAttribute InputDTO tableData) {
         System.out.println("Here");
+        // TODO: parse and save values
         return "redirect:/units";
     }
 }
