@@ -1,8 +1,8 @@
 package ua.kpi.mishchenko.monitoringsystem.repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ua.kpi.mishchenko.monitoringsystem.entity.ParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 
 import java.util.List;
@@ -14,5 +14,6 @@ public interface UnitParameterRepository extends CrudRepository<UnitParameterEnt
 
     boolean existsByUnitIdAndParameterBeanName(Long unitId, String parameterBeanName);
 
-    void removeByUnitIdAndParameterBeanName(Long unitId, String parameterBeanName);
+    @Transactional
+    void deleteByUnitIdAndParameterBeanName(Long unitId, String parameterBeanName);
 }

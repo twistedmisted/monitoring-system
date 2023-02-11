@@ -15,9 +15,6 @@ import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
@@ -113,7 +110,7 @@ public class UnitServiceImpl implements UnitService {
     private void setDepartmentParameter(Long departmentId, String beanName, Supplier<Boolean> isParameterChecked) {
         if (unitParameterRepository.existsByUnitIdAndParameterBeanName(departmentId, beanName)) {
             if (!isParameterChecked.get()) {
-                unitParameterRepository.removeByUnitIdAndParameterBeanName(departmentId, beanName);
+                unitParameterRepository.deleteByUnitIdAndParameterBeanName(departmentId, beanName);
             }
         } else {
             if (isParameterChecked.get()) {
