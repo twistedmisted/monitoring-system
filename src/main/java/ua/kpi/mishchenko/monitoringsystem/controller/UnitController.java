@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
@@ -137,18 +139,23 @@ public class UnitController {
     }
 
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
-    public String getInputPage(@PathVariable String enterpriseId,
-                               @PathVariable String departmentId,
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @PathVariable Long departmentId,
+                               @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
         InputDTO inputDTO = new InputDTO();
         inputDTO.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
         model.addAttribute("tableData", inputDTO);
+        model.addAttribute("departmentParameters", departmentParameters);
+        model.addAttribute("activeParameter", parameterName);
         return "input";
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
-    public String getInputPage(@PathVariable String enterpriseId,
-                               @PathVariable String departmentId,
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @PathVariable Long departmentId,
+                               @RequestParam(name = "parameter-name", required = false) String parameterName,
                                @ModelAttribute InputDTO tableData) {
         System.out.println("Here");
         return "redirect:/units";

@@ -3,6 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Заповнення даних</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        $(document).ready(() => {
+            $('#parameter-name').change(() => {
+                const parameterName = $('#parameter-name').val()
+                const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+                const departmentId = /*[[${departmentId}]]*/ '0'
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
+            })
+        })
+        /*]]>*/
+    </script>
 </head>
 <body>
 <style>
@@ -13,6 +28,18 @@
 <form name="input"
       th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
       method="post" th:object="${tableData}">
+    <div>
+        <label for="parameter-name">Показник</label>
+        <select id="parameter-name">
+            <th:block th:each="parameter : ${departmentParameters}">
+                <option th:if="${activeParameter == parameter.beanName}" th:value="${parameter.beanName}"
+                        th:text="${parameter.name}" selected="selected"></option>
+                <option th:unless="${activeParameter == parameter.beanName}" th:value="${parameter.beanName}"
+                        th:text="${parameter.name}"></option>
+            </th:block>
+            <option th:if="${activeParameter == null}" value="" disabled selected>Оберіть показник</option>
+        </select>
+    </div>
     <table>
         <tr>
             <th></th>
