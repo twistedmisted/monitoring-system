@@ -7,4 +7,5 @@ public class ParameterDTO {
 
     private Long id;
     private String name;
+    private String beanName;
 }

@@ -2,7 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/styles/home.css}" />
+    <link rel="stylesheet" th:href="@{/styles/home.css}"/>
     <title>Home</title>
 </head>
 <body>
@@ -18,8 +18,11 @@
                                                                                                   th:src="@{/images/settings.png}"/></a>
                     <ul>
                         <li th:each="department : ${enterprise.departments}"><a href="#" th:text="${department.name}">Department
-                            name</a> <a href="#"><img class="setting-img" th:src="@{/images/settings.png}"/></a></li>
-                        <li class="hide-bullet"><a th:href="@{/units/enterprises/{id}/departments(id=${enterprise.id})}" class="button">Додати відділ</a></li>
+                            name</a> <a
+                                th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
+                                class="setting-img" th:src="@{/images/settings.png}"/></a></li>
+                        <li class="hide-bullet"><a th:href="@{/units/enterprises/{id}/departments(id=${enterprise.id})}"
+                                                   class="button">Додати відділ</a></li>
                     </ul>
                 </li>
                 <li class="hide-bullet"><a href="/units/enterprises" class="button">Додати підприємство</a></li>
