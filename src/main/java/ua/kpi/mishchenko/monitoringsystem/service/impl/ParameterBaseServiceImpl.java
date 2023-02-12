@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterBaseEntity;
+import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
+import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 
 import java.util.ArrayList;
@@ -17,15 +19,17 @@ import java.util.List;
 public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     private final JdbcTemplate jdbcTemplate;
+    private final UnitParameterRepository unitParameterRepository;
 
     @Override
     public InputDTO getDataByParameterName(Long unitId, String parameterName) {
-        List<ParameterBaseEntity> values = jdbcTemplate.query("SELECT * FROM " + parameterName + " ORDER BY year, month",
+        List<ParameterBaseEntity> values = jdbcTemplate.query("SELECT * FROM " + parameterName + " WHERE unit_id = ? ORDER BY year, month",
                 (rs, rowNum) -> new ParameterBaseEntity(
                         rs.getLong("id"),
                         rs.getInt("year"),
                         rs.getInt("month"),
-                        rs.getDouble("value")));
+                        rs.getDouble("value")),
+                unitId);
         InputDTO tableData = new InputDTO();
         if (values.isEmpty()) {
             tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
@@ -56,6 +60,11 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
             }
         }
         yearValues.add(yearValue);
+        UnitParameterEntity unitParameter = unitParameterRepository.findByUnitIdAndParameterBeanName(unitId, parameterName)
+                .orElse(null);
+        if (unitParameter != null && unitParameter.getAmountYear() != yearValues.size()) {
+            yearValues.addAll(Collections.nCopies(unitParameter.getAmountYear() - yearValues.size(), new YearValue()));
+        }
         tableData.setYearValues(yearValues);
         return tableData;
     }

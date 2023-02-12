@@ -16,6 +16,48 @@
                 window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
             })
         })
+
+        function addRow() {
+            const parameterName = $('#parameter-name').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            const url = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/add-year?parameter-name=' + parameterName;
+
+            const settings = {
+                "url": "http://localhost:8080" + url,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+            };
+
+            $.ajax(settings).done(function () {
+                window.location.reload();
+            });
+        }
+
+        function removeRow() {
+            const parameterName = $('#parameter-name').val()
+            const year = $('#year').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            const url = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/remove-year?parameter-name=' + parameterName + '&year=' + year;
+
+            const settings = {
+                "url": "http://localhost:8080" + url,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+            };
+
+            $.ajax(settings).done(function () {
+                window.location.reload();
+            });
+        }
+
         /*]]>*/
     </script>
 </head>
@@ -52,7 +94,7 @@
             </th:block>
         </select>
     </div>
-    <table>
+    <table id="data-table">
         <tr>
             <th></th>
             <th>Січень</th>
@@ -86,5 +128,9 @@
     </table>
     <button type="submit">Зберегти</button>
 </form>
+<button onclick="addRow()">Додати рік</button>
+<label for="year">Рік для видалення</label>
+<input type="text" id="year">
+<button onclick="removeRow()">Видалити рік</button>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package ua.kpi.mishchenko.monitoringsystem.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -20,6 +21,9 @@ public class UnitParameterEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
+    @Column(name = "amount_year", nullable = false)
+    private Integer amountYear;
 
     @ManyToOne
     @JoinColumn(name = "unit_id", nullable = false)

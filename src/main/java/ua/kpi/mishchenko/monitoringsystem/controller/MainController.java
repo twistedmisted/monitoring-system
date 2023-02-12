@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 @Controller
 @RequestMapping("/units")
 @RequiredArgsConstructor
-public class UnitController {
+public class MainController {
 
     private final UnitService unitService;
     private final UnitParameterService unitParameterService;
@@ -161,10 +161,27 @@ public class UnitController {
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
-    public String getInputPage(@PathVariable Long enterpriseId,
-                               @PathVariable Long departmentId,
-                               @ModelAttribute InputDTO tableData) {
+    public String saveDepartmentData(@PathVariable Long enterpriseId,
+                                     @PathVariable Long departmentId,
+                                     @ModelAttribute InputDTO tableData) {
         parameterBaseService.saveData(departmentId, tableData.getParameterName(), tableData);
         return "redirect:/units";
+    }
+
+    @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/add-year")
+    public String addYear(@PathVariable Long enterpriseId,
+                          @PathVariable Long departmentId,
+                          @RequestParam(value = "parameter-name") String parameterName) {
+        unitParameterService.addYear(departmentId, parameterName);
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
+    }
+
+    @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/remove-year")
+    public String removeYear(@PathVariable Long enterpriseId,
+                             @PathVariable Long departmentId,
+                             @RequestParam(value = "parameter-name") String parameterName,
+                             @RequestParam(value = "year") Integer year) {
+        unitParameterService.removeYear(departmentId, parameterName, year);
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
     }
 }

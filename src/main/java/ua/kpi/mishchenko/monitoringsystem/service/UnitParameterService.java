@@ -9,4 +9,8 @@ public interface UnitParameterService {
     List<String> getAllBeanNameParametersByUnitId(Long unitId);
 
     List<ParameterDTO> getAllParametersByUnitId(Long unitId);
+
+    void addYear(Long unitId, String parameterName);
+
+    void removeYear(Long unitId, String parameterName, Integer year);
 }

@@ -31,15 +31,6 @@ public class UnitEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-//    @OneToMany(mappedBy = "unit", fetch = LAZY, cascade = ALL)
-//    private List<AmbientTemperatureEntity> ambientTemperatures = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "unit", fetch = LAZY, cascade = ALL)
-//    private List<COEmissionsEntity> coEmissions = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "unit", fetch = LAZY, cascade = ALL)
-//    private List<CoalCostsEntity> coalCosts = new ArrayList<>();
-
     @OneToMany(mappedBy = "unit", cascade = ALL)
     private List<UnitParameterEntity> parameters = new ArrayList<>();
 }

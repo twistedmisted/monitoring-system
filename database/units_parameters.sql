@@ -2,7 +2,8 @@ CREATE TABLE units_parameters
 (
     id           BIGINT GENERATED ALWAYS AS IDENTITY,
     unit_id      BIGINT,
-    parameter_id BIGINT
+    parameter_id BIGINT,
+    amount_year  INT NOT NULL DEFAULT 10
 );
 
 ALTER TABLE units_parameters

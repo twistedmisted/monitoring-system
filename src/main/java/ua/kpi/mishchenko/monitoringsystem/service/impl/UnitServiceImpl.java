@@ -117,6 +117,7 @@ public class UnitServiceImpl implements UnitService {
                 UnitParameterEntity up = new UnitParameterEntity();
                 up.setUnit(unitRepository.findById(departmentId).orElseThrow());
                 up.setParameter(parameterRepository.findByBeanName(beanName).orElseThrow());
+                up.setAmountYear(10);
                 unitParameterRepository.save(up);
             }
         }

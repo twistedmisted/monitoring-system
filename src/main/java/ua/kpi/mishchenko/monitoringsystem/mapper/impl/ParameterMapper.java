@@ -84,7 +84,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
 
     public List<String> upEntitiesToBeanNameString(List<UnitParameterEntity> entities) {
         if (entities == null || entities.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
         List<String> beanNames = new ArrayList<>();
         for (UnitParameterEntity entity : entities) {
