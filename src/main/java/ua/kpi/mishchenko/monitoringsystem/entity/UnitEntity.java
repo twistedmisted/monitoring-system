@@ -1,6 +1,11 @@
 package ua.kpi.mishchenko.monitoringsystem.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,15 +30,6 @@ public class UnitEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
-
-//    @OneToMany(mappedBy = "unit", fetch = LAZY, cascade = ALL)
-//    private List<AmbientTemperatureEntity> ambientTemperatures = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "unit", fetch = LAZY, cascade = ALL)
-//    private List<COEmissionsEntity> coEmissions = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "unit", fetch = LAZY, cascade = ALL)
-//    private List<CoalCostsEntity> coalCosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "unit", cascade = ALL)
     private List<UnitParameterEntity> parameters = new ArrayList<>();

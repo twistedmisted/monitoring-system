@@ -2,49 +2,28 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <!--    <link rel="stylesheet" href="../static/styles/home.css"/>-->
     <link rel="stylesheet" th:href="@{/styles/home.css}"/>
     <title>Home</title>
 </head>
 <body>
-<div class="center">
-    <h1>Home</h1>
-</div>
-<div class="row">
-    <div class="left">
-        <div>
-            <ol>
-                <li th:each="enterprise : ${enterprises}">
-                    <a href="#" th:text="${enterprise.name}">Enterprise name</a> <a href="#"><img class="setting-img"
-                                                                                                  th:src="@{/images/settings.png}"/></a>
-                    <ul>
-                        <li th:each="department : ${enterprise.departments}"><a href="#" th:text="${department.name}">Department
-                            name</a> <a
-                                th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
-                                class="setting-img" th:src="@{/images/settings.png}"/></a></li>
-                        <li class="hide-bullet"><a th:href="@{/units/enterprises/{id}/departments(id=${enterprise.id})}"
-                                                   class="button">Додати відділ</a></li>
-                    </ul>
-                </li>
-                <li class="hide-bullet"><a href="/units/enterprises" class="button">Додати підприємство</a></li>
-                <!--                <li><a href="#">First enterprise</a> <a href="#"><img class="setting-img"-->
-                <!--                                                                      src="../static/images/settings.png"/></a>-->
-                <!--                    <ul>-->
-                <!--                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"-->
-                <!--                                                                        src="../static/images/settings.png"/></a></li>-->
-                <!--                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"-->
-                <!--                                                                        src="../static/images/settings.png"/></a></li>-->
-                <!--                        <li><a href="#">First unit</a> <a href="#"><img class="setting-img"-->
-                <!--                                                                        src="../static/images/settings.png"/></a></li>-->
-                <!--                        <li class="hide-bullet"><a href="#" class="button">Додати відділ</a></li>-->
-                <!--                    </ul>-->
-                <!--                </li>-->
-                <!--                <li class="hide-bullet"><a href="#" class="button">Додати підприємство</a></li>-->
-            </ol>
-        </div>
-    </div>
-    <div class="right">
-
-    </div>
+<div class="container">
+    <h2>Підприємства та відділи</h2>
+    <ol class="myUL">
+        <li th:each="enterprise : ${enterprises}">
+            <a th:href="@{/units/enterprises/__${enterprise.id}__}" th:text="${enterprise.name}">Enterprise name</a>
+            <ul>
+                <li th:each="department : ${enterprise.departments}"><a
+                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterprise.id}, departmentId=${department.id})}"
+                        th:text="${department.name}">Department name</a> <a
+                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
+                        class="setting-img" th:src="@{/images/settings.png}"/></a></li>
+                <li class="hide-bullet"><a th:href="@{/units/enterprises/{id}/departments(id=${enterprise.id})}"
+                                           class="button">Додати відділ</a></li>
+            </ul>
+        </li>
+        <li class="hide-bullet"><a href="/units/enterprises" class="button">Додати підприємство</a></li>
+    </ol>
 </div>
 </body>
 </html>

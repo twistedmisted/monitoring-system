@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
+import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
 
@@ -24,10 +27,11 @@ import java.util.function.Consumer;
 @Controller
 @RequestMapping("/units")
 @RequiredArgsConstructor
-public class UnitController {
+public class MainController {
 
     private final UnitService unitService;
     private final UnitParameterService unitParameterService;
+    private final ParameterBaseService parameterBaseService;
 
     @GetMapping
     public String getHomePage(Model model) {
@@ -136,21 +140,88 @@ public class UnitController {
         return "redirect:/units";
     }
 
-    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
-    public String getInputPage(@PathVariable String enterpriseId,
-                               @PathVariable String departmentId,
+    @GetMapping("/enterprises/{enterpriseId}")
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        InputDTO tableData = new InputDTO();
+        if (parameterName != null && !parameterName.isBlank()) {
+            tableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            tableData.setParameterName(parameterName);
+        } else {
+            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+        }
+        model.addAttribute("tableData", tableData);
+        model.addAttribute("departmentParameters", departmentParameters);
+        return "output";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/year")
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @RequestParam(value = "value", required = false) Integer year,
+                               Model model) {
+        if (year == null) {
+            return "output-by-year";
+        }
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        List<InputDTO> tableDataList = new ArrayList<>();
+        for (ParameterDTO parameterName : departmentParameters) {
+            InputDTO tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
+            tableData.setParameterName(parameterName.getName());
+            tableDataList.add(tableData);
+        }
+        if (tableDataList.isEmpty()) {
+            model.addAttribute("message", "Дані за цей рік відсутні");
+        } else {
+            model.addAttribute("tableDataList", tableDataList);
+            model.addAttribute("year", year);
+        }
+        return "output-by-year";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @PathVariable Long departmentId,
+                               @RequestParam(value = "parameter-name", required = false) String parameterName,
+                               Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
         InputDTO inputDTO = new InputDTO();
         inputDTO.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
-        model.addAttribute("tableData", inputDTO);
+        InputDTO tableData = new InputDTO();
+        if (parameterName != null && !parameterName.isBlank()) {
+            tableData = parameterBaseService.getDataByParameterName(departmentId, parameterName);
+            tableData.setParameterName(parameterName);
+        } else {
+            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+        }
+        model.addAttribute("tableData", tableData);
+        model.addAttribute("departmentParameters", departmentParameters);
         return "input";
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
-    public String getInputPage(@PathVariable String enterpriseId,
-                               @PathVariable String departmentId,
-                               @ModelAttribute InputDTO tableData) {
-        System.out.println("Here");
-        return "redirect:/units";
+    public String saveDepartmentData(@PathVariable Long enterpriseId,
+                                     @PathVariable Long departmentId,
+                                     @ModelAttribute InputDTO tableData) {
+        parameterBaseService.saveData(departmentId, tableData.getParameterName(), tableData);
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + tableData.getParameterName();
+    }
+
+    @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/add-year")
+    public String addYear(@PathVariable Long enterpriseId,
+                          @PathVariable Long departmentId,
+                          @RequestParam(value = "parameter-name") String parameterName) {
+        unitParameterService.addYear(departmentId, parameterName);
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
+    }
+
+    @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/remove-year")
+    public String removeYear(@PathVariable Long enterpriseId,
+                             @PathVariable Long departmentId,
+                             @RequestParam(value = "parameter-name") String parameterName,
+                             @RequestParam(value = "year") Integer year) {
+        unitParameterService.removeYear(departmentId, parameterName, year);
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
     }
 }

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заповнення даних</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        function showForYear() {
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const year = $('#year').val()
+            window.location = '/units/enterprises/' + enterpriseId + '/year?value=' + year
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+<style>
+    table {
+        border: 1px solid black;
+        table-layout: fixed;
+        max-width: 1200px;
+        /*width: 100%;*/
+    }
+
+    th, td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+        /*width: 100%;*/
+        word-wrap: break-word;
+    }
+</style>
+<label for="year">Введіть рік</label>
+<input type="text" id="year">
+<button onclick="showForYear()">Відобразити дані</button>
+<p th:if="${tableDataList.isEmpty()}" th:text="${message}"></p>
+<table th:unless="${tableDataList.isEmpty()}" id="data-table">
+    <tbody id="table-body">
+    <tr>
+        <th>Рік</th>
+        <th>Показник</th>
+        <th>Січень</th>
+        <th>Лютий</th>
+        <th>Березень</th>
+        <th>Квітень</th>
+        <th>Травень</th>
+        <th>Червень</th>
+        <th>Липень</th>
+        <th>Серпень</th>
+        <th>Вересень</th>
+        <th>Жовтень</th>
+        <th>Листопад</th>
+        <th>Грудень</th>
+        <th>Усього за рік</th>
+    </tr>
+    <tr>
+        <th th:rowspan="${tableDataList.size() + 1}" th:text="${year}"></th>
+    </tr>
+    <th:block th:each="tableData : ${tableDataList}">
+        <tr th:each="row : ${tableData.yearValues}">
+            <th th:text="${tableData.parameterName}"></th>
+            <td th:text="${row.january}"></td>
+            <td th:text="${row.february}"></td>
+            <td th:text="${row.march}"></td>
+            <td th:text="${row.april}"></td>
+            <td th:text="${row.may}"></td>
+            <td th:text="${row.june}"></td>
+            <td th:text="${row.july}"></td>
+            <td th:text="${row.august}"></td>
+            <td th:text="${row.september}"></td>
+            <td th:text="${row.october}"></td>
+            <td th:text="${row.november}"></td>
+            <td th:text="${row.december}"></td>
+            <td th:text="${row.getTotalValue()}"></td>
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+</body>
+</html>
