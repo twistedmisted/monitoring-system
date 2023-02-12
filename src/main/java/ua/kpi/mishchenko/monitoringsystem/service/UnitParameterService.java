@@ -13,4 +13,6 @@ public interface UnitParameterService {
     void addYear(Long unitId, String parameterName);
 
     void removeYear(Long unitId, String parameterName, Integer year);
+
+    List<ParameterDTO> getAllParametersByEnterpriseId(Long enterpriseId);
 }

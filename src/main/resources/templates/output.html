@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заповнення даних</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        $(document).ready(() => {
+            $('#parameter-name').change(() => {
+                const parameterName = $('#parameter-name').val()
+                const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+                window.location = '/units/enterprises/' + enterpriseId + '?parameter-name=' + parameterName
+            })
+        })
+        /*]]>*/
+    </script>
+</head>
+<body>
+<style>
+
+    table {
+        border: 1px solid black;
+        table-layout: fixed;
+        max-width: 1200px;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+        width: 100%;
+    }
+</style>
+<div>
+    <label for="parameter-name">Показник</label>
+    <select id="parameter-name">
+        <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
+        </option>
+        <th:block th:each="parameter : ${departmentParameters}">
+            <option th:if="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}" selected="selected"></option>
+            <option th:unless="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}"></option>
+        </th:block>
+    </select>
+</div>
+<table id="data-table">
+    <tbody id="table-body">
+    <tr>
+        <th></th>
+        <th>Січень</th>
+        <th>Лютий</th>
+        <th>Березень</th>
+        <th>Квітень</th>
+        <th>Травень</th>
+        <th>Червень</th>
+        <th>Липень</th>
+        <th>Серпень</th>
+        <th>Вересень</th>
+        <th>Жовтень</th>
+        <th>Листопад</th>
+        <th>Грудень</th>
+    </tr>
+    <tr th:each="row : ${tableData.yearValues}">
+        <th th:text="${row.year}"></th>
+        <th th:text="${row.january}"></th>
+        <th th:text="${row.february}"></th>
+        <th th:text="${row.march}"></th>
+        <th th:text="${row.april}"></th>
+        <th th:text="${row.may}"></th>
+        <th th:text="${row.june}"></th>
+        <th th:text="${row.july}"></th>
+        <th th:text="${row.august}"></th>
+        <th th:text="${row.september}"></th>
+        <th th:text="${row.october}"></th>
+        <th th:text="${row.november}"></th>
+        <th th:text="${row.december}"></th>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/units/enterprises/__${enterpriseId}__/year}">Загальна за роками</a>
+</body>
+</html>

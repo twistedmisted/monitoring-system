@@ -140,6 +140,46 @@ public class MainController {
         return "redirect:/units";
     }
 
+    @GetMapping("/enterprises/{enterpriseId}")
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @RequestParam(value = "parameter-name", required = false) String parameterName,
+                               Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        InputDTO tableData = new InputDTO();
+        if (parameterName != null && !parameterName.isBlank()) {
+            tableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            tableData.setParameterName(parameterName);
+        } else {
+            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+        }
+        model.addAttribute("tableData", tableData);
+        model.addAttribute("departmentParameters", departmentParameters);
+        return "output";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/year")
+    public String getInputPage(@PathVariable Long enterpriseId,
+                               @RequestParam(value = "value", required = false) Integer year,
+                               Model model) {
+        if (year == null) {
+            return "output-by-year";
+        }
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        List<InputDTO> tableDataList = new ArrayList<>();
+        for (ParameterDTO parameterName : departmentParameters) {
+            InputDTO tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
+            tableData.setParameterName(parameterName.getName());
+            tableDataList.add(tableData);
+        }
+        if (tableDataList.isEmpty()) {
+            model.addAttribute("message", "Дані за цей рік відсутні");
+        } else {
+            model.addAttribute("tableDataList", tableDataList);
+            model.addAttribute("year", year);
+        }
+        return "output-by-year";
+    }
+
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
     public String getInputPage(@PathVariable Long enterpriseId,
                                @PathVariable Long departmentId,
@@ -165,7 +205,7 @@ public class MainController {
                                      @PathVariable Long departmentId,
                                      @ModelAttribute InputDTO tableData) {
         parameterBaseService.saveData(departmentId, tableData.getParameterName(), tableData);
-        return "redirect:/units";
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + tableData.getParameterName();
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/add-year")

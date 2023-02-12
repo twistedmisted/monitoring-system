@@ -58,6 +58,29 @@
             });
         }
 
+        function generate() {
+            const min = 0;
+            const max = 200;
+            const decimals = 2;
+            const table = document.getElementById("data-table");
+            let year = 2013;
+            for (let i = 1, row; row = table.rows[i]; i++) {
+                row.cells[0].children[0].value = year;
+                year = year + 1;
+            }
+            for (let i = 1, row; row = table.rows[i]; i++) {
+                for (let j = 1, col; col = row.cells[j]; j++) {
+                    col.children[0].value = getRandomFloat(min, max, decimals);
+                }
+            }
+
+        }
+
+        function getRandomFloat(min, max, decimals) {
+            const str = (Math.random() * (max - min) + min).toFixed(decimals);
+            return parseFloat(str);
+        }
+
         /*]]>*/
     </script>
 </head>
@@ -77,6 +100,18 @@
         max-width: 300px;
         width: 100%;
     }
+
+    .button {
+        font-size: 12px;
+        text-decoration: none;
+        background-color: #EEEEEE;
+        color: #333333;
+        padding: 2px 6px 2px 6px;
+        border-top: 1px solid #CCCCCC;
+        border-right: 1px solid #333333;
+        border-bottom: 1px solid #333333;
+        border-left: 1px solid #CCCCCC;
+    }
 </style>
 <form name="input"
       th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
@@ -95,6 +130,7 @@
         </select>
     </div>
     <table id="data-table">
+        <tbody id="table-body">
         <tr>
             <th></th>
             <th>Січень</th>
@@ -125,12 +161,20 @@
             <th><input th:field="*{yearValues[__${itemStat.index}__].november}"></th>
             <th><input th:field="*{yearValues[__${itemStat.index}__].december}"></th>
         </tr>
+        </tbody>
     </table>
     <button type="submit">Зберегти</button>
 </form>
 <button onclick="addRow()">Додати рік</button>
+<br>
 <label for="year">Рік для видалення</label>
 <input type="text" id="year">
 <button onclick="removeRow()">Видалити рік</button>
+<br>
+<button onclick="generate()">Згенерувати дані</button>
+<br>
+<br>
+<br>
+<a class="button" href="/units">На головну</a>
 </body>
 </html>

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.impl.ParameterMapper;
+import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 
@@ -18,6 +19,7 @@ import static java.util.Objects.isNull;
 public class UnitParameterServiceImpl implements UnitParameterService {
 
     private final UnitParameterRepository unitParameterRepository;
+    private final ParameterRepository parameterRepository;
     private final ParameterMapper parameterMapper;
     private final JdbcTemplate jdbcTemplate;
 
@@ -52,5 +54,10 @@ public class UnitParameterServiceImpl implements UnitParameterService {
         unitParameter.setAmountYear(unitParameter.getAmountYear() - 1);
         unitParameterRepository.save(unitParameter);
         jdbcTemplate.update("DELETE FROM " + parameterName + " WHERE unit_id = ? AND year = ?", unitId, year);
+    }
+
+    @Override
+    public List<ParameterDTO> getAllParametersByEnterpriseId(Long enterpriseId) {
+        return parameterMapper.entitiesToDtos(parameterRepository.findAllByUnitParentId(enterpriseId));
     }
 }

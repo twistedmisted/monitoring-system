@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterBaseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterBaseEntity;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
@@ -38,6 +39,112 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
         List<YearValue> yearValues = new ArrayList<>();
         YearValue yearValue = new YearValue();
         for (ParameterBaseEntity parameterBase : values) {
+            if (!yearValue.getYear().equals("xxxx") &&
+                    !yearValue.getYear().equals(String.valueOf(parameterBase.getYear()))) {
+                yearValues.add(yearValue);
+                yearValue = new YearValue();
+            }
+            yearValue.setYear(String.valueOf(parameterBase.getYear()));
+            switch (parameterBase.getMonth()) {
+                case 1 -> yearValue.setJanuary(parameterBase.getValue());
+                case 2 -> yearValue.setFebruary(parameterBase.getValue());
+                case 3 -> yearValue.setMarch(parameterBase.getValue());
+                case 4 -> yearValue.setApril(parameterBase.getValue());
+                case 5 -> yearValue.setMay(parameterBase.getValue());
+                case 6 -> yearValue.setJune(parameterBase.getValue());
+                case 7 -> yearValue.setJuly(parameterBase.getValue());
+                case 8 -> yearValue.setAugust(parameterBase.getValue());
+                case 9 -> yearValue.setSeptember(parameterBase.getValue());
+                case 10 -> yearValue.setOctober(parameterBase.getValue());
+                case 11 -> yearValue.setNovember(parameterBase.getValue());
+                case 12 -> yearValue.setDecember(parameterBase.getValue());
+            }
+        }
+        yearValues.add(yearValue);
+        UnitParameterEntity unitParameter = unitParameterRepository.findByUnitIdAndParameterBeanName(unitId, parameterName)
+                .orElse(null);
+        if (unitParameter != null && unitParameter.getAmountYear() != yearValues.size()) {
+            yearValues.addAll(Collections.nCopies(unitParameter.getAmountYear() - yearValues.size(), new YearValue()));
+        }
+        tableData.setYearValues(yearValues);
+        return tableData;
+    }
+
+    @Override
+    public InputDTO getDataForEnterpriseByParameterName(Long unitId, String parameterName) {
+        List<ParameterBaseDTO> values = jdbcTemplate.query("SELECT ROUND(SUM(parameter_table.value)::numeric, 2) AS value,\n" +
+                        "       parameter_table.year,\n" +
+                        "       parameter_table.month\n" +
+                        "FROM " + parameterName + " parameter_table\n" +
+                        "         INNER JOIN units u on u.id = parameter_table.unit_id\n" +
+                        "WHERE u.parent_id = ?\n" +
+                        "GROUP BY parameter_table.year, parameter_table.month;",
+                (rs, rowNum) -> new ParameterBaseDTO(
+                        rs.getInt("year"),
+                        rs.getInt("month"),
+                        rs.getDouble("value")),
+                unitId);
+        InputDTO tableData = new InputDTO();
+        if (values.isEmpty()) {
+            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+            return tableData;
+        }
+        List<YearValue> yearValues = new ArrayList<>();
+        YearValue yearValue = new YearValue();
+        for (ParameterBaseDTO parameterBase : values) {
+            if (!yearValue.getYear().equals("xxxx") &&
+                    !yearValue.getYear().equals(String.valueOf(parameterBase.getYear()))) {
+                yearValues.add(yearValue);
+                yearValue = new YearValue();
+            }
+            yearValue.setYear(String.valueOf(parameterBase.getYear()));
+            switch (parameterBase.getMonth()) {
+                case 1 -> yearValue.setJanuary(parameterBase.getValue());
+                case 2 -> yearValue.setFebruary(parameterBase.getValue());
+                case 3 -> yearValue.setMarch(parameterBase.getValue());
+                case 4 -> yearValue.setApril(parameterBase.getValue());
+                case 5 -> yearValue.setMay(parameterBase.getValue());
+                case 6 -> yearValue.setJune(parameterBase.getValue());
+                case 7 -> yearValue.setJuly(parameterBase.getValue());
+                case 8 -> yearValue.setAugust(parameterBase.getValue());
+                case 9 -> yearValue.setSeptember(parameterBase.getValue());
+                case 10 -> yearValue.setOctober(parameterBase.getValue());
+                case 11 -> yearValue.setNovember(parameterBase.getValue());
+                case 12 -> yearValue.setDecember(parameterBase.getValue());
+            }
+        }
+        yearValues.add(yearValue);
+        UnitParameterEntity unitParameter = unitParameterRepository.findByUnitIdAndParameterBeanName(unitId, parameterName)
+                .orElse(null);
+        if (unitParameter != null && unitParameter.getAmountYear() != yearValues.size()) {
+            yearValues.addAll(Collections.nCopies(unitParameter.getAmountYear() - yearValues.size(), new YearValue()));
+        }
+        tableData.setYearValues(yearValues);
+        return tableData;
+    }
+
+    @Override
+    public InputDTO getDataForEnterpriseByParameterNameAndYear(Long unitId, String parameterName, Integer year) {
+        List<ParameterBaseDTO> values = jdbcTemplate.query("SELECT ROUND(SUM(parameter_table.value)::numeric, 2) AS value,\n" +
+                        "       parameter_table.year,\n" +
+                        "       parameter_table.month\n" +
+                        "FROM " + parameterName + " parameter_table\n" +
+                        "         INNER JOIN units u on u.id = parameter_table.unit_id\n" +
+                        "WHERE u.parent_id = ? AND parameter_table.year = ?\n" +
+                        "GROUP BY parameter_table.year, parameter_table.month;",
+                (rs, rowNum) -> new ParameterBaseDTO(
+                        rs.getInt("year"),
+                        rs.getInt("month"),
+                        rs.getDouble("value")),
+                unitId, year);
+        InputDTO tableData = new InputDTO();
+        if (values.isEmpty()) {
+            tableData.setYearValues(new ArrayList<>(Collections.nCopies(1, new YearValue())));
+            return tableData;
+        }
+        List<YearValue> yearValues = new ArrayList<>();
+        YearValue yearValue = new YearValue();
+        for (ParameterBaseDTO parameterBase : values) {
             if (!yearValue.getYear().equals("xxxx") &&
                     !yearValue.getYear().equals(String.valueOf(parameterBase.getYear()))) {
                 yearValues.add(yearValue);
