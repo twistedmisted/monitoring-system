@@ -15,6 +15,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
+import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
 
@@ -30,6 +31,7 @@ public class UnitController {
 
     private final UnitService unitService;
     private final UnitParameterService unitParameterService;
+    private final ParameterBaseService parameterBaseService;
 
     @GetMapping
     public String getHomePage(Model model) {
@@ -146,10 +148,15 @@ public class UnitController {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
         InputDTO inputDTO = new InputDTO();
         inputDTO.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
-        // TODO: get active parameter and show values
-        model.addAttribute("tableData", inputDTO);
+        InputDTO tableData = new InputDTO();
+        if (parameterName != null && !parameterName.isBlank()) {
+            tableData = parameterBaseService.getDataByParameterName(departmentId, parameterName);
+            tableData.setParameterName(parameterName);
+        } else {
+            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+        }
+        model.addAttribute("tableData", tableData);
         model.addAttribute("departmentParameters", departmentParameters);
-        model.addAttribute("activeParameter", parameterName);
         return "input";
     }
 
@@ -158,8 +165,7 @@ public class UnitController {
                                @PathVariable Long departmentId,
                                @RequestParam(name = "parameter-name", required = false) String parameterName,
                                @ModelAttribute InputDTO tableData) {
-        System.out.println("Here");
-        // TODO: parse and save values
+        parameterBaseService.saveData(departmentId, tableData.getParameterName(), tableData);
         return "redirect:/units";
     }
 }

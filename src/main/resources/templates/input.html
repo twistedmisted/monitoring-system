@@ -21,23 +21,35 @@
 </head>
 <body>
 <style>
-    table, th, td {
+
+    table {
         border: 1px solid black;
+        table-layout: fixed;
+        max-width: 1200px;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+        width: 100%;
     }
 </style>
 <form name="input"
-      th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
+      th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input?(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
       method="post" th:object="${tableData}">
     <div>
         <label for="parameter-name">Показник</label>
-        <select id="parameter-name">
+        <select id="parameter-name" th:field="*{parameterName}">
+            <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
+            </option>
             <th:block th:each="parameter : ${departmentParameters}">
-                <option th:if="${activeParameter == parameter.beanName}" th:value="${parameter.beanName}"
+                <option th:if="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                         th:text="${parameter.name}" selected="selected"></option>
-                <option th:unless="${activeParameter == parameter.beanName}" th:value="${parameter.beanName}"
+                <option th:unless="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                         th:text="${parameter.name}"></option>
             </th:block>
-            <option th:if="${activeParameter == null}" value="" disabled selected>Оберіть показник</option>
         </select>
     </div>
     <table>
