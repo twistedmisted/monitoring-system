@@ -163,7 +163,6 @@ public class UnitController {
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
     public String getInputPage(@PathVariable Long enterpriseId,
                                @PathVariable Long departmentId,
-                               @RequestParam(name = "parameter-name", required = false) String parameterName,
                                @ModelAttribute InputDTO tableData) {
         parameterBaseService.saveData(departmentId, tableData.getParameterName(), tableData);
         return "redirect:/units";

@@ -37,7 +37,7 @@
     }
 </style>
 <form name="input"
-      th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input?(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
+      th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
       method="post" th:object="${tableData}">
     <div>
         <label for="parameter-name">Показник</label>
