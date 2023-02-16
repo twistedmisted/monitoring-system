@@ -4,27 +4,47 @@ import lombok.Data;
 
 import java.text.DecimalFormat;
 
+import static java.lang.Double.parseDouble;
+
 @Data
 public class YearValue {
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
 
     private String year = "xxxx";
-    private Double january = 0.0;
-    private Double february = 0.0;
-    private Double march = 0.0;
-    private Double april = 0.0;
-    private Double may = 0.0;
-    private Double june = 0.0;
-    private Double july = 0.0;
-    private Double august = 0.0;
-    private Double september = 0.0;
-    private Double october = 0.0;
-    private Double november = 0.0;
-    private Double december = 0.0;
+    private String january = "";
+    private String february = "";
+    private String march = "";
+    private String april = "";
+    private String may = "";
+    private String june = "";
+    private String july = "";
+    private String august = "";
+    private String september = "";
+    private String october = "";
+    private String november = "";
+    private String december = "";
 
     public String getTotalValue() {
-        return DECIMAL_FORMAT.format(january + february + march + april + may + june +
-                july + august + september + october + november + december);
+        return DECIMAL_FORMAT.format(parseDouble(january) +
+                parseDouble(february) +
+                parseDouble(february) +
+                parseDouble(april) +
+                parseDouble(may) +
+                parseDouble(june) +
+                parseDouble(july) +
+                parseDouble(august) +
+                parseDouble(september) +
+                parseDouble(october) +
+                parseDouble(november) +
+                parseDouble(december));
+    }
+
+    public static Double toDoubleValue(String month) {
+        return month.isBlank() ? 0.0 : Double.parseDouble(month);
+    }
+
+    public static String toStringValue(Double month) {
+        return month == 0.0 ? "" : String.valueOf(month);
     }
 }

@@ -1,10 +1,13 @@
 package ua.kpi.mishchenko.monitoringsystem.service;
 
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.OutputData;
 
 public interface ParameterBaseService {
 
     InputDTO getDataByParameterName(Long unitId, String parameterName);
+
+    OutputData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
 
     InputDTO getDataForEnterpriseByParameterName(Long unitId, String parameterName);
 

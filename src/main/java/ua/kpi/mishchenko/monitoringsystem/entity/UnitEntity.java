@@ -33,4 +33,7 @@ public class UnitEntity {
 
     @OneToMany(mappedBy = "unit", cascade = ALL)
     private List<UnitParameterEntity> parameters = new ArrayList<>();
+
+    @OneToMany(mappedBy = "unit", cascade = ALL)
+    private List<WorkingDaysEntity> workingDays = new ArrayList<>();
 }

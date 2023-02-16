@@ -12,4 +12,5 @@ public class UnitDTO {
     private Long parentId;
     private String name;
     private List<ParameterDTO> parameters = new ArrayList<>();
+    private List<WorkingDaysDTO> workingDays = new ArrayList<>();
 }

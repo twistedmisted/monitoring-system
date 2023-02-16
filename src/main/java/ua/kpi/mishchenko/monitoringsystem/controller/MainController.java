@@ -11,13 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.OutputData;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
+import ua.kpi.mishchenko.monitoringsystem.service.WorkingDaysService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +35,7 @@ public class MainController {
     private final UnitService unitService;
     private final UnitParameterService unitParameterService;
     private final ParameterBaseService parameterBaseService;
+    private final WorkingDaysService workingDaysService;
 
     @GetMapping
     public String getHomePage(Model model) {
@@ -146,6 +150,7 @@ public class MainController {
                                Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
         InputDTO tableData = new InputDTO();
+        OutputData outputData = new OutputData();
         if (parameterName != null && !parameterName.isBlank()) {
             tableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
             tableData.setParameterName(parameterName);
@@ -186,8 +191,6 @@ public class MainController {
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
-        InputDTO inputDTO = new InputDTO();
-        inputDTO.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
         InputDTO tableData = new InputDTO();
         if (parameterName != null && !parameterName.isBlank()) {
             tableData = parameterBaseService.getDataByParameterName(departmentId, parameterName);
@@ -223,5 +226,31 @@ public class MainController {
                              @RequestParam(value = "year") Integer year) {
         unitParameterService.removeYear(departmentId, parameterName, year);
         return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/working-days")
+    public String getWorkingDaysPage(@PathVariable Long enterpriseId,
+                                     @PathVariable Long departmentId,
+                                     @RequestParam(name = "year", required = false) Integer year,
+                                     Model model) {
+        UnitDTO department = unitService.getUnitById(departmentId);
+        WorkingDaysDTO workingDays = workingDaysService.getWorkingDaysByUnitIdAndYear(departmentId, year);
+        model.addAttribute("department", department);
+        model.addAttribute("workingDays", workingDays);
+        return "working-days";
+    }
+
+    @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/working-days")
+    public String saveWorkingDays(@PathVariable Long enterpriseId,
+                                  @PathVariable Long departmentId,
+                                  @RequestParam(name = "year", required = false) Integer year,
+                                  @ModelAttribute WorkingDaysDTO workingDays) {
+//        UnitDTO department = unitService.getUnitById(departmentId);
+        workingDays.setUnitId(departmentId);
+        workingDaysService.saveWorkingDays(workingDays);
+//        WorkingDaysDTO workingDays = workingDaysService.getWorkingDaysByUnitIdAndYear(departmentId, year);
+//        model.addAttribute("department", department);
+//        model.addAttribute("workingDays", workingDays);
+        return "redirect:/units";
     }
 }
