@@ -4,10 +4,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ua.kpi.mishchenko.monitoringsystem.entity.WorkingDaysEntity;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface WorkingDaysRepository extends CrudRepository<WorkingDaysEntity, Long> {
 
-    Optional<WorkingDaysEntity> findByUnitIdAndYear(Long unitId, Integer year);
+    List<WorkingDaysEntity> findAllByUnitIdAndYearOrderByYearAscMonthAsc(Long unitId, Integer year);
 }

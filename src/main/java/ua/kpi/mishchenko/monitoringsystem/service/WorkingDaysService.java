@@ -1,10 +1,10 @@
 package ua.kpi.mishchenko.monitoringsystem.service;
 
-import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 
 public interface WorkingDaysService {
 
-    WorkingDaysDTO getWorkingDaysByUnitIdAndYear(Long unitId, Integer year);
+    WorkingDaysByYear getAllWorkingDaysByUnitIdAndYear(Long unitId, Integer year);
 
-    void saveWorkingDays(WorkingDaysDTO workingDays);
+    void saveWorkingDays(WorkingDaysByYear workingDays);
 }

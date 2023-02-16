@@ -1,11 +1,15 @@
 package ua.kpi.mishchenko.monitoringsystem.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysDTO;
 import ua.kpi.mishchenko.monitoringsystem.mapper.impl.WorkingDaysMapper;
 import ua.kpi.mishchenko.monitoringsystem.repository.WorkingDaysRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.WorkingDaysService;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -15,18 +19,36 @@ public class WorkingDaysServiceImpl implements WorkingDaysService {
     private final WorkingDaysRepository workingDaysRepository;
 
     @Override
-    public WorkingDaysDTO getWorkingDaysByUnitIdAndYear(Long unitId, Integer year) {
-        WorkingDaysDTO workingDaysDTO = workingDaysMapper.entityToDto(workingDaysRepository.findByUnitIdAndYear(unitId, year)
-                .orElse(null));
-        if (workingDaysDTO == null) {
-            workingDaysDTO = new WorkingDaysDTO();
-            workingDaysDTO.setYear(year);
+    public WorkingDaysByYear getAllWorkingDaysByUnitIdAndYear(Long unitId, Integer year) {
+        List<WorkingDaysDTO> workingDays = workingDaysMapper.entitiesToDtos(workingDaysRepository.findAllByUnitIdAndYearOrderByYearAscMonthAsc(unitId, year));
+        if (workingDays.isEmpty()) {
+            return new WorkingDaysByYear(year);
         }
-        return workingDaysDTO;
+        WorkingDaysByYear workingDaysByYear = new WorkingDaysByYear();
+        workingDaysByYear.setYear(workingDays.get(0).getYear());
+        workingDaysByYear.setUnitId(workingDays.get(0).getUnitId());
+        for (WorkingDaysDTO wd : workingDays) {
+            switch (wd.getMonth()) {
+                case 1 -> workingDaysByYear.setJanuary(wd.getAmount());
+                case 2 -> workingDaysByYear.setFebruary(wd.getAmount());
+                case 3 -> workingDaysByYear.setMarch(wd.getAmount());
+                case 4 -> workingDaysByYear.setApril(wd.getAmount());
+                case 5 -> workingDaysByYear.setMay(wd.getAmount());
+                case 6 -> workingDaysByYear.setJune(wd.getAmount());
+                case 7 -> workingDaysByYear.setJuly(wd.getAmount());
+                case 8 -> workingDaysByYear.setAugust(wd.getAmount());
+                case 9 -> workingDaysByYear.setSeptember(wd.getAmount());
+                case 10 -> workingDaysByYear.setOctober(wd.getAmount());
+                case 11 -> workingDaysByYear.setNovember(wd.getAmount());
+                case 12 -> workingDaysByYear.setDecember(wd.getAmount());
+            }
+        }
+        return workingDaysByYear;
     }
 
     @Override
-    public void saveWorkingDays(WorkingDaysDTO workingDays) {
-        workingDaysRepository.save(workingDaysMapper.dtoToEntity(workingDays));
+    @Transactional
+    public void saveWorkingDays(WorkingDaysByYear workingDaysByYear) {
+        workingDaysRepository.saveAll(workingDaysMapper.yearToEntities(workingDaysByYear));
     }
 }

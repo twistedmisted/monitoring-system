@@ -29,16 +29,9 @@ public class WorkingDaysEntity {
     @Column(name = "year", nullable = false)
     private Integer year;
 
-    private Integer january;
-    private Integer february;
-    private Integer march;
-    private Integer april;
-    private Integer may;
-    private Integer june;
-    private Integer july;
-    private Integer august;
-    private Integer september;
-    private Integer october;
-    private Integer november;
-    private Integer december;
+    @Column(name = "month", nullable = false)
+    private Integer month;
+
+    @Column(name = "amount", nullable = false)
+    private Integer amount;
 }

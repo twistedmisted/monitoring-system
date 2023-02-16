@@ -1,0 +1,12 @@
+{november=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+june=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+september=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+may=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+ august=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+  january=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+  february=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+  july=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+  december=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+   october=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+    april=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null),
+     march=MonthInfo(month=null, value=null, workingDays=null, dailyAverage=null)}

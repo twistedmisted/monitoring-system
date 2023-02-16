@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.OutputData;
+import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.InputYearInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
+import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
+import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
+import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
@@ -149,13 +150,11 @@ public class MainController {
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
-        InputDTO tableData = new InputDTO();
-        OutputData outputData = new OutputData();
+        TableData tableData = new TableData();
         if (parameterName != null && !parameterName.isBlank()) {
             tableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
-            tableData.setParameterName(parameterName);
         } else {
-            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
         }
         model.addAttribute("tableData", tableData);
         model.addAttribute("departmentParameters", departmentParameters);
@@ -170,9 +169,9 @@ public class MainController {
             return "output-by-year";
         }
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
-        List<InputDTO> tableDataList = new ArrayList<>();
+        List<TableData> tableDataList = new ArrayList<>();
         for (ParameterDTO parameterName : departmentParameters) {
-            InputDTO tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
+            TableData tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
             tableData.setParameterName(parameterName.getName());
             tableDataList.add(tableData);
         }
@@ -185,18 +184,35 @@ public class MainController {
         return "output-by-year";
     }
 
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/output")
+    public String getOutputDepartmentPage(@PathVariable Long enterpriseId,
+                                          @PathVariable Long departmentId,
+                                          @RequestParam(value = "parameter-name", required = false) String parameterName,
+                                          Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+        TableData tableData = new TableData();
+        if (parameterName != null && !parameterName.isBlank()) {
+            tableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
+        } else {
+            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
+        }
+        model.addAttribute("tableData", tableData);
+        model.addAttribute("departmentParameters", departmentParameters);
+        return "output";
+    }
+
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
     public String getInputPage(@PathVariable Long enterpriseId,
                                @PathVariable Long departmentId,
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
-        InputDTO tableData = new InputDTO();
+        InputDataDTO tableData = new InputDataDTO();
         if (parameterName != null && !parameterName.isBlank()) {
             tableData = parameterBaseService.getDataByParameterName(departmentId, parameterName);
             tableData.setParameterName(parameterName);
         } else {
-            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new InputYearInfo())));
         }
         model.addAttribute("tableData", tableData);
         model.addAttribute("departmentParameters", departmentParameters);
@@ -206,8 +222,8 @@ public class MainController {
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
     public String saveDepartmentData(@PathVariable Long enterpriseId,
                                      @PathVariable Long departmentId,
-                                     @ModelAttribute InputDTO tableData) {
-        parameterBaseService.saveData(departmentId, tableData.getParameterName(), tableData);
+                                     @ModelAttribute InputDataDTO tableData) {
+        parameterBaseService.saveData(departmentId, tableData);
         return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + tableData.getParameterName();
     }
 
@@ -234,7 +250,7 @@ public class MainController {
                                      @RequestParam(name = "year", required = false) Integer year,
                                      Model model) {
         UnitDTO department = unitService.getUnitById(departmentId);
-        WorkingDaysDTO workingDays = workingDaysService.getWorkingDaysByUnitIdAndYear(departmentId, year);
+        WorkingDaysByYear workingDays = workingDaysService.getAllWorkingDaysByUnitIdAndYear(departmentId, year);
         model.addAttribute("department", department);
         model.addAttribute("workingDays", workingDays);
         return "working-days";
@@ -244,7 +260,7 @@ public class MainController {
     public String saveWorkingDays(@PathVariable Long enterpriseId,
                                   @PathVariable Long departmentId,
                                   @RequestParam(name = "year", required = false) Integer year,
-                                  @ModelAttribute WorkingDaysDTO workingDays) {
+                                  @ModelAttribute WorkingDaysByYear workingDays) {
 //        UnitDTO department = unitService.getUnitById(departmentId);
         workingDays.setUnitId(departmentId);
         workingDaysService.saveWorkingDays(workingDays);

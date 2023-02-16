@@ -1,17 +1,17 @@
 package ua.kpi.mishchenko.monitoringsystem.service;
 
-import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.OutputData;
+import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 
 public interface ParameterBaseService {
 
-    InputDTO getDataByParameterName(Long unitId, String parameterName);
+    InputDataDTO getDataByParameterName(Long unitId, String parameterName);
 
-    OutputData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
+    TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
 
-    InputDTO getDataForEnterpriseByParameterName(Long unitId, String parameterName);
+    TableData getDataForEnterpriseByParameterName(Long unitId, String parameterName);
 
-    InputDTO getDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
+    TableData getDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
 
-    void saveData(Long unitId, String parameterName, InputDTO tableData);
+    void saveData(Long unitId, InputDataDTO tableData);
 }

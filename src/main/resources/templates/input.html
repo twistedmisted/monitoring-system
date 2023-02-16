@@ -146,20 +146,20 @@
             <th>Листопад</th>
             <th>Грудень</th>
         </tr>
-        <tr th:each="row, itemStat : *{yearValues}">
-            <th><input th:field="*{yearValues[__${itemStat.index}__].year}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].january}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].february}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].march}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].april}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].may}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].june}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].july}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].august}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].september}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].october}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].november}"></th>
-            <th><input th:field="*{yearValues[__${itemStat.index}__].december}"></th>
+        <tr th:each="row, itemStat : *{yearInfos}">
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].year}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].january}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].february}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].march}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].april}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].may}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].june}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].july}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].august}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].september}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].october}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].november}"></th>
+            <th><input th:field="*{yearInfos[__${itemStat.index}__].december}"></th>
         </tr>
         </tbody>
     </table>

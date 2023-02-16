@@ -2,14 +2,8 @@ package ua.kpi.mishchenko.monitoringsystem.dto;
 
 import lombok.Data;
 
-import java.text.DecimalFormat;
-
-import static java.lang.Double.parseDouble;
-
 @Data
-public class YearValue {
-
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
+public class InputYearInfo {
 
     private String year = "xxxx";
     private String january = "";
@@ -24,21 +18,6 @@ public class YearValue {
     private String october = "";
     private String november = "";
     private String december = "";
-
-    public String getTotalValue() {
-        return DECIMAL_FORMAT.format(parseDouble(january) +
-                parseDouble(february) +
-                parseDouble(february) +
-                parseDouble(april) +
-                parseDouble(may) +
-                parseDouble(june) +
-                parseDouble(july) +
-                parseDouble(august) +
-                parseDouble(september) +
-                parseDouble(october) +
-                parseDouble(november) +
-                parseDouble(december));
-    }
 
     public static Double toDoubleValue(String month) {
         return month.isBlank() ? 0.0 : Double.parseDouble(month);

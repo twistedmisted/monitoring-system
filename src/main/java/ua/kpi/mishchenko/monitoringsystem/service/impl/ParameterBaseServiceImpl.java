@@ -3,17 +3,19 @@ package ua.kpi.mishchenko.monitoringsystem.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ua.kpi.mishchenko.monitoringsystem.dto.InputDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.OutputData;
+import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.InputYearInfo;
+import ua.kpi.mishchenko.monitoringsystem.dto.MonthInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterBaseDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysDTO;
-import ua.kpi.mishchenko.monitoringsystem.dto.YearValue;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterWithWorkingDays;
+import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
+import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterBaseEntity;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 
-import java.lang.annotation.Target;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,98 +27,83 @@ import static java.lang.String.format;
 public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID = "SELECT * FROM %s WHERE unit_id = ? ORDER BY year, month";
-    private static final String SELECT_FROM_WORKING_DAYS_BY_UNIT_ID = "SELECT wd.* FROM working_days wd WHERE unit_id = 13 ORDER BY year";
+    private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS = "SELECT parameter_table.year, parameter_table.month, parameter_table.value, wd.amount\n" +
+            "FROM %s parameter_table\n" +
+            "         LEFT JOIN working_days wd ON wd.month = parameter_table.month AND wd.year = parameter_table.year\n" +
+            "WHERE parameter_table.unit_id = ?\n" +
+            "ORDER BY year, month;";
     private final JdbcTemplate jdbcTemplate;
     private final UnitParameterRepository unitParameterRepository;
 
     @Override
-    public InputDTO getDataByParameterName(Long unitId, String parameterName) {
+    public InputDataDTO getDataByParameterName(Long unitId, String parameterName) {
         List<ParameterBaseEntity> values = getValuesForParameterByUnitId(unitId, parameterName);
         if (values.isEmpty()) {
-            return createDefaultTableDataForInput();
+            return createDefaultInputData();
         }
-        List<YearValue> yearValues = new ArrayList<>();
-        YearValue yearValue = new YearValue();
+        List<InputYearInfo> yearInfos = new ArrayList<>();
+        InputYearInfo yearInfo = new InputYearInfo();
         for (ParameterBaseEntity parameterBase : values) {
-            if (isNotDefaultYear(yearValue) &&
-                    !yearValue.getYear().equals(String.valueOf(parameterBase.getYear()))) {
-                yearValues.add(yearValue);
-                yearValue = new YearValue();
+            if (isNotDefaultYear(yearInfo.getYear()) && yearsNotEquals(yearInfo.getYear(), parameterBase.getYear())) {
+                yearInfos.add(yearInfo);
+                yearInfo = new InputYearInfo();
             }
-            yearValue.setYear(String.valueOf(parameterBase.getYear()));
-            mapValueByMonth(yearValue, parameterBase.getMonth(), parameterBase.getValue());
+            yearInfo.setYear(String.valueOf(parameterBase.getYear()));
+            mapValueByMonth(yearInfo, parameterBase.getMonth(), parameterBase.getValue());
         }
-        yearValues.add(yearValue);
+        yearInfos.add(yearInfo);
         UnitParameterEntity unitParameter = unitParameterRepository.findByUnitIdAndParameterBeanName(unitId, parameterName)
                 .orElse(null);
-        if (unitParameter != null && unitParameter.getAmountYear() != yearValues.size()) {
-            yearValues.addAll(Collections.nCopies(unitParameter.getAmountYear() - yearValues.size(), new YearValue()));
+        if (unitParameter != null && unitParameter.getAmountYear() != yearInfos.size()) {
+            yearInfos.addAll(Collections.nCopies(unitParameter.getAmountYear() - yearInfos.size(), new InputYearInfo()));
         }
-        InputDTO tableData = new InputDTO();
-        tableData.setYearValues(yearValues);
+        InputDataDTO tableData = new InputDataDTO();
+        tableData.setYearInfos(yearInfos);
         return tableData;
     }
 
-    private InputDTO createDefaultTableDataForInput() {
-        InputDTO tableData = new InputDTO();
-        tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+    private InputDataDTO createDefaultInputData() {
+        InputDataDTO tableData = new InputDataDTO();
+        tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new InputYearInfo())));
+        return tableData;
+    }
+
+    private TableData createDefaultTableData() {
+        TableData tableData = new TableData();
+        tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
         return tableData;
     }
 
     @Override
-    public OutputData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName) {
-        List<ParameterBaseEntity> values = getValuesForParameterByUnitId(unitId, parameterName);
-        List<WorkingDaysDTO> workingDays = getWorkingDaysByUnitId(unitId);
+    public TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName) {
+        List<ParameterWithWorkingDays> values = getParameterValuesWithWorkingDays(unitId, parameterName);
         if (values.isEmpty()) {
-            return createEmptyTableDataForOutput();
+            return createDefaultTableData();
         }
-        List<YearValue> yearValues = new ArrayList<>();
-        YearValue yearValue = new YearValue();
-        for (ParameterBaseEntity parameterBase : values) {
-            if (isNotDefaultYear(yearValue) &&
-                    !yearValue.getYear().equals(String.valueOf(parameterBase.getYear()))) {
-                yearValues.add(yearValue);
-                yearValue = new YearValue();
+        List<YearInfo> yearInfos = new ArrayList<>();
+        YearInfo yearInfo = new YearInfo();
+        for (ParameterWithWorkingDays value : values) {
+            if (isNotDefaultYear(yearInfo.getYear()) && yearsNotEquals(yearInfo.getYear(), value.getYear())) {
+                yearInfos.add(yearInfo);
+                yearInfo = new YearInfo();
             }
-            yearValue.setYear(String.valueOf(parameterBase.getYear()));
-            mapValueByMonth(yearValue, parameterBase.getMonth(), parameterBase.getValue());
+            yearInfo.setYear(String.valueOf(value.getYear()));
+            mapValueByMonth(yearInfo, value);
         }
-        yearValues.add(yearValue);
-        UnitParameterEntity unitParameter = unitParameterRepository.findByUnitIdAndParameterBeanName(unitId, parameterName)
-                .orElse(null);
-        if (unitParameter != null && unitParameter.getAmountYear() != yearValues.size()) {
-            yearValues.addAll(Collections.nCopies(unitParameter.getAmountYear() - yearValues.size(), new YearValue()));
-        }
-        OutputData tableData = new OutputData();
-        tableData.setYearValues(yearValues);
+        yearInfos.add(yearInfo);
+        TableData tableData = new TableData();
+        tableData.setYearInfos(yearInfos);
+        tableData.setParameterName(parameterName);
         return tableData;
     }
 
-    private OutputData createEmptyTableDataForOutput() {
-        OutputData tableData = new OutputData();
-        tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
-        tableData.setWorkingDays(new ArrayList<>(Collections.nCopies(10, new WorkingDaysDTO())));
-        return tableData;
-    }
-
-    private List<WorkingDaysDTO> getWorkingDaysByUnitId(Long unitId) {
-        return jdbcTemplate.query(SELECT_FROM_WORKING_DAYS_BY_UNIT_ID,
-                (rs, rowNum) -> new WorkingDaysDTO(
-                        rs.getLong("id"),
-                        rs.getLong("unitId"),
+    private List<ParameterWithWorkingDays> getParameterValuesWithWorkingDays(Long unitId, String parameterName) {
+        return jdbcTemplate.query(format(SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS, parameterName),
+                (rs, rowNum) -> new ParameterWithWorkingDays(
                         rs.getInt("year"),
-                        rs.getInt("january"),
-                        rs.getInt("february"),
-                        rs.getInt("march"),
-                        rs.getInt("april"),
-                        rs.getInt("may"),
-                        rs.getInt("june"),
-                        rs.getInt("july"),
-                        rs.getInt("august"),
-                        rs.getInt("september"),
-                        rs.getInt("october"),
-                        rs.getInt("november"),
-                        rs.getInt("december")),
+                        rs.getInt("month"),
+                        rs.getDouble("value"),
+                        rs.getInt("amount")),
                 unitId);
     }
 
@@ -131,7 +118,7 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
     }
 
     @Override
-    public InputDTO getDataForEnterpriseByParameterName(Long unitId, String parameterName) {
+    public TableData getDataForEnterpriseByParameterName(Long unitId, String parameterName) {
         List<ParameterBaseDTO> values = jdbcTemplate.query("SELECT ROUND(SUM(parameter_table.value)::numeric, 2) AS value,\n" +
                         "       parameter_table.year,\n" +
                         "       parameter_table.month\n" +
@@ -145,63 +132,146 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
                         rs.getInt("month"),
                         rs.getDouble("value")),
                 unitId);
-        InputDTO tableData = new InputDTO();
+        TableData tableData = new TableData();
         if (values.isEmpty()) {
-            tableData.setYearValues(new ArrayList<>(Collections.nCopies(10, new YearValue())));
+            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
             return tableData;
         }
-        return getTableData(unitId, parameterName, values);
+        return getTableData(parameterName, values);
     }
 
-    private InputDTO getTableData(Long unitId, String parameterName, List<ParameterBaseDTO> values) {
-        List<YearValue> yearValues = mapParameterDtosToYearValues(values);
-        InputDTO tableData = new InputDTO();
-        tableData.setYearValues(yearValues);
+    private TableData getTableData(String parameterName, List<ParameterBaseDTO> values) {
+        List<YearInfo> yearInfos = mapParameterDtosToYearValues(values);
+        TableData tableData = new TableData();
+        tableData.setYearInfos(yearInfos);
+        tableData.setParameterName(parameterName);
         return tableData;
     }
 
-    private List<YearValue> mapParameterDtosToYearValues(List<ParameterBaseDTO> values) {
-        List<YearValue> yearValues = new ArrayList<>();
-        YearValue yearValue = new YearValue();
+    private List<YearInfo> mapParameterDtosToYearValues(List<ParameterBaseDTO> values) {
+        List<YearInfo> yearInfos = new ArrayList<>();
+        YearInfo yearInfo = new YearInfo();
         for (ParameterBaseDTO parameterBase : values) {
-            if (isNotDefaultYear(yearValue) && yearsNotEquals(yearValue, parameterBase)) {
-                yearValues.add(yearValue);
-                yearValue = new YearValue();
+            if (isNotDefaultYear(yearInfo.getYear()) && yearsNotEquals(yearInfo.getYear(), parameterBase.getYear())) {
+                yearInfos.add(yearInfo);
+                yearInfo = new YearInfo();
             }
-            yearValue.setYear(String.valueOf(parameterBase.getYear()));
-            mapValueByMonth(yearValue, parameterBase.getMonth(), parameterBase.getValue());
+            yearInfo.setYear(String.valueOf(parameterBase.getYear()));
+            mapValueByMonth(yearInfo, parameterBase.getMonth(), parameterBase.getValue());
         }
-        yearValues.add(yearValue);
-        return yearValues;
+        yearInfos.add(yearInfo);
+        return yearInfos;
     }
 
-    private static boolean yearsNotEquals(YearValue yearValue, ParameterBaseDTO parameterBase) {
-        return !yearValue.getYear().equals(String.valueOf(parameterBase.getYear()));
+    private boolean yearsNotEquals(String firstYear, Integer secondYear) {
+        return !firstYear.equals(String.valueOf(secondYear));
     }
 
-    private boolean isNotDefaultYear(YearValue yearValue) {
-        return !yearValue.getYear().equals("xxxx");
+    private boolean isNotDefaultYear(String year) {
+        return !year.equals("xxxx");
     }
 
-    private void mapValueByMonth(YearValue yearValue, int monthIndex, Double value) {
+    private void mapValueByMonth(InputYearInfo yearInfo, int monthIndex, Double value) {
         switch (monthIndex) {
-            case 1 -> yearValue.setJanuary(YearValue.toStringValue(value));
-            case 2 -> yearValue.setFebruary(YearValue.toStringValue(value));
-            case 3 -> yearValue.setMarch(YearValue.toStringValue(value));
-            case 4 -> yearValue.setApril(YearValue.toStringValue(value));
-            case 5 -> yearValue.setMay(YearValue.toStringValue(value));
-            case 6 -> yearValue.setJune(YearValue.toStringValue(value));
-            case 7 -> yearValue.setJuly(YearValue.toStringValue(value));
-            case 8 -> yearValue.setAugust(YearValue.toStringValue(value));
-            case 9 -> yearValue.setSeptember(YearValue.toStringValue(value));
-            case 10 -> yearValue.setOctober(YearValue.toStringValue(value));
-            case 11 -> yearValue.setNovember(YearValue.toStringValue(value));
-            case 12 -> yearValue.setDecember(YearValue.toStringValue(value));
+            case 1 -> yearInfo.setJanuary(InputYearInfo.toStringValue(value));
+            case 2 -> yearInfo.setFebruary(InputYearInfo.toStringValue(value));
+            case 3 -> yearInfo.setMarch(InputYearInfo.toStringValue(value));
+            case 4 -> yearInfo.setApril(InputYearInfo.toStringValue(value));
+            case 5 -> yearInfo.setMay(InputYearInfo.toStringValue(value));
+            case 6 -> yearInfo.setJune(InputYearInfo.toStringValue(value));
+            case 7 -> yearInfo.setJuly(InputYearInfo.toStringValue(value));
+            case 8 -> yearInfo.setAugust(InputYearInfo.toStringValue(value));
+            case 9 -> yearInfo.setSeptember(InputYearInfo.toStringValue(value));
+            case 10 -> yearInfo.setOctober(InputYearInfo.toStringValue(value));
+            case 11 -> yearInfo.setNovember(InputYearInfo.toStringValue(value));
+            case 12 -> yearInfo.setDecember(InputYearInfo.toStringValue(value));
         }
+    }
+
+    private void mapValueByMonth(YearInfo yearInfo, int monthIndex, Double value) {
+        switch (monthIndex) {
+            case 1 -> yearInfo.addMonthByMonth("january", new MonthInfo(monthIndex, value));
+            case 2 -> yearInfo.addMonthByMonth("february", new MonthInfo(monthIndex, value));
+            case 3 -> yearInfo.addMonthByMonth("march", new MonthInfo(monthIndex, value));
+            case 4 -> yearInfo.addMonthByMonth("april", new MonthInfo(monthIndex, value));
+            case 5 -> yearInfo.addMonthByMonth("may", new MonthInfo(monthIndex, value));
+            case 6 -> yearInfo.addMonthByMonth("june", new MonthInfo(monthIndex, value));
+            case 7 -> yearInfo.addMonthByMonth("july", new MonthInfo(monthIndex, value));
+            case 8 -> yearInfo.addMonthByMonth("august", new MonthInfo(monthIndex, value));
+            case 9 -> yearInfo.addMonthByMonth("september", new MonthInfo(monthIndex, value));
+            case 10 -> yearInfo.addMonthByMonth("october", new MonthInfo(monthIndex, value));
+            case 11 -> yearInfo.addMonthByMonth("november", new MonthInfo(monthIndex, value));
+            case 12 -> yearInfo.addMonthByMonth("december", new MonthInfo(monthIndex, value));
+        }
+    }
+
+    private void mapValueByMonth(YearInfo yearInfo, ParameterWithWorkingDays value) {
+//        final String monthValueStr = YearInfo.toStringValue(value.getValue());
+//        String amountWorkingDaysStr = getAmountWorkingDaysStr(value.getAmount(), monthValueStr);
+        double monthDailyAverage = getMonthDailyAverage(value.getValue(), value.getAmount());
+//        String monthDailyAverageStr = DECIMAL_FORMAT.format(monthDailyAverage);
+        switch (value.getMonth()) {
+            case 1 -> {
+                yearInfo.addMonthByMonth("january", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+//                yearInfo.setJanuary(monthValueStr);
+//                yearInfo.setJanuaryAmount(amountWorkingDaysStr);
+//                yearInfo.setJanuaryDailyAverage(monthDailyAverageStr);
+            }
+            case 2 -> {
+                yearInfo.addMonthByMonth("february", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 3 -> {
+                yearInfo.addMonthByMonth("march", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 4 -> {
+                yearInfo.addMonthByMonth("april", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 5 -> {
+                yearInfo.addMonthByMonth("may", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 6 -> {
+                yearInfo.addMonthByMonth("june", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 7 -> {
+                yearInfo.addMonthByMonth("july", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 8 -> {
+                yearInfo.addMonthByMonth("august", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 9 -> {
+                yearInfo.addMonthByMonth("september", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 10 -> {
+                yearInfo.addMonthByMonth("october", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 11 -> {
+                yearInfo.addMonthByMonth("november", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+            case 12 -> {
+                yearInfo.addMonthByMonth("december", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+            }
+        }
+    }
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
+
+    private Double getMonthDailyAverage(Double value, Integer amount) {
+        if (value > 0 && amount > 0) {
+            return value / amount;
+        }
+        return 0.0;
+    }
+
+    private String getAmountWorkingDaysStr(Integer workingDays, String monthValueStr) {
+        String amountWorkingDaysStr = "";
+        if (!monthValueStr.isBlank()) {
+            amountWorkingDaysStr = YearInfo.toStringValue(workingDays);
+        }
+        return amountWorkingDaysStr;
     }
 
     @Override
-    public InputDTO getDataForEnterpriseByParameterNameAndYear(Long unitId, String parameterName, Integer year) {
+    public TableData getDataForEnterpriseByParameterNameAndYear(Long unitId, String parameterName, Integer year) {
         List<ParameterBaseDTO> values = jdbcTemplate.query("SELECT ROUND(SUM(parameter_table.value)::numeric, 2) AS value,\n" +
                         "       parameter_table.year,\n" +
                         "       parameter_table.month\n" +
@@ -215,29 +285,30 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
                         rs.getDouble("value")),
                 unitId, year);
         if (values.isEmpty()) {
-            InputDTO tableData = new InputDTO();
-            tableData.setYearValues(new ArrayList<>(Collections.nCopies(1, new YearValue())));
+            TableData tableData = new TableData();
+            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(1, new YearInfo())));
             return tableData;
         }
-        return getTableData(unitId, parameterName, values);
+        return getTableData(parameterName, values);
     }
 
     @Override
-    public void saveData(Long unitId, String parameterName, InputDTO tableData) {
+    public void saveData(Long unitId, InputDataDTO tableData) {
+        String parameterName = tableData.getParameterName();
         jdbcTemplate.update("DELETE FROM " + parameterName + " WHERE unit_id = ?", unitId);
-        for (YearValue yearValue : tableData.getYearValues()) {
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 1, YearValue.toDoubleValue(yearValue.getJanuary()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 2, YearValue.toDoubleValue(yearValue.getFebruary()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 3, YearValue.toDoubleValue(yearValue.getMarch()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 4, YearValue.toDoubleValue(yearValue.getApril()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 5, YearValue.toDoubleValue(yearValue.getMay()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 6, YearValue.toDoubleValue(yearValue.getJune()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 7, YearValue.toDoubleValue(yearValue.getJuly()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 8, YearValue.toDoubleValue(yearValue.getAugust()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 9, YearValue.toDoubleValue(yearValue.getSeptember()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 10, YearValue.toDoubleValue(yearValue.getOctober()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 11, YearValue.toDoubleValue(yearValue.getNovember()));
-            save(unitId, parameterName, Integer.parseInt(yearValue.getYear()), 12, YearValue.toDoubleValue(yearValue.getDecember()));
+        for (InputYearInfo yearInfo : tableData.getYearInfos()) {
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 1, InputYearInfo.toDoubleValue(yearInfo.getJanuary()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 2, InputYearInfo.toDoubleValue(yearInfo.getFebruary()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 3, InputYearInfo.toDoubleValue(yearInfo.getMarch()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 4, InputYearInfo.toDoubleValue(yearInfo.getApril()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 5, InputYearInfo.toDoubleValue(yearInfo.getMay()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 6, InputYearInfo.toDoubleValue(yearInfo.getJune()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 7, InputYearInfo.toDoubleValue(yearInfo.getJuly()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 8, InputYearInfo.toDoubleValue(yearInfo.getAugust()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 9, InputYearInfo.toDoubleValue(yearInfo.getSeptember()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 10, InputYearInfo.toDoubleValue(yearInfo.getOctober()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 11, InputYearInfo.toDoubleValue(yearInfo.getNovember()));
+            save(unitId, parameterName, Integer.parseInt(yearInfo.getYear()), 12, InputYearInfo.toDoubleValue(yearInfo.getDecember()));
         }
     }
 

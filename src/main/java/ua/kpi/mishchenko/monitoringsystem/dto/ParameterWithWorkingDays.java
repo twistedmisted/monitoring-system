@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkingDaysDTO {
+public class ParameterWithWorkingDays {
 
-    private Long id;
-    private Long unitId;
     private Integer year;
     private Integer month;
+    private Double value;
     private Integer amount;
 }

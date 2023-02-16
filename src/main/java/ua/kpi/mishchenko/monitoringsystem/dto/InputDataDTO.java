@@ -5,13 +5,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class OutputData {
+public class InputDataDTO {
 
-    private List<YearInfo> yearInfos;
-    private List<WorkingDaysDTO> workingDays;
+    private List<InputYearInfo> yearInfos;
     private String parameterName = "nothing";
 
-    public void addYearValue(YearInfo yearInfo) {
+    public void addYearValue(InputYearInfo yearInfo) {
         yearInfos.add(yearInfo);
     }
 }

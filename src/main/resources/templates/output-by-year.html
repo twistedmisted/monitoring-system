@@ -60,20 +60,20 @@
         <th th:rowspan="${tableDataList.size() + 1}" th:text="${year}"></th>
     </tr>
     <th:block th:each="tableData : ${tableDataList}">
-        <tr th:each="row : ${tableData.yearValues}">
+        <tr th:each="row : ${tableData.yearInfos}">
             <th th:text="${tableData.parameterName}"></th>
-            <td th:text="${row.january}"></td>
-            <td th:text="${row.february}"></td>
-            <td th:text="${row.march}"></td>
-            <td th:text="${row.april}"></td>
-            <td th:text="${row.may}"></td>
-            <td th:text="${row.june}"></td>
-            <td th:text="${row.july}"></td>
-            <td th:text="${row.august}"></td>
-            <td th:text="${row.september}"></td>
-            <td th:text="${row.october}"></td>
-            <td th:text="${row.november}"></td>
-            <td th:text="${row.december}"></td>
+            <td th:text="${row.months.get('january').value}"></td>
+            <td th:text="${row.months.get('february').value}"></td>
+            <td th:text="${row.months.get('march').value}"></td>
+            <td th:text="${row.months.get('april').value}"></td>
+            <td th:text="${row.months.get('may').value}"></td>
+            <td th:text="${row.months.get('june').value}"></td>
+            <td th:text="${row.months.get('july').value}"></td>
+            <td th:text="${row.months.get('august').value}"></td>
+            <td th:text="${row.months.get('september').value}"></td>
+            <td th:text="${row.months.get('october').value}"></td>
+            <td th:text="${row.months.get('november').value}"></td>
+            <td th:text="${row.months.get('december').value}"></td>
             <td th:text="${row.getTotalValue()}"></td>
         </tr>
     </th:block>
