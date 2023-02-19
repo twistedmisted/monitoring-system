@@ -8,6 +8,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.InputYearInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.MonthInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterBaseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterWithWorkingDays;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterBaseEntity;
@@ -15,7 +16,6 @@ import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +27,32 @@ import static java.lang.String.format;
 public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID = "SELECT * FROM %s WHERE unit_id = ? ORDER BY year, month";
-    private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS = "SELECT parameter_table.year, parameter_table.month, parameter_table.value, wd.amount\n" +
-            "FROM %s parameter_table\n" +
-            "         LEFT JOIN working_days wd ON wd.month = parameter_table.month AND wd.year = parameter_table.year\n" +
-            "WHERE parameter_table.unit_id = ?\n" +
-            "ORDER BY year, month;";
+    private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS = """
+            SELECT parameter_table.year, parameter_table.month, parameter_table.value, wd.amount
+            FROM %s parameter_table
+                     LEFT JOIN working_days wd ON wd.month = parameter_table.month AND wd.year = parameter_table.year
+            WHERE parameter_table.unit_id = ?
+            ORDER BY year, month;""";
+    private static final String SELECT_VALUES_FOR_PARAMETER_BY_ENTERPRISE_ID_WITH_WORKING_DAYS = """
+            SELECT parameter_table.value,
+                   parameter_table.year,
+                   parameter_table.month,
+                   parameter_table.amount
+            FROM %s parameter_table
+                     INNER JOIN units u ON u.id = parameter_table.unit_id
+                     INNER JOIN working_days wd ON parameter_table.unit_id = wd.unit_id AND parameter_table.year = wd.year AND
+                                                            parameter_table.month = wd.month
+            WHERE u.parent_id = ?
+            ORDER BY parameter_table.year, parameter_table.month;""";
+
+    private static final String SELECT_DEPARTMENTS_ID_BY_ENTERPRISE_ID_AND_PARAMETER_BEAN_NAME = """
+            SELECT up.unit_id AS id
+            FROM units_parameters up
+                     INNER JOIN parameters p ON up.parameter_id = p.id
+                     INNER JOIN units u on u.id = up.unit_id
+            WHERE p.bean_name = ?
+              AND u.parent_id = ?;""";
+
     private final JdbcTemplate jdbcTemplate;
     private final UnitParameterRepository unitParameterRepository;
 
@@ -76,9 +97,20 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     @Override
     public TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName) {
-        List<ParameterWithWorkingDays> values = getParameterValuesWithWorkingDays(unitId, parameterName);
-        if (values.isEmpty()) {
+        List<YearInfo> yearInfos = getYearInfosByDepartmentIdAndParameterBeanName(unitId, parameterName);
+        if (yearInfos.isEmpty()) {
             return createDefaultTableData();
+        }
+        TableData tableData = new TableData();
+        tableData.setYearInfos(yearInfos);
+        tableData.setParameterName(parameterName);
+        return tableData;
+    }
+
+    private List<YearInfo> getYearInfosByDepartmentIdAndParameterBeanName(Long departmentId, String beanName) {
+        List<ParameterWithWorkingDays> values = getParameterValuesWithWorkingDays(departmentId, beanName);
+        if (values.isEmpty()) {
+            return new ArrayList<>();
         }
         List<YearInfo> yearInfos = new ArrayList<>();
         YearInfo yearInfo = new YearInfo();
@@ -91,10 +123,7 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
             mapValueByMonth(yearInfo, value);
         }
         yearInfos.add(yearInfo);
-        TableData tableData = new TableData();
-        tableData.setYearInfos(yearInfos);
-        tableData.setParameterName(parameterName);
-        return tableData;
+        return yearInfos;
     }
 
     private List<ParameterWithWorkingDays> getParameterValuesWithWorkingDays(Long unitId, String parameterName) {
@@ -118,26 +147,33 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
     }
 
     @Override
-    public TableData getDataForEnterpriseByParameterName(Long unitId, String parameterName) {
-        List<ParameterBaseDTO> values = jdbcTemplate.query("SELECT ROUND(SUM(parameter_table.value)::numeric, 2) AS value,\n" +
-                        "       parameter_table.year,\n" +
-                        "       parameter_table.month\n" +
-                        "FROM " + parameterName + " parameter_table\n" +
-                        "         INNER JOIN units u on u.id = parameter_table.unit_id\n" +
-                        "WHERE u.parent_id = ?\n" +
-                        "GROUP BY parameter_table.year, parameter_table.month\n" +
-                        "ORDER BY parameter_table.year, parameter_table.month",
-                (rs, rowNum) -> new ParameterBaseDTO(
+    public ParameterYearsInfo getDataForEnterpriseByParameterName(Long unitId, String parameterName) {
+        ParameterYearsInfo parameterYearsInfo = new ParameterYearsInfo();
+        parameterYearsInfo.setParameterName(parameterName);
+        List<Long> departmentsId = getDepartmentsIdByEnterpriseIdAndParameterBeanName(unitId, parameterName);
+        for (Long departmentId : departmentsId) {
+            List<YearInfo> yearInfoByDepartment = getYearInfosByDepartmentIdAndParameterBeanName(departmentId, parameterName);
+            for (YearInfo yearInfo : yearInfoByDepartment) {
+                parameterYearsInfo.addYearInfo(Integer.valueOf(yearInfo.getYear()), yearInfo);
+            }
+        }
+        return parameterYearsInfo;
+    }
+
+    private List<Long> getDepartmentsIdByEnterpriseIdAndParameterBeanName(Long unitId, String beanName) {
+        return jdbcTemplate.query(SELECT_DEPARTMENTS_ID_BY_ENTERPRISE_ID_AND_PARAMETER_BEAN_NAME,
+                (rs, rowNum) -> rs.getLong("id"),
+                beanName, unitId);
+    }
+
+    private List<ParameterWithWorkingDays> getEnterpriseParameterValuesWithWorkingDays(Long unitId, String parameterName) {
+        return jdbcTemplate.query(format(SELECT_VALUES_FOR_PARAMETER_BY_ENTERPRISE_ID_WITH_WORKING_DAYS, parameterName),
+                (rs, rowNum) -> new ParameterWithWorkingDays(
                         rs.getInt("year"),
                         rs.getInt("month"),
-                        rs.getDouble("value")),
+                        rs.getDouble("value"),
+                        rs.getInt("amount")),
                 unitId);
-        TableData tableData = new TableData();
-        if (values.isEmpty()) {
-            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
-            return tableData;
-        }
-        return getTableData(parameterName, values);
     }
 
     private TableData getTableData(String parameterName, List<ParameterBaseDTO> values) {
@@ -190,84 +226,68 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     private void mapValueByMonth(YearInfo yearInfo, int monthIndex, Double value) {
         switch (monthIndex) {
-            case 1 -> yearInfo.addMonthByMonth("january", new MonthInfo(monthIndex, value));
-            case 2 -> yearInfo.addMonthByMonth("february", new MonthInfo(monthIndex, value));
-            case 3 -> yearInfo.addMonthByMonth("march", new MonthInfo(monthIndex, value));
-            case 4 -> yearInfo.addMonthByMonth("april", new MonthInfo(monthIndex, value));
-            case 5 -> yearInfo.addMonthByMonth("may", new MonthInfo(monthIndex, value));
-            case 6 -> yearInfo.addMonthByMonth("june", new MonthInfo(monthIndex, value));
-            case 7 -> yearInfo.addMonthByMonth("july", new MonthInfo(monthIndex, value));
-            case 8 -> yearInfo.addMonthByMonth("august", new MonthInfo(monthIndex, value));
-            case 9 -> yearInfo.addMonthByMonth("september", new MonthInfo(monthIndex, value));
-            case 10 -> yearInfo.addMonthByMonth("october", new MonthInfo(monthIndex, value));
-            case 11 -> yearInfo.addMonthByMonth("november", new MonthInfo(monthIndex, value));
-            case 12 -> yearInfo.addMonthByMonth("december", new MonthInfo(monthIndex, value));
+            case 1 -> yearInfo.addMonthByMonth(1, new MonthInfo(monthIndex, value));
+            case 2 -> yearInfo.addMonthByMonth(2, new MonthInfo(monthIndex, value));
+            case 3 -> yearInfo.addMonthByMonth(3, new MonthInfo(monthIndex, value));
+            case 4 -> yearInfo.addMonthByMonth(4, new MonthInfo(monthIndex, value));
+            case 5 -> yearInfo.addMonthByMonth(5, new MonthInfo(monthIndex, value));
+            case 6 -> yearInfo.addMonthByMonth(6, new MonthInfo(monthIndex, value));
+            case 7 -> yearInfo.addMonthByMonth(7, new MonthInfo(monthIndex, value));
+            case 8 -> yearInfo.addMonthByMonth(8, new MonthInfo(monthIndex, value));
+            case 9 -> yearInfo.addMonthByMonth(9, new MonthInfo(monthIndex, value));
+            case 10 -> yearInfo.addMonthByMonth(10, new MonthInfo(monthIndex, value));
+            case 11 -> yearInfo.addMonthByMonth(11, new MonthInfo(monthIndex, value));
+            case 12 -> yearInfo.addMonthByMonth(12, new MonthInfo(monthIndex, value));
         }
     }
 
     private void mapValueByMonth(YearInfo yearInfo, ParameterWithWorkingDays value) {
-//        final String monthValueStr = YearInfo.toStringValue(value.getValue());
-//        String amountWorkingDaysStr = getAmountWorkingDaysStr(value.getAmount(), monthValueStr);
         double monthDailyAverage = getMonthDailyAverage(value.getValue(), value.getAmount());
-//        String monthDailyAverageStr = DECIMAL_FORMAT.format(monthDailyAverage);
         switch (value.getMonth()) {
             case 1 -> {
-                yearInfo.addMonthByMonth("january", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
-//                yearInfo.setJanuary(monthValueStr);
-//                yearInfo.setJanuaryAmount(amountWorkingDaysStr);
-//                yearInfo.setJanuaryDailyAverage(monthDailyAverageStr);
+                yearInfo.addMonthByMonth(1, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 2 -> {
-                yearInfo.addMonthByMonth("february", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(2, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 3 -> {
-                yearInfo.addMonthByMonth("march", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(3, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 4 -> {
-                yearInfo.addMonthByMonth("april", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(4, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 5 -> {
-                yearInfo.addMonthByMonth("may", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(5, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 6 -> {
-                yearInfo.addMonthByMonth("june", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(6, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 7 -> {
-                yearInfo.addMonthByMonth("july", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(7, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 8 -> {
-                yearInfo.addMonthByMonth("august", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(8, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 9 -> {
-                yearInfo.addMonthByMonth("september", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(9, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 10 -> {
-                yearInfo.addMonthByMonth("october", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(10, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 11 -> {
-                yearInfo.addMonthByMonth("november", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(11, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
             case 12 -> {
-                yearInfo.addMonthByMonth("december", new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
+                yearInfo.addMonthByMonth(12, new MonthInfo(value.getMonth(), value.getValue(), value.getAmount(), monthDailyAverage));
             }
         }
     }
-
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
 
     private Double getMonthDailyAverage(Double value, Integer amount) {
         if (value > 0 && amount > 0) {
             return value / amount;
         }
         return 0.0;
-    }
-
-    private String getAmountWorkingDaysStr(Integer workingDays, String monthValueStr) {
-        String amountWorkingDaysStr = "";
-        if (!monthValueStr.isBlank()) {
-            amountWorkingDaysStr = YearInfo.toStringValue(workingDays);
-        }
-        return amountWorkingDaysStr;
     }
 
     @Override

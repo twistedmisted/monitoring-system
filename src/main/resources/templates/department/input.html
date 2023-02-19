@@ -73,12 +73,22 @@
                     col.children[0].value = getRandomFloat(min, max, decimals);
                 }
             }
-
         }
 
         function getRandomFloat(min, max, decimals) {
             const str = (Math.random() * (max - min) + min).toFixed(decimals);
             return parseFloat(str);
+        }
+
+        function output() {
+            const parameterName = $('#parameter-name').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0';
+            if (parameterName == null) {
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output'
+            } else {
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
+            }
         }
 
         /*]]>*/
@@ -129,6 +139,15 @@
             </th:block>
         </select>
     </div>
+    <div>
+        <input class="button" type="button" value="Відобразити дані" onclick="output()">
+        <input class="button" type="button" value="Згенерувати дані" onclick="generate()">
+        <input class="button" type="button" value="Додати рік" onclick="addRow()">
+        <label for="year">Рік для видалення</label>
+        <input type="text" id="year">
+        <input class="button" type="button" value="Видалити рік" onclick="removeRow()">
+        <a class="button" href="/units">На головну</a>
+    </div>
     <table id="data-table">
         <tbody id="table-body">
         <tr>
@@ -163,18 +182,7 @@
         </tr>
         </tbody>
     </table>
-    <button type="submit">Зберегти</button>
+    <button class="button" type="submit">Зберегти</button>
 </form>
-<button onclick="addRow()">Додати рік</button>
-<br>
-<label for="year">Рік для видалення</label>
-<input type="text" id="year">
-<button onclick="removeRow()">Видалити рік</button>
-<br>
-<button onclick="generate()">Згенерувати дані</button>
-<br>
-<br>
-<br>
-<a class="button" href="/units">На головну</a>
 </body>
 </html>

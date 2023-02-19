@@ -15,23 +15,23 @@ public class YearInfo {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
 
     private String year = "xxxx";
-    private String minMonthKey = null;
-    private String maxMonthKey = null;
-    private Map<String, MonthInfo> months = new HashMap<>();
+    private Integer minMonthKey = null;
+    private Integer maxMonthKey = null;
+    private Map<Integer, MonthInfo> months = new HashMap<>();
 
     public YearInfo() {
-        months.put("january", new MonthInfo());
-        months.put("february", new MonthInfo());
-        months.put("march", new MonthInfo());
-        months.put("april", new MonthInfo());
-        months.put("may", new MonthInfo());
-        months.put("june", new MonthInfo());
-        months.put("july", new MonthInfo());
-        months.put("august", new MonthInfo());
-        months.put("september", new MonthInfo());
-        months.put("october", new MonthInfo());
-        months.put("november", new MonthInfo());
-        months.put("december", new MonthInfo());
+        months.put(1, new MonthInfo());
+        months.put(2, new MonthInfo());
+        months.put(3, new MonthInfo());
+        months.put(4, new MonthInfo());
+        months.put(5, new MonthInfo());
+        months.put(6, new MonthInfo());
+        months.put(7, new MonthInfo());
+        months.put(8, new MonthInfo());
+        months.put(9, new MonthInfo());
+        months.put(10, new MonthInfo());
+        months.put(11, new MonthInfo());
+        months.put(12, new MonthInfo());
     }
 
     public String getTotalValue() {
@@ -42,7 +42,12 @@ public class YearInfo {
                 .orElse(0.0));
     }
 
-    public String calcYearAverage() {
+    public String yearAverage() {
+        Double aver = calcYearAverage();
+        return aver == 0 ? "" : DECIMAL_FORMAT.format(aver);
+    }
+
+    public Double calcYearAverage() {
         Collection<MonthInfo> values = months.values();
         double sum = 0.0;
         int amount = 0;
@@ -53,9 +58,9 @@ public class YearInfo {
             }
         }
         if (sum == 0.0) {
-            return "";
+            return 0.0;
         }
-        return DECIMAL_FORMAT.format(sum / amount);
+        return sum / amount;
     }
 
     public String getMinValue() {
@@ -84,7 +89,7 @@ public class YearInfo {
     }
 
     private double getMin() {
-        Map.Entry<String, MonthInfo> entry = findFirstBigThanZero();
+        Map.Entry<Integer, MonthInfo> entry = findFirstBigThanZero();
         if (isNull(entry)) {
             return 0;
         }
@@ -125,7 +130,7 @@ public class YearInfo {
     }
 
     private double getMax() {
-        Map.Entry<String, MonthInfo> entry = findFirstBigThanZero();
+        Map.Entry<Integer, MonthInfo> entry = findFirstBigThanZero();
         if (isNull(entry)) {
             return 0;
         }
@@ -140,7 +145,7 @@ public class YearInfo {
         return max[0];
     }
 
-    private Map.Entry<String, MonthInfo> findFirstBigThanZero() {
+    private Map.Entry<Integer, MonthInfo> findFirstBigThanZero() {
         return months.entrySet()
                 .stream()
                 .filter(e -> e.getValue().getDailyAverage() > 0)
@@ -157,19 +162,11 @@ public class YearInfo {
         return DECIMAL_FORMAT.format(max / min);
     }
 
-    public static Double toDoubleValue(String month) {
-        return month.isBlank() ? 0.0 : Double.parseDouble(month);
-    }
-
-    public static String toStringValue(Double month) {
-        return month == 0.0 ? "" : String.valueOf(month);
-    }
-
-    public static String toStringValue(Integer workingDays) {
-        return workingDays == 0 ? "" : String.valueOf(workingDays);
-    }
-
-    public void addMonthByMonth(String month, MonthInfo value) {
+    public void addMonthByMonth(Integer month, MonthInfo value) {
         months.put(month, value);
+    }
+
+    public MonthInfo getMonthInfo(Integer month) {
+        return months.get(month);
     }
 }

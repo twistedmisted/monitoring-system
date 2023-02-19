@@ -13,6 +13,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputYearInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
@@ -145,28 +146,26 @@ public class MainController {
         return "redirect:/units";
     }
 
-    @GetMapping("/enterprises/{enterpriseId}")
+    @GetMapping("/enterprises/{enterpriseId}/output")
     public String getInputPage(@PathVariable Long enterpriseId,
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
-        TableData tableData = new TableData();
+        ParameterYearsInfo tableData = new ParameterYearsInfo();
         if (parameterName != null && !parameterName.isBlank()) {
             tableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
-        } else {
-            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
         }
         model.addAttribute("tableData", tableData);
         model.addAttribute("departmentParameters", departmentParameters);
-        return "output";
+        return "enterprise/output";
     }
 
-    @GetMapping("/enterprises/{enterpriseId}/year")
+    @GetMapping("/enterprises/{enterpriseId}/output/year")
     public String getInputPage(@PathVariable Long enterpriseId,
                                @RequestParam(value = "value", required = false) Integer year,
                                Model model) {
         if (year == null) {
-            return "output-by-year";
+            return "enterprise/output-by-year";
         }
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
         List<TableData> tableDataList = new ArrayList<>();
@@ -181,7 +180,7 @@ public class MainController {
             model.addAttribute("tableDataList", tableDataList);
             model.addAttribute("year", year);
         }
-        return "output-by-year";
+        return "enterprise/output-by-year";
     }
 
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/output")
@@ -198,7 +197,9 @@ public class MainController {
         }
         model.addAttribute("tableData", tableData);
         model.addAttribute("departmentParameters", departmentParameters);
-        return "output";
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("departmentId", departmentId);
+        return "department/output";
     }
 
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
@@ -216,7 +217,7 @@ public class MainController {
         }
         model.addAttribute("tableData", tableData);
         model.addAttribute("departmentParameters", departmentParameters);
-        return "input";
+        return "department/input";
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/input")
@@ -267,6 +268,6 @@ public class MainController {
 //        WorkingDaysDTO workingDays = workingDaysService.getWorkingDaysByUnitIdAndYear(departmentId, year);
 //        model.addAttribute("department", department);
 //        model.addAttribute("workingDays", workingDays);
-        return "redirect:/units";
+        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/working-days?year=" + workingDays.getYear();
     }
 }

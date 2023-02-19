@@ -15,6 +15,25 @@
             window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/working-days?year=' + year
         }
 
+        function generate(year) {
+            const min = 10;
+            const max = 23;
+            const table = document.getElementById("data-table");
+            table.rows[1].cells[1].children[0].value = year;
+            for (let i = 3, row; row = table.rows[i], i < 15; i++) {
+                for (let j = 1, col; col = row.cells[j]; j++) {
+                    col.children[0].value = getRandomInt(min, max);
+                }
+            }
+            $("#save-btn").click();
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+
         /*]]>*/
     </script>
 </head>
@@ -68,10 +87,20 @@
         margin-right: auto;
     }
 </style>
+<!--<input class="button" type="button" value="2013" onclick="generate(2013)">-->
+<!--<input class="button" type="button" value="2014" onclick="generate(2014)">-->
+<!--<input class="button" type="button" value="2015" onclick="generate(2015)">-->
+<!--<input class="button" type="button" value="2016" onclick="generate(2016)">-->
+<!--<input class="button" type="button" value="2017" onclick="generate(2017)">-->
+<!--<input class="button" type="button" value="2018" onclick="generate(2018)">-->
+<!--<input class="button" type="button" value="2019" onclick="generate(2019)">-->
+<!--<input class="button" type="button" value="2020" onclick="generate(2020)">-->
+<!--<input class="button" type="button" value="2021" onclick="generate(2021)">-->
+<!--<input class="button" type="button" value="2022" onclick="generate(2022)">-->
 <form name="input"
       th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/working-days(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
       method="post" th:object="${workingDays}">
-    <table class="center">
+    <table id="data-table" class="center">
         <tr>
             <th colspan="2" th:text="${'Відділ: ' + department.name}">Відділ</th>
         </tr>
@@ -132,8 +161,8 @@
             <td><input class="month-value" th:field="*{december}"></td>
         </tr>
         <tr>
-            <th><button type="submit">Зберегти</button></th>
-            <th><input type="button" onclick="showForYear()" value="Відобразити дані"></th>
+            <th><button id="save-btn" class="button" type="submit">Зберегти</button></th>
+            <th><input class="button" type="button" onclick="showForYear()" value="Відобразити дані"></th>
         </tr>
         <tr>
             <td colspan="2"><a class="button" href="/units">На головну</a></td>

@@ -11,7 +11,7 @@
         function showForYear() {
             const enterpriseId = /*[[${enterpriseId}]]*/ '0'
             const year = $('#year').val()
-            window.location = '/units/enterprises/' + enterpriseId + '/year?value=' + year
+            window.location = '/units/enterprises/' + enterpriseId + '/output/year?value=' + year
         }
         /*]]>*/
     </script>
@@ -36,8 +36,8 @@
 <label for="year">Введіть рік</label>
 <input type="text" id="year">
 <button onclick="showForYear()">Відобразити дані</button>
-<p th:if="${tableDataList.isEmpty()}" th:text="${message}"></p>
-<table th:unless="${tableDataList.isEmpty()}" id="data-table">
+<p th:if="${tableDataList == null}" th:text="${message}"></p>
+<table th:unless="${tableDataList == null}" id="data-table">
     <tbody id="table-body">
     <tr>
         <th>Рік</th>
@@ -62,18 +62,18 @@
     <th:block th:each="tableData : ${tableDataList}">
         <tr th:each="row : ${tableData.yearInfos}">
             <th th:text="${tableData.parameterName}"></th>
-            <td th:text="${row.months.get('january').value}"></td>
-            <td th:text="${row.months.get('february').value}"></td>
-            <td th:text="${row.months.get('march').value}"></td>
-            <td th:text="${row.months.get('april').value}"></td>
-            <td th:text="${row.months.get('may').value}"></td>
-            <td th:text="${row.months.get('june').value}"></td>
-            <td th:text="${row.months.get('july').value}"></td>
-            <td th:text="${row.months.get('august').value}"></td>
-            <td th:text="${row.months.get('september').value}"></td>
-            <td th:text="${row.months.get('october').value}"></td>
-            <td th:text="${row.months.get('november').value}"></td>
-            <td th:text="${row.months.get('december').value}"></td>
+            <td th:text="${row.months.get(1).value}"></td>
+            <td th:text="${row.months.get(2).value}"></td>
+            <td th:text="${row.months.get(3).value}"></td>
+            <td th:text="${row.months.get(4).value}"></td>
+            <td th:text="${row.months.get(5).value}"></td>
+            <td th:text="${row.months.get(6).value}"></td>
+            <td th:text="${row.months.get(7).value}"></td>
+            <td th:text="${row.months.get(8).value}"></td>
+            <td th:text="${row.months.get(9).value}"></td>
+            <td th:text="${row.months.get(10).value}"></td>
+            <td th:text="${row.months.get(11).value}"></td>
+            <td th:text="${row.months.get(12).value}"></td>
             <td th:text="${row.getTotalValue()}"></td>
         </tr>
     </th:block>

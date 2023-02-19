@@ -2,6 +2,7 @@ package ua.kpi.mishchenko.monitoringsystem.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysDTO;
@@ -46,9 +47,13 @@ public class WorkingDaysServiceImpl implements WorkingDaysService {
         return workingDaysByYear;
     }
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Override
     @Transactional
     public void saveWorkingDays(WorkingDaysByYear workingDaysByYear) {
+        jdbcTemplate.update("DELETE FROM working_days WHERE unit_id = ? and year = ?",
+                workingDaysByYear.getUnitId(), workingDaysByYear.getYear());
         workingDaysRepository.saveAll(workingDaysMapper.yearToEntities(workingDaysByYear));
     }
 }

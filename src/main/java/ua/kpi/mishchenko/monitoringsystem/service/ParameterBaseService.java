@@ -1,6 +1,7 @@
 package ua.kpi.mishchenko.monitoringsystem.service;
 
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 
 public interface ParameterBaseService {
@@ -9,7 +10,7 @@ public interface ParameterBaseService {
 
     TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
 
-    TableData getDataForEnterpriseByParameterName(Long unitId, String parameterName);
+    ParameterYearsInfo getDataForEnterpriseByParameterName(Long unitId, String parameterName);
 
     TableData getDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
 

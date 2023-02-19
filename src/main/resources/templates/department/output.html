@@ -16,6 +16,18 @@
                 window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
             })
         })
+
+        function input() {
+            const parameterName = $('#parameter-name').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            if (parameterName == null) {
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input'
+            } else {
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
+            }
+        }
+
         /*]]>*/
     </script>
 </head>
@@ -25,7 +37,6 @@
     table {
         border: 1px solid black;
         table-layout: fixed;
-        width: 100%;
     }
 
     th, td {
@@ -33,6 +44,18 @@
         overflow: hidden;
         max-width: 300px;
         width: 100%;
+    }
+
+    .button {
+        font-size: 12px;
+        text-decoration: none;
+        background-color: #EEEEEE;
+        color: #333333;
+        padding: 2px 6px 2px 6px;
+        border-top: 1px solid #CCCCCC;
+        border-right: 1px solid #333333;
+        border-bottom: 1px solid #333333;
+        border-left: 1px solid #CCCCCC;
     }
 </style>
 <div>
@@ -47,6 +70,10 @@
                     th:text="${parameter.name}"></option>
         </th:block>
     </select>
+</div>
+<div>
+    <input class="button" type="button" value="Редагувати" onclick="input()">
+    <a class="button" href="/units">На головну</a>
 </div>
 <table id="data-table">
     <tbody id="table-body">
@@ -97,43 +124,43 @@
     </tr>
     <tr th:each="row : ${tableData.yearInfos}">
         <td th:text="${row.year}"></td>
-        <td th:text="${row.months.get('january').valueToStr()}"></td>
-        <td th:text="${row.months.get('january').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('january').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('february').valueToStr()}"></td>
-        <td th:text="${row.months.get('february').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('february').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('march').valueToStr()}"></td>
-        <td th:text="${row.months.get('march').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('march').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('april').valueToStr()}"></td>
-        <td th:text="${row.months.get('april').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('april').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('may').valueToStr()}"></td>
-        <td th:text="${row.months.get('may').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('may').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('june').valueToStr()}"></td>
-        <td th:text="${row.months.get('june').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('june').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('july').valueToStr()}"></td>
-        <td th:text="${row.months.get('july').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('july').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('august').valueToStr()}"></td>
-        <td th:text="${row.months.get('august').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('august').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('september').valueToStr()}"></td>
-        <td th:text="${row.months.get('september').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('september').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('october').valueToStr()}"></td>
-        <td th:text="${row.months.get('october').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('october').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('november').valueToStr()}"></td>
-        <td th:text="${row.months.get('november').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('november').dailyAverageToString()}"></td>
-        <td th:text="${row.months.get('december').valueToStr()}"></td>
-        <td th:text="${row.months.get('december').workingDaysToStr()}"></td>
-        <td th:text="${row.months.get('december').dailyAverageToString()}"></td>
-        <td th:text="${row.calcYearAverage()}"></td>
+        <td th:text="${row.months.get(1).valueToStr()}"></td>
+        <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(2).valueToStr()}"></td>
+        <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(3).valueToStr()}"></td>
+        <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(4).valueToStr()}"></td>
+        <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(5).valueToStr()}"></td>
+        <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(6).valueToStr()}"></td>
+        <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(7).valueToStr()}"></td>
+        <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(8).valueToStr()}"></td>
+        <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(9).valueToStr()}"></td>
+        <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(10).valueToStr()}"></td>
+        <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(11).valueToStr()}"></td>
+        <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(12).valueToStr()}"></td>
+        <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
+        <td th:text="${row.yearAverage()}"></td>
         <td th:text="${row.getMinValue()}"></td>
         <td th:text="${row.getMinMonth()}"></td>
         <td th:text="${row.getMaxValue()}"></td>
@@ -142,6 +169,5 @@
     </tr>
     </tbody>
 </table>
-<a th:href="@{/units/enterprises/__${enterpriseId}__/year}">Загальна за роками</a>
 </body>
 </html>

@@ -19,7 +19,7 @@ public class MonthInfo {
     private Double dailyAverage = 0.0;
 
     public String valueToStr() {
-        return value == 0.0 ? "" : DECIMAL_FORMAT.format(value);
+        return value == 0.0 || workingDays == 0 ? "" : DECIMAL_FORMAT.format(value);
     }
 
     public String workingDaysToStr() {

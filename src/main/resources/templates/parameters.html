@@ -3,313 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <title>Налаштування показників</title>
+
+    <style>
+        .button {
+            font-size: 12px;
+            text-decoration: none;
+            background-color: #EEEEEE;
+            color: #333333;
+            padding: 2px 6px 2px 6px;
+            border-top: 1px solid #CCCCCC;
+            border-right: 1px solid #333333;
+            border-bottom: 1px solid #333333;
+            border-left: 1px solid #CCCCCC;
+        }
+    </style>
 </head>
 <body>
+<div>
+    <a class="button" href="/units">На головну</a>
+</div>
 <div>
     <form name="parameters"
           th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
           method="post" th:object="${parameters}">
+        <table>
+            <caption th:text="${department.name}"><h2>Department name</h2></caption>
+            <tr>
+                <th>Показник</th>
+                <th>Статус</th>
+            </tr>
+            <tr>
+                <td><label for="volumes_electricity_consumption">Обсяги споживання електроенергії (кВт·год)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_electricity_consumption"
+                           th:field="*{volumesElectricityConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="electricity_costs">Витрати на електроенергію (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="electricity_costs"
+                           th:field="*{electricityCosts}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_electricity_production">Обсяги виробництва електроенергії (кВт·год)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_electricity_production"
+                           th:field="*{volumesElectricityProduction}"></td>
+            </tr>
+            <tr>
+                <td><label for="costs_electricity_production">Витрати на виробництво електроенергію (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="costs_electricity_production"
+                           th:field="*{costsElectricityProduction}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_thermal_energy_production_sale">Обсяги виробництва теплової енергії на продаж
+                    (Гкал)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_thermal_energy_production_sale"
+                           th:field="*{volumesThermalEnergyProductionSale}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_thermal_energy_sales">Обсяги продажів теплової енергії (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_thermal_energy_sales"
+                           th:field="*{volumesThermalEnergySales}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_thermal_energy_consumption">Обсяги споживання теплової енергії (Гкал)</label>
+                </td>
+                <td><input type="checkbox"
+                           id="volumes_thermal_energy_consumption"
+                           th:field="*{volumesThermalEnergyConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="heat_energy_costs_own_needs">Витрати на теплову енергію на власні потреби (грн.)</label>
+                </td>
+                <td><input type="checkbox"
+                           id="heat_energy_costs_own_needs"
+                           th:field="*{heatEnergyCostsOwnNeeds}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_gas_consumption">Обсяги споживання газу (тис. м3)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_gas_consumption"
+                           th:field="*{volumesGasConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="gas_expenses">Витрати на газ (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="gas_expenses"
+                           th:field="*{gasExpenses}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_water_consumption">Обсяги споживання води (тис. м3)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_water_consumption"
+                           th:field="*{volumesWaterConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="water_costs">Витрати на воду (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="water_costs"
+                           th:field="*{waterCosts}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_coal_consumption">Обсяги споживання вугілля (тон)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_coal_consumption"
+                           th:field="*{volumesCoalConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="coal_costs">Витрати на вугілля (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="coal_costs"
+                           th:field="*{coalCosts}"></td>
+            </tr>
+            <tr>
+                <td><label for="fuel_oil_consumption_volumes">Обсяги споживання мазуту (тон)</label></td>
+                <td><input type="checkbox"
+                           id="fuel_oil_consumption_volumes"
+                           th:field="*{fuelOilConsumptionVolumes}"></td>
+            </tr>
+            <tr>
+                <td><label for="costs_fuel_oil">Витрати на мазут (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="costs_fuel_oil"
+                           th:field="*{costsFuelOil}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_diesel_fuel_consumption">Обсяги споживання дизельного палива (тон)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_diesel_fuel_consumption"
+                           th:field="*{volumesDieselFuelConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="diesel_fuel_costs">Витрати на дизельне паливо (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="diesel_fuel_costs"
+                           th:field="*{dieselFuelCosts}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_gasoline_consumption">Обсяги споживання бензину (тон)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_gasoline_consumption"
+                           th:field="*{volumesGasolineConsumption}"></td>
+            </tr>
+            <tr>
+                <td><label for="gasoline_expenses">Витрати на бензин (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="gasoline_expenses"
+                           th:field="*{gasolineExpenses}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_consumption_lubricants">Обсяги споживання мастильних матеріалів (тон)</label>
+                </td>
+                <td><input type="checkbox"
+                           id="volumes_consumption_lubricants"
+                           th:field="*{volumesConsumptionLubricants}"></td>
+            </tr>
+            <tr>
+                <td><label for="costs_lubricants">Витрати на мастильні матеріали (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="costs_lubricants"
+                           th:field="*{costsLubricants}"></td>
+            </tr>
+            <tr>
+                <td><label for="drainage_volumes">Обсяги водовідведення (тис. м3)</label></td>
+                <td><input type="checkbox"
+                           id="drainage_volumes"
+                           th:field="*{drainageVolumes}"></td>
+            </tr>
+            <tr>
+                <td><label for="drainage_costs">Витрати на водовідведення (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="drainage_costs"
+                           th:field="*{drainageCosts}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_solid_household_waste">Обсяги твердих побутових відходів (тис. м3 / тон)</label>
+                </td>
+                <td><input type="checkbox"
+                           id="volumes_solid_household_waste"
+                           th:field="*{volumesSolidHouseholdWaste}"></td>
+            </tr>
+            <tr>
+                <td><label for="costs_disposal_solid_household_waste">Витрати на утилізацію твердих побутових відходів
+                    (грн.)</label></td>
+                <td><input type="checkbox"
+                           id="costs_disposal_solid_household_waste"
+                           th:field="*{costsDisposalSolidHouseholdWaste}"></td>
+            </tr>
+            <tr>
+                <td><label for="ambient_temperature">Температура довкілля (0С)</label></td>
+                <td><input type="checkbox"
+                           id="ambient_temperature"
+                           th:field="*{ambientTemperature}"></td>
+            </tr>
+            <tr>
+                <td><label for="volumes_production_products_and_services">Обсяги виробництва продукції та послуг (грн. з
+                    ПДВ)</label></td>
+                <td><input type="checkbox"
+                           id="volumes_production_products_and_services"
+                           th:field="*{volumesProductionProductsAndServices}"></td>
+            </tr>
+            <tr>
+                <td><label for="CO_emissions">Викиди СО</label></td>
+                <td><input type="checkbox"
+                           id="CO_emissions"
+                           th:field="*{COEmissions}"></td>
+            </tr>
+            <tr>
+                <th colspan="2">
+                    <button class="button" type="submit">Зберегти</button>
+                </th>
+            </tr>
+        </table>
 
-        <p th:text="${department.name}">Department name</p>
-
-        <!--        <div th:if="${parameters.isEmpty()}">-->
-        <!--            <label for="volumes_electricity_consumption">Обсяги споживання електроенергії (кВт·год)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_electricity_consumption"-->
-        <!--                   th:field="*{volumesElectricityConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="electricity_costs">Витрати на електроенергію (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="electricity_costs"-->
-        <!--                   th:field="*{electricityCosts}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_electricity_production">Обсяги виробництва електроенергії (кВт·год)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_electricity_production"-->
-        <!--                   th:field="*{volumesElectricityProduction}">-->
-        <!--            <br>-->
-        <!--            <label for="costs_electricity_production">Витрати на виробництво електроенергію (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="costs_electricity_production"-->
-        <!--                   th:field="*{costsElectricityProduction}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_thermal_energy_production_sale">Обсяги виробництва теплової енергії на продаж-->
-        <!--                (Гкал)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_thermal_energy_production_sale"-->
-        <!--                   th:field="*{volumesThermalEnergyProductionSale}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_thermal_energy_sales">Обсяги продажів теплової енергії (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_thermal_energy_sales"-->
-        <!--                   th:field="*{volumesThermalEnergySales}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_thermal_energy_consumption">Обсяги споживання теплової енергії (Гкал)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_thermal_energy_consumption"-->
-        <!--                   th:field="*{volumesThermalEnergyConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="heat_energy_costs_own_needs">Витрати на теплову енергію на власні потреби (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="heat_energy_costs_own_needs"-->
-        <!--                   th:field="*{heatEnergyCostsOwnNeeds}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_gas_consumption">Обсяги споживання газу (тис. м3)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_gas_consumption"-->
-        <!--                   th:field="*{volumesGasConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="gas_expenses">Витрати на газ (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="gas_expenses"-->
-        <!--                   th:field="*{gasExpenses}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_water_consumption">Обсяги споживання води (тис. м3)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_water_consumption"-->
-        <!--                   th:field="*{volumesWaterConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="water_costs">Витрати на воду (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="water_costs"-->
-        <!--                   th:field="*{waterCosts}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_coal_consumption">Обсяги споживання вугілля (тон)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_coal_consumption"-->
-        <!--                   th:field="*{volumesCoalConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="coal_costs">Витрати на вугілля (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="coal_costs"-->
-        <!--                   th:field="*{coalCosts}">-->
-        <!--            <br>-->
-        <!--            <label for="fuel_oil_consumption_volumes">Обсяги споживання мазуту (тон)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="fuel_oil_consumption_volumes"-->
-        <!--                   th:field="*{fuelOilConsumptionVolumes}">-->
-        <!--            <br>-->
-        <!--            <label for="costs_fuel_oil">Витрати на мазут (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="costs_fuel_oil"-->
-        <!--                   th:field="*{costsFuelOil}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_diesel_fuel_consumption">Обсяги споживання дизельного палива (тон)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_diesel_fuel_consumption"-->
-        <!--                   th:field="*{volumesDieselFuelConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="diesel_fuel_costs">Витрати на дизельне паливо (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="diesel_fuel_costs"-->
-        <!--                   th:field="*{dieselFuelCosts}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_gasoline_consumption">Обсяги споживання бензину (тон)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_gasoline_consumption"-->
-        <!--                   th:field="*{volumesGasolineConsumption}">-->
-        <!--            <br>-->
-        <!--            <label for="gasoline_expenses">Витрати на бензин (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="gasoline_expenses"-->
-        <!--                   th:field="*{gasolineExpenses}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_consumption_lubricants">Обсяги споживання мастильних матеріалів (тон)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_consumption_lubricants"-->
-        <!--                   th:field="*{volumesConsumptionLubricants}">-->
-        <!--            <br>-->
-        <!--            <label for="costs_lubricants">Витрати на мастильні матеріали (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="costs_lubricants"-->
-        <!--                   th:field="*{costsLubricants}">-->
-        <!--            <br>-->
-        <!--            <label for="drainage_volumes">Обсяги водовідведення (тис. м3)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="drainage_volumes"-->
-        <!--                   th:field="*{drainageVolumes}">-->
-        <!--            <br>-->
-        <!--            <label for="drainage_costs">Витрати на водовідведення (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="drainage_costs"-->
-        <!--                   th:field="*{drainageCosts}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_solid_household_waste">Обсяги твердих побутових відходів (тис. м3 / тон)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_solid_household_waste"-->
-        <!--                   th:field="*{volumesSolidHouseholdWaste}">-->
-        <!--            <br>-->
-        <!--            <label for="costs_disposal_solid_household_waste">Витрати на утилізацію твердих побутових відходів-->
-        <!--                (грн.)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="costs_disposal_solid_household_waste"-->
-        <!--                   th:field="*{costsDisposalSolidHouseholdWaste}">-->
-        <!--            <br>-->
-        <!--            <label for="ambient_temperature">Температура довкілля (0С)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="ambient_temperature"-->
-        <!--                   th:field="*{ambientTemperature}">-->
-        <!--            <br>-->
-        <!--            <label for="volumes_production_products_and_services">Обсяги виробництва продукції та послуг (грн. з-->
-        <!--                ПДВ)</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="volumes_production_products_and_services"-->
-        <!--                   th:field="*{volumesProductionProductsAndServices}">-->
-        <!--            <br>-->
-        <!--            <label for="CO_emissions">Викиди СО</label>-->
-        <!--            <input type="checkbox"-->
-        <!--                   id="CO_emissions"-->
-        <!--                   th:field="*{COEmissions}">-->
-        <!--        </div>-->
-        <label for="volumes_electricity_consumption">Обсяги споживання електроенергії (кВт·год)</label>
-        <input type="checkbox"
-               id="volumes_electricity_consumption"
-               th:field="*{volumesElectricityConsumption}">
-        <br>
-        <label for="electricity_costs">Витрати на електроенергію (грн.)</label>
-        <input type="checkbox"
-               id="electricity_costs"
-               th:field="*{electricityCosts}">
-        <br>
-        <label for="volumes_electricity_production">Обсяги виробництва електроенергії (кВт·год)</label>
-        <input type="checkbox"
-               id="volumes_electricity_production"
-               th:field="*{volumesElectricityProduction}">
-        <br>
-        <label for="costs_electricity_production">Витрати на виробництво електроенергію (грн.)</label>
-        <input type="checkbox"
-               id="costs_electricity_production"
-               th:field="*{costsElectricityProduction}">
-        <br>
-        <label for="volumes_thermal_energy_production_sale">Обсяги виробництва теплової енергії на продаж
-            (Гкал)</label>
-        <input type="checkbox"
-               id="volumes_thermal_energy_production_sale"
-               th:field="*{volumesThermalEnergyProductionSale}">
-        <br>
-        <label for="volumes_thermal_energy_sales">Обсяги продажів теплової енергії (грн.)</label>
-        <input type="checkbox"
-               id="volumes_thermal_energy_sales"
-               th:field="*{volumesThermalEnergySales}">
-        <br>
-        <label for="volumes_thermal_energy_consumption">Обсяги споживання теплової енергії (Гкал)</label>
-        <input type="checkbox"
-               id="volumes_thermal_energy_consumption"
-               th:field="*{volumesThermalEnergyConsumption}">
-        <br>
-        <label for="heat_energy_costs_own_needs">Витрати на теплову енергію на власні потреби (грн.)</label>
-        <input type="checkbox"
-               id="heat_energy_costs_own_needs"
-               th:field="*{heatEnergyCostsOwnNeeds}">
-        <br>
-        <label for="volumes_gas_consumption">Обсяги споживання газу (тис. м3)</label>
-        <input type="checkbox"
-               id="volumes_gas_consumption"
-               th:field="*{volumesGasConsumption}">
-        <br>
-        <label for="gas_expenses">Витрати на газ (грн.)</label>
-        <input type="checkbox"
-               id="gas_expenses"
-               th:field="*{gasExpenses}">
-        <br>
-        <label for="volumes_water_consumption">Обсяги споживання води (тис. м3)</label>
-        <input type="checkbox"
-               id="volumes_water_consumption"
-               th:field="*{volumesWaterConsumption}">
-        <br>
-        <label for="water_costs">Витрати на воду (грн.)</label>
-        <input type="checkbox"
-               id="water_costs"
-               th:field="*{waterCosts}">
-        <br>
-        <label for="volumes_coal_consumption">Обсяги споживання вугілля (тон)</label>
-        <input type="checkbox"
-               id="volumes_coal_consumption"
-               th:field="*{volumesCoalConsumption}">
-        <br>
-        <label for="coal_costs">Витрати на вугілля (грн.)</label>
-        <input type="checkbox"
-               id="coal_costs"
-               th:field="*{coalCosts}">
-        <br>
-        <label for="fuel_oil_consumption_volumes">Обсяги споживання мазуту (тон)</label>
-        <input type="checkbox"
-               id="fuel_oil_consumption_volumes"
-               th:field="*{fuelOilConsumptionVolumes}">
-        <br>
-        <label for="costs_fuel_oil">Витрати на мазут (грн.)</label>
-        <input type="checkbox"
-               id="costs_fuel_oil"
-               th:field="*{costsFuelOil}">
-        <br>
-        <label for="volumes_diesel_fuel_consumption">Обсяги споживання дизельного палива (тон)</label>
-        <input type="checkbox"
-               id="volumes_diesel_fuel_consumption"
-               th:field="*{volumesDieselFuelConsumption}">
-        <br>
-        <label for="diesel_fuel_costs">Витрати на дизельне паливо (грн.)</label>
-        <input type="checkbox"
-               id="diesel_fuel_costs"
-               th:field="*{dieselFuelCosts}">
-        <br>
-        <label for="volumes_gasoline_consumption">Обсяги споживання бензину (тон)</label>
-        <input type="checkbox"
-               id="volumes_gasoline_consumption"
-               th:field="*{volumesGasolineConsumption}">
-        <br>
-        <label for="gasoline_expenses">Витрати на бензин (грн.)</label>
-        <input type="checkbox"
-               id="gasoline_expenses"
-               th:field="*{gasolineExpenses}">
-        <br>
-        <label for="volumes_consumption_lubricants">Обсяги споживання мастильних матеріалів (тон)</label>
-        <input type="checkbox"
-               id="volumes_consumption_lubricants"
-               th:field="*{volumesConsumptionLubricants}">
-        <br>
-        <label for="costs_lubricants">Витрати на мастильні матеріали (грн.)</label>
-        <input type="checkbox"
-               id="costs_lubricants"
-               th:field="*{costsLubricants}">
-        <br>
-        <label for="drainage_volumes">Обсяги водовідведення (тис. м3)</label>
-        <input type="checkbox"
-               id="drainage_volumes"
-               th:field="*{drainageVolumes}">
-        <br>
-        <label for="drainage_costs">Витрати на водовідведення (грн.)</label>
-        <input type="checkbox"
-               id="drainage_costs"
-               th:field="*{drainageCosts}">
-        <br>
-        <label for="volumes_solid_household_waste">Обсяги твердих побутових відходів (тис. м3 / тон)</label>
-        <input type="checkbox"
-               id="volumes_solid_household_waste"
-               th:field="*{volumesSolidHouseholdWaste}">
-        <br>
-        <label for="costs_disposal_solid_household_waste">Витрати на утилізацію твердих побутових відходів
-            (грн.)</label>
-        <input type="checkbox"
-               id="costs_disposal_solid_household_waste"
-               th:field="*{costsDisposalSolidHouseholdWaste}">
-        <br>
-        <label for="ambient_temperature">Температура довкілля (0С)</label>
-        <input type="checkbox"
-               id="ambient_temperature"
-               th:field="*{ambientTemperature}">
-        <br>
-        <label for="volumes_production_products_and_services">Обсяги виробництва продукції та послуг (грн. з
-            ПДВ)</label>
-        <input type="checkbox"
-               id="volumes_production_products_and_services"
-               th:field="*{volumesProductionProductsAndServices}">
-        <br>
-        <label for="CO_emissions">Викиди СО</label>
-        <input type="checkbox"
-               id="CO_emissions"
-               th:field="*{COEmissions}">
-
-        <button type="submit">Зберегти</button>
     </form>
 </div>
 </body>
