@@ -14,6 +14,8 @@ public interface ParameterRepository extends CrudRepository<ParameterEntity, Lon
 
     Optional<ParameterEntity> findByBeanName(String beanName);
 
+    Optional<ParameterEntity> findByBeanNameAndHasTariff(String beanName, Boolean hasTariff);
+
     @Query("""
             SELECT p
             FROM ParameterEntity p
@@ -22,4 +24,8 @@ public interface ParameterRepository extends CrudRepository<ParameterEntity, Lon
             WHERE u.parentId = :parentId
             GROUP BY p.id, p.name, p.beanName""")
     List<ParameterEntity> findAllByUnitParentId(@Param("parentId") Long parentId);
+
+    List<ParameterEntity> findAllByHasTariff(Boolean hasTariff);
+
+    boolean existsByBeanNameAndHasTariff(String parameterName, Boolean hasTariff);
 }

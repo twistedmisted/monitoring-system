@@ -1,7 +1,9 @@
 package ua.kpi.mishchenko.monitoringsystem.mapper.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterWithTariff;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
@@ -9,8 +11,13 @@ import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Component
+@RequiredArgsConstructor
 public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
+
+    private final TariffMapper tariffMapper;
 
     @Override
     public ParameterEntity dtoToEntity(ParameterDTO dto) {
@@ -21,6 +28,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setBeanName(dto.getBeanName());
+        entity.setHasTariff(dto.getHasTariff());
         return entity;
     }
 
@@ -33,6 +41,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setBeanName(entity.getBeanName());
+        dto.setHasTariff(entity.getHasTariff());
         return dto;
     }
 
@@ -44,6 +53,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         dto.setId(entity.getParameter().getId());
         dto.setName(entity.getParameter().getName());
         dto.setBeanName(entity.getParameter().getBeanName());
+        dto.setHasTariff(entity.getParameter().getHasTariff());
         return dto;
     }
 
@@ -91,5 +101,26 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
             beanNames.add(entity.getParameter().getBeanName());
         }
         return beanNames;
+    }
+
+    public ParameterWithTariff entityToDtoWithTariff(ParameterEntity entity) {
+        if (isNull(entity)) {
+            return null;
+        }
+        ParameterWithTariff dto = new ParameterWithTariff();
+        dto.setParameter(entityToDto(entity));
+        dto.setTariff(tariffMapper.entityToDto(entity.getTariff()));
+        return dto;
+    }
+
+    public List<ParameterWithTariff> entitiesToDtosWithTariff(List<ParameterEntity> entities) {
+        if (isNull(entities) || entities.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<ParameterWithTariff> dtos = new ArrayList<>();
+        for (ParameterEntity entity : entities) {
+            dtos.add(entityToDtoWithTariff(entity));
+        }
+        return dtos;
     }
 }

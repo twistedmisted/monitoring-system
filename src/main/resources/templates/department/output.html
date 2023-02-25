@@ -61,12 +61,12 @@
 <div>
     <label for="parameter-name">Показник</label>
     <select id="parameter-name">
-        <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
+        <option th:if="${consumptionTableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
         </option>
         <th:block th:each="parameter : ${departmentParameters}">
-            <option th:if="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+            <option th:if="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                     th:text="${parameter.name}" selected="selected"></option>
-            <option th:unless="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                     th:text="${parameter.name}"></option>
         </th:block>
     </select>
@@ -75,8 +75,8 @@
     <input class="button" type="button" value="Редагувати" onclick="input()">
     <a class="button" href="/units">На головну</a>
 </div>
-<table id="data-table">
-    <tbody id="table-body">
+<table th:if="${!consumptionTableData.yearInfos.isEmpty()}" id="consumption-data-table">
+    <tbody id="consumption-table-body">
     <tr>
         <th></th>
         <th>Січень</th>
@@ -122,7 +122,105 @@
         <th>Місяць</th>
         <th>Коефіцієнт нерівності</th>
     </tr>
-    <tr th:each="row : ${tableData.yearInfos}">
+    <tr th:each="row : ${consumptionTableData.yearInfos}">
+        <td th:text="${row.year}"></td>
+        <td th:text="${row.months.get(1).valueToStr()}"></td>
+        <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(2).valueToStr()}"></td>
+        <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(3).valueToStr()}"></td>
+        <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(4).valueToStr()}"></td>
+        <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(5).valueToStr()}"></td>
+        <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(6).valueToStr()}"></td>
+        <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(7).valueToStr()}"></td>
+        <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(8).valueToStr()}"></td>
+        <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(9).valueToStr()}"></td>
+        <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(10).valueToStr()}"></td>
+        <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(11).valueToStr()}"></td>
+        <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(12).valueToStr()}"></td>
+        <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
+        <td th:text="${row.yearAverage()}"></td>
+        <td th:text="${row.getMinValue()}"></td>
+        <td th:text="${row.getMinMonth()}"></td>
+        <td th:text="${row.getMaxValue()}"></td>
+        <td th:text="${row.getMaxMonth()}"></td>
+        <td th:text="${row.calcInequalityCoefficient()}"></td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<br>
+<br>
+<table th:if="${!costsTableData.yearInfos.isEmpty()}" id="costs-data-table">
+    <caption><h2>Витрати</h2></caption>
+    <tbody id="costs-table-body">
+    <tr>
+        <th></th>
+        <th>Січень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Лютий</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Березень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Квітень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Травень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Червень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Липень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Серпень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Вересень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Жовтень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Листопад</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Грудень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Середнє за рік</th>
+        <th>Мінімальне значення</th>
+        <th>Місяць</th>
+        <th>Максимальне значення</th>
+        <th>Місяць</th>
+        <th>Коефіцієнт нерівності</th>
+    </tr>
+    <tr th:each="row : ${costsTableData.yearInfos}">
         <td th:text="${row.year}"></td>
         <td th:text="${row.months.get(1).valueToStr()}"></td>
         <td th:text="${row.months.get(1).workingDaysToStr()}"></td>

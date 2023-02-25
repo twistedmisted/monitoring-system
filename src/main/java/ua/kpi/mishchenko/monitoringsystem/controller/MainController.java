@@ -19,6 +19,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
+import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
@@ -38,6 +39,7 @@ public class MainController {
     private final UnitParameterService unitParameterService;
     private final ParameterBaseService parameterBaseService;
     private final WorkingDaysService workingDaysService;
+    private final ParameterRepository parameterRepository;
 
     @GetMapping
     public String getHomePage(Model model) {
@@ -151,11 +153,16 @@ public class MainController {
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
-        ParameterYearsInfo tableData = new ParameterYearsInfo();
+        ParameterYearsInfo consumptionTableData = new ParameterYearsInfo();
+        ParameterYearsInfo costsTableData = new ParameterYearsInfo();
         if (parameterName != null && !parameterName.isBlank()) {
-            tableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            consumptionTableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            }
         }
-        model.addAttribute("tableData", tableData);
+        model.addAttribute("consumptionTableData", consumptionTableData);
+        model.addAttribute("costsTableData", costsTableData);
         model.addAttribute("departmentParameters", departmentParameters);
         return "enterprise/output";
     }
@@ -173,6 +180,11 @@ public class MainController {
             TableData tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
             tableData.setParameterName(parameterName.getName());
             tableDataList.add(tableData);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName.getBeanName(), true)) {
+                TableData costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
+                costsTableData.setParameterName("Витрати");
+                tableDataList.add(costsTableData);
+            }
         }
         if (tableDataList.isEmpty()) {
             model.addAttribute("message", "Дані за цей рік відсутні");
@@ -189,13 +201,16 @@ public class MainController {
                                           @RequestParam(value = "parameter-name", required = false) String parameterName,
                                           Model model) {
         List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
-        TableData tableData = new TableData();
+        TableData consumptionTableData = new TableData();
+        TableData costsTableData = new TableData();
         if (parameterName != null && !parameterName.isBlank()) {
-            tableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
-        } else {
-            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(10, new YearInfo())));
+            consumptionTableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                costsTableData = parameterBaseService.getCostsDataByParameterNameWithWorkingDays(departmentId, parameterName);
+            }
         }
-        model.addAttribute("tableData", tableData);
+        model.addAttribute("consumptionTableData", consumptionTableData);
+        model.addAttribute("costsTableData", costsTableData);
         model.addAttribute("departmentParameters", departmentParameters);
         model.addAttribute("enterpriseId", enterpriseId);
         model.addAttribute("departmentId", departmentId);

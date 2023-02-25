@@ -10,9 +10,14 @@ public interface ParameterBaseService {
 
     TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
 
+    TableData getCostsDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
+
     ParameterYearsInfo getDataForEnterpriseByParameterName(Long unitId, String parameterName);
+    ParameterYearsInfo getCostsDataForEnterpriseByParameterName(Long unitId, String parameterName);
 
     TableData getDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
+
+    TableData getCostsDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
 
     void saveData(Long unitId, InputDataDTO tableData);
 }
