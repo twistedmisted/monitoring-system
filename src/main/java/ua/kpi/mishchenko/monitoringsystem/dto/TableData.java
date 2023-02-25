@@ -5,12 +5,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class InputDTO {
+public class TableData {
 
-    private List<YearValue> yearValues;
+    private List<YearInfo> yearInfos;
     private String parameterName = "nothing";
 
-    public void addYearValue(YearValue yearValue) {
-        yearValues.add(yearValue);
+    public void addYearValue(YearInfo yearInfo) {
+        yearInfos.add(yearInfo);
     }
 }

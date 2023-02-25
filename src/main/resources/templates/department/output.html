@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заповнення даних</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        $(document).ready(() => {
+            $('#parameter-name').change(() => {
+                const parameterName = $('#parameter-name').val()
+                const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+                const departmentId = /*[[${departmentId}]]*/ '0'
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
+            })
+        })
+
+        function input() {
+            const parameterName = $('#parameter-name').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            if (parameterName == null) {
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input'
+            } else {
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
+            }
+        }
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+<style>
+
+    table {
+        border: 1px solid black;
+        table-layout: fixed;
+    }
+
+    th, td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+        width: 100%;
+    }
+
+    .button {
+        font-size: 12px;
+        text-decoration: none;
+        background-color: #EEEEEE;
+        color: #333333;
+        padding: 2px 6px 2px 6px;
+        border-top: 1px solid #CCCCCC;
+        border-right: 1px solid #333333;
+        border-bottom: 1px solid #333333;
+        border-left: 1px solid #CCCCCC;
+    }
+</style>
+<div>
+    <label for="parameter-name">Показник</label>
+    <select id="parameter-name">
+        <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
+        </option>
+        <th:block th:each="parameter : ${departmentParameters}">
+            <option th:if="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}" selected="selected"></option>
+            <option th:unless="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}"></option>
+        </th:block>
+    </select>
+</div>
+<div>
+    <input class="button" type="button" value="Редагувати" onclick="input()">
+    <a class="button" href="/units">На головну</a>
+</div>
+<table id="data-table">
+    <tbody id="table-body">
+    <tr>
+        <th></th>
+        <th>Січень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Лютий</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Березень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Квітень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Травень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Червень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Липень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Серпень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Вересень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Жовтень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Листопад</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Грудень</th>
+        <th>Робочі дні</th>
+        <th>Середньодобове</th>
+        <th>Середнє за рік</th>
+        <th>Мінімальне значення</th>
+        <th>Місяць</th>
+        <th>Максимальне значення</th>
+        <th>Місяць</th>
+        <th>Коефіцієнт нерівності</th>
+    </tr>
+    <tr th:each="row : ${tableData.yearInfos}">
+        <td th:text="${row.year}"></td>
+        <td th:text="${row.months.get(1).valueToStr()}"></td>
+        <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(2).valueToStr()}"></td>
+        <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(3).valueToStr()}"></td>
+        <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(4).valueToStr()}"></td>
+        <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(5).valueToStr()}"></td>
+        <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(6).valueToStr()}"></td>
+        <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(7).valueToStr()}"></td>
+        <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(8).valueToStr()}"></td>
+        <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(9).valueToStr()}"></td>
+        <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(10).valueToStr()}"></td>
+        <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(11).valueToStr()}"></td>
+        <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
+        <td th:text="${row.months.get(12).valueToStr()}"></td>
+        <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
+        <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
+        <td th:text="${row.yearAverage()}"></td>
+        <td th:text="${row.getMinValue()}"></td>
+        <td th:text="${row.getMinMonth()}"></td>
+        <td th:text="${row.getMaxValue()}"></td>
+        <td th:text="${row.getMaxMonth()}"></td>
+        <td th:text="${row.calcInequalityCoefficient()}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

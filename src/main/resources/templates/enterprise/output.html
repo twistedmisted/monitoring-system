@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заповнення даних</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        $(document).ready(() => {
+            $('#parameter-name').change(() => {
+                const parameterName = $('#parameter-name').val()
+                const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+                window.location = '/units/enterprises/' + enterpriseId + '/output?parameter-name=' + parameterName
+            })
+        })
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+<style>
+
+    table {
+        border: 1px solid black;
+        table-layout: fixed;
+    }
+
+    th, td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+        width: 100%;
+    }
+
+    .button {
+        font-size: 12px;
+        text-decoration: none;
+        background-color: #EEEEEE;
+        color: #333333;
+        padding: 2px 6px 2px 6px;
+        border-top: 1px solid #CCCCCC;
+        border-right: 1px solid #333333;
+        border-bottom: 1px solid #333333;
+        border-left: 1px solid #CCCCCC;
+    }
+</style>
+<div>
+    <label for="parameter-name">Показник</label>
+    <select id="parameter-name">
+        <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
+        </option>
+        <th:block th:each="parameter : ${departmentParameters}">
+            <option th:if="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}" selected="selected"></option>
+            <option th:unless="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}"></option>
+        </th:block>
+    </select>
+</div>
+<div>
+    <a class="button" th:href="@{/units/enterprises/__${enterpriseId}__/output/year}">Загальна за роками</a>
+    <a class="button" href="/units">На головну</a>
+</div>
+<table th:if="${!tableData.yearsInfo.isEmpty()}" id="data-table">
+    <tbody id="table-body">
+    <tr>
+        <th></th>
+        <th>Січень</th>
+        <th>Середньодобове</th>
+        <th>Лютий</th>
+        <th>Середньодобове</th>
+        <th>Березень</th>
+        <th>Середньодобове</th>
+        <th>Квітень</th>
+        <th>Середньодобове</th>
+        <th>Травень</th>
+        <th>Середньодобове</th>
+        <th>Червень</th>
+        <th>Середньодобове</th>
+        <th>Липень</th>
+        <th>Середньодобове</th>
+        <th>Серпень</th>
+        <th>Середньодобове</th>
+        <th>Вересень</th>
+        <th>Середньодобове</th>
+        <th>Жовтень</th>
+        <th>Середньодобове</th>
+        <th>Листопад</th>
+        <th>Середньодобове</th>
+        <th>Грудень</th>
+        <th>Середньодобове</th>
+        <th>Середнє за рік</th>
+        <th>Мінімальне значення</th>
+        <th>Місяць</th>
+        <th>Максимальне значення</th>
+        <th>Місяць</th>
+        <th>Коефіцієнт нерівності</th>
+    </tr>
+    <tr th:each="pr, stat : ${tableData.yearsInfo}">
+        <td th:text="${pr.key}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 1)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 1)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 2)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 2)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 3)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 3)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 4)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 4)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 5)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 5)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 6)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 6)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 7)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 7)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 8)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 8)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 9)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 9)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 10)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 10)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 11)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 11)}"></td>
+        <td th:text="${tableData.monthValue(pr.key, 12)}"></td>
+        <td th:text="${tableData.monthAverage(pr.key, 12)}"></td>
+        <td th:text="${tableData.yearAverage(pr.key)}"></td>
+        <td th:text="${tableData.getMinValue(pr.key)}"></td>
+        <td th:text="${tableData.getMinMonth(pr.key)}"></td>
+        <td th:text="${tableData.getMaxValue(pr.key)}"></td>
+        <td th:text="${tableData.getMaxMonth(pr.key)}"></td>
+        <td th:text="${tableData.calcInequalityCoefficient(pr.key)}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
