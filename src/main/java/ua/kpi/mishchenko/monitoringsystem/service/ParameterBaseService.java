@@ -3,12 +3,15 @@ package ua.kpi.mishchenko.monitoringsystem.service;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
+import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 
 public interface ParameterBaseService {
 
     InputDataDTO getDataByParameterName(Long unitId, String parameterName);
 
     TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
+
+    YearInfo getDataByParameterNameWithWorkingDaysByYear(Long unitId, String parameterName, Integer year);
 
     TableData getCostsDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
 

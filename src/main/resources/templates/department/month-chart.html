@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Графік</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        $(document).ready(() => {
+            $('#parameter-name').change(() => {
+                const parameterName = $('#parameter-name').val()
+                const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+                const departmentId = /*[[${departmentId}]]*/ '0'
+                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/line-chart?parameter-name=' + parameterName
+            })
+        })
+
+        $(function () {
+            drawCharts();
+        });
+        /*]]>*/
+    </script>
+</head>
+<body>
+<style>
+
+    table {
+        border: 1px solid black;
+        table-layout: fixed;
+    }
+
+    th {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 50px;
+    }
+
+    td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+    }
+
+    input {
+        max-width: 105px;
+    }
+
+    .button {
+        font-size: 12px;
+        text-decoration: none;
+        background-color: #EEEEEE;
+        color: #333333;
+        padding: 2px 6px 2px 6px;
+        border-top: 1px solid #CCCCCC;
+        border-right: 1px solid #333333;
+        border-bottom: 1px solid #333333;
+        border-left: 1px solid #CCCCCC;
+    }
+
+    canvas#monthChart {
+        width: 1500px !important;
+        height: 650px !important;
+    }
+
+    canvas#yearChart {
+        width: 1275px !important;
+        height: 650px !important;
+        padding-top: 10px;
+    }
+</style>
+<div>
+    <label for="parameter-name">Показник</label>
+    <select id="parameter-name">
+        <option th:if="${consumptionTableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть
+            показник
+        </option>
+        <th:block th:each="parameter : ${departmentParameters}">
+            <option th:if="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+                    th:text="${parameter.name}" selected="selected"></option>
+            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}"
+                    th:value="${parameter.beanName}"
+                    th:text="${parameter.name}"></option>
+        </th:block>
+    </select>
+</div>
+<div>
+    <input class="button" type="button" value="Оновити графік" onclick="updateChart()">
+    <a class="button" href="/units">На головну</a>
+</div>
+<div>
+    <canvas id="monthChart"></canvas>
+</div>
+<div>
+    <table th:if="${!consumptionTableData.yearInfos.isEmpty()}" id="consumption-data-table">
+        <tbody id="consumption-table-body">
+        <tr>
+            <th></th>
+            <th>Січень</th>
+            <th>Лютий</th>
+            <th>Березень</th>
+            <th>Квітень</th>
+            <th>Травень</th>
+            <th>Червень</th>
+            <th>Липень</th>
+            <th>Серпень</th>
+            <th>Вересень</th>
+            <th>Жовтень</th>
+            <th>Листопад</th>
+            <th>Грудень</th>
+        </tr>
+        <tr th:each="row : ${consumptionTableData.yearInfos}">
+            <th th:text="${row.year}"></th>
+            <td><input th:value="${row.months.get(1).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(2).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(3).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(4).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(5).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(6).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(7).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(8).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(9).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(10).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(11).dailyAverageToString()}"></td>
+            <td><input th:value="${row.months.get(12).dailyAverageToString()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${!consumptionTableData.yearInfos.isEmpty()}">
+    <form name="input"
+          th:action="@{/comments/consumption(enterpriseId=${enterpriseId}, departmentId=${departmentId}, parameterName=${consumptionTableData.parameterName})}"
+          method="post" th:object="${consumptionComment}">
+        <p><label for="review">Коментарій для графіку споживань:</label></p>
+        <textarea id="review" name="review" rows="4" cols="50" th:field="*{text}"></textarea>
+        <br>
+        <input type="submit" value="Зберегти">
+    </form>
+</div>
+<div>
+    <canvas id="yearChart"></canvas>
+</div>
+<div>
+    <table th:if="${!consumptionTableData.yearInfos.isEmpty()}" id="costs-data-table">
+        <tbody id="costs-table-body">
+        <tr>
+            <th></th>
+            <th:block th:each="row : ${costsTableData.yearInfos}">
+                <th th:text="${row.year}"></th>
+            </th:block>
+        </tr>
+        <tr>
+            <th>Сума витрат за рік</th>
+            <th:block th:each="row : ${costsTableData.yearInfos}">
+                <td><input th:value="${row.yearAverage()}"></td>
+            </th:block>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${!costsTableData.yearInfos.isEmpty()}">
+    <form name="input"
+          th:action="@{/comments/costs(enterpriseId=${enterpriseId}, departmentId=${departmentId}, parameterName=${consumptionTableData.parameterName})}"
+          method="post" th:object="${costsComment}">
+        <p><label for="review">Коментарій для графіку споживань:</label></p>
+        <textarea id="review" name="review" rows="4" cols="50" th:field="*{text}"></textarea>
+        <br>
+        <input type="submit" value="Зберегти">
+    </form>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+
+<script>
+    var randomColorGenerator = function () {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function drawMonthChart() {
+        let myDatasets = [];
+        let myLabels = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
+        const table = document.getElementById("consumption-data-table");
+        for (let i = 1, row; row = table.rows[i]; i++) {
+            let tempData = [];
+            let myLabel = "dummy";
+            for (let j = 0, col; col = row.cells[j]; j++) {
+                if (j === 0) {
+                    myLabel = col.innerHTML;
+                    // myLabels.push(myLabel);
+                    continue;
+                }
+                let tempValue = col.children[0].value;
+                if (tempValue === "") {
+                    tempValue = 0;
+                }
+                tempData.push(parseFloat(col.children[0].value));
+            }
+            myDatasets.push({
+                label: myLabel,
+                data: tempData,
+                borderColor: randomColorGenerator(),
+                fill: false
+            });
+        }
+
+        new Chart("monthChart", {
+            type: "line",
+            data: {
+                labels: myLabels,
+                datasets: myDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    display: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            align: 'center',
+                            labels: {
+                                color: 'darkred',
+                                font: {
+                                    weight: 'bold'
+                                },
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        offset: true
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    function drawYearChart() {
+        let myDatasets = [];
+        let myLabels = [];
+        const table = document.getElementById("costs-data-table");
+        for (let i = 0, row; row = table.rows[i]; i++) {
+            let tempData = [];
+            let myLabel = "dummy";
+            for (let j = 1, col; col = row.cells[j]; j++) {
+                if (i === 0) {
+                    myLabel = col.innerHTML;
+                    myLabels.push(myLabel);
+                    continue;
+                }
+                let tempValue = col.children[0].value;
+                if (tempValue === "") {
+                    tempValue = 0;
+                }
+                tempData.push(parseFloat(col.children[0].value));
+            }
+            myDatasets.push({
+                label: "Year",
+                data: tempData,
+                borderColor: randomColorGenerator(),
+                fill: false
+            });
+        }
+
+        new Chart("yearChart", {
+            type: "line",
+            data: {
+                labels: myLabels,
+                datasets: myDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    display: false
+                },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        offset: true
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    function drawCharts() {
+        drawMonthChart();
+        drawYearChart();
+    }
+</script>
+</body>
+</html>

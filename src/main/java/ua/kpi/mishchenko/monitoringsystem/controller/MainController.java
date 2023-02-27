@@ -9,18 +9,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ua.kpi.mishchenko.monitoringsystem.dto.CommentDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputYearInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
+import ua.kpi.mishchenko.monitoringsystem.dto.PieChartDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
+import ua.kpi.mishchenko.monitoringsystem.service.CommentService;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
+import ua.kpi.mishchenko.monitoringsystem.service.ParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
 import ua.kpi.mishchenko.monitoringsystem.service.WorkingDaysService;
@@ -40,6 +44,8 @@ public class MainController {
     private final ParameterBaseService parameterBaseService;
     private final WorkingDaysService workingDaysService;
     private final ParameterRepository parameterRepository;
+    private final CommentService commentService;
+    private final ParameterService parameterService;
 
     @GetMapping
     public String getHomePage(Model model) {
@@ -284,5 +290,85 @@ public class MainController {
 //        model.addAttribute("department", department);
 //        model.addAttribute("workingDays", workingDays);
         return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/working-days?year=" + workingDays.getYear();
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/line-chart")
+    public String getMonthChart(@PathVariable Long enterpriseId,
+                                @PathVariable Long departmentId,
+                                @RequestParam(value = "parameter-name", required = false) String parameterName,
+                                Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+        TableData consumptionTableData = new TableData();
+        TableData costsTableData = new TableData();
+        CommentDTO consumptionComment = new CommentDTO();
+        CommentDTO costsComment = new CommentDTO();
+        if (parameterName != null && !parameterName.isBlank()) {
+            consumptionTableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
+            consumptionComment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, parameterName);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                costsTableData = parameterBaseService.getCostsDataByParameterNameWithWorkingDays(departmentId, parameterName);
+                costsComment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, parameterName + "_costs");
+            }
+        }
+        model.addAttribute("consumptionTableData", consumptionTableData);
+        model.addAttribute("costsTableData", costsTableData);
+        model.addAttribute("departmentParameters", departmentParameters);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("consumptionComment", consumptionComment);
+        model.addAttribute("costsComment", costsComment);
+        return "department/month-chart";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/line-chart")
+    public String getEnterpriseLineChart(@PathVariable Long enterpriseId,
+                                         @RequestParam(value = "parameter-name", required = false) String parameterName,
+                                         Model model) {
+        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        ParameterYearsInfo consumptionTableData = new ParameterYearsInfo();
+        ParameterYearsInfo costsTableData = new ParameterYearsInfo();
+        CommentDTO consumptionComment = new CommentDTO();
+        CommentDTO costsComment = new CommentDTO();
+        if (parameterName != null && !parameterName.isBlank()) {
+            consumptionTableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            consumptionComment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, parameterName);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterName(enterpriseId, parameterName);
+                costsComment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, parameterName + "_costs");
+            }
+        }
+        model.addAttribute("consumptionTableData", consumptionTableData);
+        model.addAttribute("costsTableData", costsTableData);
+        model.addAttribute("departmentParameters", departmentParameters);
+        model.addAttribute("consumptionComment", consumptionComment);
+        model.addAttribute("costsComment", costsComment);
+        return "enterprise/month-chart";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/pie-chart")
+    public String getPieChart(@PathVariable Long enterpriseId,
+                              @PathVariable Long departmentId,
+                              @RequestParam(required = false) Integer year,
+                              Model model) {
+        PieChartDTO pieChartDTO = new PieChartDTO();
+        CommentDTO consumptionComment = new CommentDTO();
+        CommentDTO costsComment = new CommentDTO();
+        if (year != null) {
+            List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+            for (ParameterDTO parameterDTO : departmentParameters) {
+                String parameterName = parameterDTO.getBeanName();
+                if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                    YearInfo tempYearInfo = parameterBaseService.getDataByParameterNameWithWorkingDaysByYear(departmentId, parameterName, year);
+                    pieChartDTO.addYearInfo(parameterService.getParameterByBeanName(parameterName).getCostsName(), tempYearInfo);
+                }
+            }
+        }
+        model.addAttribute("pieChart", pieChartDTO);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("consumptionComment", consumptionComment);
+        model.addAttribute("costsComment", costsComment);
+        model.addAttribute("year", year);
+        return "department/pie-chart";
     }
 }

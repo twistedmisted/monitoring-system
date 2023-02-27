@@ -3,7 +3,8 @@ CREATE TABLE parameters
     id         BIGINT GENERATED ALWAYS AS IDENTITY,
     name       VARCHAR(255) NOT NULL,
     bean_name  VARCHAR(255) NOT NULL,
-    has_tariff BOOLEAN      NOT NULL
+    has_tariff BOOLEAN      NOT NULL,
+    costs_name VARCHAR(255)
 );
 
 ALTER TABLE parameters

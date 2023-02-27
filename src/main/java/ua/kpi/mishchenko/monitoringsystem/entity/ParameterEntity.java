@@ -36,6 +36,9 @@ public class ParameterEntity {
     @Column(name = "has_tariff", nullable = false)
     private Boolean hasTariff;
 
+    @Column(name = "costs_name")
+    private String costsName;
+
     @OneToMany(mappedBy = "parameter", cascade = ALL)
     private List<UnitParameterEntity> units = new ArrayList<>();
 

@@ -29,6 +29,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         entity.setName(dto.getName());
         entity.setBeanName(dto.getBeanName());
         entity.setHasTariff(dto.getHasTariff());
+        entity.setCostsName(dto.getCostsName());
         return entity;
     }
 
@@ -42,6 +43,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         dto.setName(entity.getName());
         dto.setBeanName(entity.getBeanName());
         dto.setHasTariff(entity.getHasTariff());
+        dto.setCostsName(entity.getCostsName());
         return dto;
     }
 
@@ -54,6 +56,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         dto.setName(entity.getParameter().getName());
         dto.setBeanName(entity.getParameter().getBeanName());
         dto.setHasTariff(entity.getParameter().getHasTariff());
+        dto.setCostsName(entity.getParameter().getCostsName());
         return dto;
     }
 

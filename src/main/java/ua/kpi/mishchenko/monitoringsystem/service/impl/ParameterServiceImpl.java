@@ -2,6 +2,7 @@ package ua.kpi.mishchenko.monitoringsystem.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterWithTariff;
 import ua.kpi.mishchenko.monitoringsystem.mapper.impl.ParameterMapper;
 import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
@@ -17,6 +18,11 @@ public class ParameterServiceImpl implements ParameterService {
 
     private final ParameterRepository parameterRepository;
     private final ParameterMapper parameterMapper;
+
+    @Override
+    public ParameterDTO getParameterByBeanName(String name) {
+        return parameterMapper.entityToDto(parameterRepository.findByBeanName(name).orElse(null));
+    }
 
     @Override
     public ParameterWithTariff getParameterWithTariffByName(String name) {

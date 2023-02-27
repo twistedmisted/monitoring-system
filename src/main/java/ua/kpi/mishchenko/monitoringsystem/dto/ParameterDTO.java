@@ -9,4 +9,5 @@ public class ParameterDTO {
     private String name;
     private String beanName;
     private Boolean hasTariff;
+    private String costsName;
 }
