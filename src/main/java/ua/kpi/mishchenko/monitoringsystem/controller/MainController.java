@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ua.kpi.mishchenko.monitoringsystem.dto.CommentDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.EnterprisePieChartDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputYearInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
@@ -21,6 +22,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
+import ua.kpi.mishchenko.monitoringsystem.entity.ParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.CommentService;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
@@ -33,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static ua.kpi.mishchenko.monitoringsystem.controller.CommentController.PIE_CHART;
 
 @Controller
 @RequestMapping("/units")
@@ -302,12 +306,16 @@ public class MainController {
         TableData costsTableData = new TableData();
         CommentDTO consumptionComment = new CommentDTO();
         CommentDTO costsComment = new CommentDTO();
+        String consumptionTitle = null;
+        String costsTitle = null;
         if (parameterName != null && !parameterName.isBlank()) {
             consumptionTableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
             consumptionComment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, parameterName);
+            consumptionTitle = "Середньодобове за місяць \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
             if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
                 costsTableData = parameterBaseService.getCostsDataByParameterNameWithWorkingDays(departmentId, parameterName);
                 costsComment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, parameterName + "_costs");
+                costsTitle = "Середньодобове за рік \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getCostsName() + "\"";
             }
         }
         model.addAttribute("consumptionTableData", consumptionTableData);
@@ -317,6 +325,8 @@ public class MainController {
         model.addAttribute("departmentId", departmentId);
         model.addAttribute("consumptionComment", consumptionComment);
         model.addAttribute("costsComment", costsComment);
+        model.addAttribute("consumptionTitle", consumptionTitle);
+        model.addAttribute("costsTitle", costsTitle);
         return "department/month-chart";
     }
 
@@ -329,12 +339,16 @@ public class MainController {
         ParameterYearsInfo costsTableData = new ParameterYearsInfo();
         CommentDTO consumptionComment = new CommentDTO();
         CommentDTO costsComment = new CommentDTO();
+        String consumptionTitle = null;
+        String costsTitle = null;
         if (parameterName != null && !parameterName.isBlank()) {
             consumptionTableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
             consumptionComment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, parameterName);
+            consumptionTitle = "Середньодобове за місяць \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
             if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
                 costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterName(enterpriseId, parameterName);
                 costsComment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, parameterName + "_costs");
+                costsTitle = "Середньодобове за рік \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getCostsName() + "\"";
             }
         }
         model.addAttribute("consumptionTableData", consumptionTableData);
@@ -342,6 +356,8 @@ public class MainController {
         model.addAttribute("departmentParameters", departmentParameters);
         model.addAttribute("consumptionComment", consumptionComment);
         model.addAttribute("costsComment", costsComment);
+        model.addAttribute("consumptionTitle", consumptionTitle);
+        model.addAttribute("costsTitle", costsTitle);
         return "enterprise/month-chart";
     }
 
@@ -351,8 +367,8 @@ public class MainController {
                               @RequestParam(required = false) Integer year,
                               Model model) {
         PieChartDTO pieChartDTO = new PieChartDTO();
-        CommentDTO consumptionComment = new CommentDTO();
-        CommentDTO costsComment = new CommentDTO();
+        CommentDTO comment = new CommentDTO();
+        String chartTitle = null;
         if (year != null) {
             List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
             for (ParameterDTO parameterDTO : departmentParameters) {
@@ -360,15 +376,44 @@ public class MainController {
                 if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
                     YearInfo tempYearInfo = parameterBaseService.getDataByParameterNameWithWorkingDaysByYear(departmentId, parameterName, year);
                     pieChartDTO.addYearInfo(parameterService.getParameterByBeanName(parameterName).getCostsName(), tempYearInfo);
+                    comment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, PIE_CHART + year);
                 }
             }
+            chartTitle = "Енергобаланс по відділу \"" + unitService.getUnitById(departmentId).getName() + "\" за " + year + " рік";
         }
         model.addAttribute("pieChart", pieChartDTO);
         model.addAttribute("enterpriseId", enterpriseId);
         model.addAttribute("departmentId", departmentId);
-        model.addAttribute("consumptionComment", consumptionComment);
-        model.addAttribute("costsComment", costsComment);
+        model.addAttribute("comment", comment);
         model.addAttribute("year", year);
+        model.addAttribute("chartTitle", chartTitle);
         return "department/pie-chart";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/pie-chart")
+    public String getEnterprisePieChart(@PathVariable Long enterpriseId,
+                                        @RequestParam(required = false) Integer year,
+                                        Model model) {
+        EnterprisePieChartDTO pieChartDTO = new EnterprisePieChartDTO();
+        CommentDTO comment = new CommentDTO();
+        String chartTitle = null;
+        if (year != null) {
+            List<ParameterDTO> enterpriseParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+            for (ParameterDTO parameterDTO : enterpriseParameters) {
+                String parameterName = parameterDTO.getBeanName();
+                if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                    List<YearInfo> tempYearInfos = parameterBaseService.getYearCostsDataForEnterpriseByParameterName(enterpriseId, parameterName, year);
+                    pieChartDTO.addYearInfos(parameterService.getParameterByBeanName(parameterName).getCostsName(), tempYearInfos);
+                }
+            }
+            comment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, PIE_CHART + year);
+            chartTitle = "Енергобаланс по підприємству \"" + unitService.getUnitById(enterpriseId).getName() + "\" за " + year + " рік";
+        }
+        model.addAttribute("pieChart", pieChartDTO);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("comment", comment);
+        model.addAttribute("year", year);
+        model.addAttribute("chartTitle", chartTitle);
+        return "enterprise/pie-chart";
     }
 }

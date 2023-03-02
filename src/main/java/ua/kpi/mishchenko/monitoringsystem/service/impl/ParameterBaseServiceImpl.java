@@ -15,6 +15,7 @@ import ua.kpi.mishchenko.monitoringsystem.entity.ParameterBaseEntity;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
+import ua.kpi.mishchenko.monitoringsystem.service.ParameterService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,6 +83,7 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     private final JdbcTemplate jdbcTemplate;
     private final UnitParameterRepository unitParameterRepository;
+    private final ParameterService parameterService;
 
     @Override
     public InputDataDTO getDataByParameterName(Long unitId, String parameterName) {
@@ -137,10 +139,6 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
     @Override
     public YearInfo getDataByParameterNameWithWorkingDaysByYear(Long unitId, String parameterName, Integer year) {
         return getYearInfo(getParameterValuesWithWorkingDaysByYear(unitId, parameterName, year));
-//        TableData tableData = new TableData();
-//        tableData.setYearInfos(yearInfos);
-//        tableData.setParameterName(parameterName);
-//        return tableData;
     }
 
     private List<YearInfo> getYearInfosByDepartmentIdAndParameterBeanName(Long departmentId, String beanName) {
@@ -261,6 +259,17 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
             }
         }
         return parameterYearsInfo;
+    }
+
+    @Override
+    public List<YearInfo> getYearCostsDataForEnterpriseByParameterName(Long unitId, String parameterName, Integer year) {
+        List<YearInfo> yearInfos = new ArrayList<>();
+        List<Long> departmentsId = getDepartmentsIdByEnterpriseIdAndParameterBeanName(unitId, parameterName);
+        for (Long departmentId : departmentsId) {
+            YearInfo tempYearInfo = getDataByParameterNameWithWorkingDaysByYear(departmentId, parameterName, year);
+            yearInfos.add(tempYearInfo);
+        }
+        return yearInfos;
     }
 
     private List<Long> getDepartmentsIdByEnterpriseIdAndParameterBeanName(Long unitId, String beanName) {

@@ -20,6 +20,14 @@
         $(function () {
             drawCharts();
         });
+
+        function updateChart() {
+            drawCharts();
+        }
+
+        const consTitle = /*[[${consumptionTitle}]]*/ 'Споживання';
+        const costsTitle = /*[[${costsTitle}]]*/ 'Витрати';
+
         /*]]>*/
     </script>
 </head>
@@ -34,6 +42,10 @@
     th {
         border: 1px solid black;
         overflow: hidden;
+        max-width: 100px;
+    }
+
+    .costs-th {
         max-width: 50px;
     }
 
@@ -60,7 +72,7 @@
     }
 
     canvas#monthChart {
-        width: 1500px !important;
+        width: 1845px !important;
         height: 650px !important;
     }
 
@@ -68,6 +80,11 @@
         width: 1275px !important;
         height: 650px !important;
         padding-top: 10px;
+    }
+
+    .empty-col {
+        border: none;
+        width: 140px;
     }
 </style>
 <div>
@@ -109,6 +126,8 @@
             <th>Жовтень</th>
             <th>Листопад</th>
             <th>Грудень</th>
+            <td class="empty-col"></td>
+            <th>Середнє за рік</th>
         </tr>
         <tr th:each="row : ${consumptionTableData.yearInfos}">
             <th th:text="${row.year}"></th>
@@ -124,6 +143,8 @@
             <td><input th:value="${row.months.get(10).dailyAverageToString()}"></td>
             <td><input th:value="${row.months.get(11).dailyAverageToString()}"></td>
             <td><input th:value="${row.months.get(12).dailyAverageToString()}"></td>
+            <td class="empty-col"></td>
+            <td></td>
         </tr>
         </tbody>
     </table>
@@ -151,7 +172,7 @@
             </th:block>
         </tr>
         <tr>
-            <th>Сума витрат за рік</th>
+            <th class="costs-th">Сума витрат за рік</th>
             <th:block th:each="row : ${costsTableData.yearInfos}">
                 <td><input th:value="${row.yearAverage()}"></td>
             </th:block>
@@ -183,22 +204,40 @@
 
     function drawMonthChart() {
         let myDatasets = [];
-        let myLabels = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
+        let myLabels = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень", "", "Середнє за рік", ""];
         const table = document.getElementById("consumption-data-table");
         for (let i = 1, row; row = table.rows[i]; i++) {
             let tempData = [];
             let myLabel = "dummy";
+            let yearSum = 0.0;
+            let monthCount = 0;
             for (let j = 0, col; col = row.cells[j]; j++) {
                 if (j === 0) {
                     myLabel = col.innerHTML;
                     // myLabels.push(myLabel);
                     continue;
                 }
+                if (j === row.cells.length - 2) {
+                    continue;
+                }
+                if (j === row.cells.length - 1) {
+                    const yearAver = yearSum / monthCount;
+                    col.innerHTML = (Math.round((yearAver + Number.EPSILON) * 100) / 100).toString();
+                    tempData.push(parseFloat(''));
+                    tempData.push(yearAver);
+                    tempData.push(yearAver);
+                    continue;
+                }
                 let tempValue = col.children[0].value;
                 if (tempValue === "") {
                     tempValue = 0;
                 }
-                tempData.push(parseFloat(col.children[0].value));
+                const monthValue = parseFloat(col.children[0].value.replace(',', '.'));
+                if (monthValue > 0) {
+                    yearSum += monthValue;
+                    monthCount++;
+                }
+                tempData.push(monthValue);
             }
             myDatasets.push({
                 label: myLabel,
@@ -217,6 +256,13 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: consTitle,
+                    font: {
+                        size: 16
+                    }
+                },
                 legend: {
                     display: true,
                     plugins: {
@@ -269,14 +315,16 @@
                 if (tempValue === "") {
                     tempValue = 0;
                 }
-                tempData.push(parseFloat(col.children[0].value));
+                tempData.push(parseFloat(col.children[0].value.replace(',', '.')));
             }
-            myDatasets.push({
-                label: "Year",
-                data: tempData,
-                borderColor: randomColorGenerator(),
-                fill: false
-            });
+            if (i > 0) {
+                myDatasets.push({
+                    label: "Year",
+                    data: tempData,
+                    borderColor: randomColorGenerator(),
+                    fill: false
+                });
+            }
         }
 
         new Chart("yearChart", {
@@ -288,6 +336,13 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: costsTitle,
+                    font: {
+                        size: 16
+                    }
+                },
                 legend: {
                     display: false
                 },

@@ -10,9 +10,8 @@
         /*<![CDATA[*/
         function showForYear() {
             const enterpriseId = /*[[${enterpriseId}]]*/ '0'
-            const departmentId = /*[[${departmentId}]]*/ '0'
             const year = $('#year').val()
-            window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/pie-chart?year=' + year
+            window.location = '/units/enterprises/' + enterpriseId + '/pie-chart?year=' + year
         }
 
         $(function () {
@@ -78,7 +77,7 @@
     <input class="button" type="button" value="Оновити графік" onclick="updateChart()">
     <a class="button" href="/units">На головну</a>
 </div>
-<div class="chart-box">
+<div>
     <canvas id="pieChart"></canvas>
 </div>
 <div>
@@ -94,7 +93,7 @@
         <tr>
             <th th:text="${year}"></th>
             <th:block th:each="pr, stat : ${pieChart.costs}">
-                <td><input th:value="${pieChart.getYearInfo(pr.key).yearAverage()}"></td>
+                <td><input th:value="${pieChart.yearAverage(pr.key)}"></td>
             </th:block>
             <td id="total-sum"></td>
         </tr>
@@ -103,7 +102,7 @@
 </div>
 <div th:if="${!pieChart.costs.isEmpty()}">
     <form name="input"
-          th:action="@{/comments/pie-department(enterpriseId=${enterpriseId}, departmentId=${departmentId}, year=${year})}"
+          th:action="@{/comments/pie-enterprise(enterpriseId=${enterpriseId}, year=${year})}"
           method="post" th:object="${comment}">
         <p><label for="review">Коментарій для графіку витрат:</label></p>
         <textarea id="review" name="review" rows="4" cols="50" th:field="*{text}"></textarea>

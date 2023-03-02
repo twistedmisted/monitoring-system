@@ -5,6 +5,8 @@ import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 
+import java.util.List;
+
 public interface ParameterBaseService {
 
     InputDataDTO getDataByParameterName(Long unitId, String parameterName);
@@ -16,7 +18,10 @@ public interface ParameterBaseService {
     TableData getCostsDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
 
     ParameterYearsInfo getDataForEnterpriseByParameterName(Long unitId, String parameterName);
+
     ParameterYearsInfo getCostsDataForEnterpriseByParameterName(Long unitId, String parameterName);
+
+    List<YearInfo> getYearCostsDataForEnterpriseByParameterName(Long unitId, String parameterName, Integer year);
 
     TableData getDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
 

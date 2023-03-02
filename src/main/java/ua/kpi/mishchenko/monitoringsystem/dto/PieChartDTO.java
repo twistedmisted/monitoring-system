@@ -10,6 +10,14 @@ public class PieChartDTO {
 
     private Map<String, YearInfo> costs = new HashMap<>();
 
+    public String sum() {
+        return String.valueOf(costs.values()
+                .stream()
+                .map(YearInfo::calcYearAverage)
+                .reduce(Double::sum)
+        );
+    }
+
     public void addYearInfo(String key, YearInfo value) {
         costs.put(key, value);
     }
