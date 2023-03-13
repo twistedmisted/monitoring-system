@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Графік</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
+        function showForYear() {
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            const year = $('#year').val()
+            window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/pie-chart?year=' + year
+        }
+
+        $(function () {
+            drawCharts();
+        });
+
+        function updateChart() {
+            $("#pieChart").replaceWith($("<canvas id=\"pieChart\"></canvas>"));
+            drawCharts();
+        }
+
+        const pieTitle = /*[[${chartTitle}]]*/ 'Енергобаланс';
+        /*]]>*/
+    </script>
+</head>
+<body>
+<style>
+
+    table {
+        border: 1px solid black;
+        table-layout: fixed;
+    }
+
+    th {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 100px;
+    }
+
+    td {
+        border: 1px solid black;
+        overflow: hidden;
+        max-width: 300px;
+    }
+
+    input {
+        max-width: 105px;
+    }
+
+    .button {
+        font-size: 12px;
+        text-decoration: none;
+        background-color: #EEEEEE;
+        color: #333333;
+        padding: 2px 6px 2px 6px;
+        border-top: 1px solid #CCCCCC;
+        border-right: 1px solid #333333;
+        border-bottom: 1px solid #333333;
+        border-left: 1px solid #CCCCCC;
+    }
+
+    canvas {
+        width: 500px !important;
+        height: 500px !important;
+    }
+</style>
+<div>
+    <label for="year">Введіть рік</label>
+    <input type="text" id="year">
+    <button class="button" onclick="showForYear()">Відобразити дані</button>
+</div>
+<div>
+    <input class="button" type="button" value="Оновити графік" onclick="updateChart()">
+    <a class="button" href="/units">На головну</a>
+</div>
+<div class="chart-box">
+    <canvas id="pieChart"></canvas>
+</div>
+<div>
+    <table th:if="${!pieChart.costs.isEmpty()}" id="consumption-data-table">
+        <tbody id="consumption-table-body">
+        <tr>
+            <th></th>
+            <th:block th:each="pr, stat : ${pieChart.costs}">
+                <th th:text="${pr.key}"></th>
+            </th:block>
+            <th>Загальна сума</th>
+        </tr>
+        <tr>
+            <th th:text="${year}"></th>
+            <th:block th:each="pr, stat : ${pieChart.costs}">
+                <td><input th:value="${pieChart.getYearInfo(pr.key).yearAverage()}"></td>
+            </th:block>
+            <td id="total-sum"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${!pieChart.costs.isEmpty()}">
+    <form name="input"
+          th:action="@{/comments/pie-department(enterpriseId=${enterpriseId}, departmentId=${departmentId}, year=${year})}"
+          method="post" th:object="${comment}">
+        <p><label for="review">Коментарій для графіку витрат:</label></p>
+        <textarea id="review" name="review" rows="4" cols="50" th:field="*{text}"></textarea>
+        <br>
+        <input type="submit" value="Зберегти">
+    </form>
+</div>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"
+        integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    var randomColorGenerator = function () {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function drawPieChart() {
+        let myDatasets = [];
+        let myLabels = [];
+        let backgroundColors = [];
+        let totalCostsSum = 0.0;
+        const table = document.getElementById("consumption-data-table");
+        for (let i = 0, row; row = table.rows[i]; i++) {
+            let tempData = [];
+            let myLabel = "dummy";
+            for (let j = 1, col; col = row.cells[j], j < row.cells.length - 1; j++) {
+                if (i === 0) {
+                    myLabel = col.innerHTML;
+                    myLabels.push(myLabel);
+                    continue;
+                }
+                let tempValue = col.children[0].value;
+                if (tempValue === "") {
+                    tempValue = 0;
+                }
+                backgroundColors.push(randomColorGenerator());
+                const costsValue = parseFloat(col.children[0].value.replace(',', '.'));
+                totalCostsSum += costsValue;
+                tempData.push(costsValue);
+            }
+            if (i > 0) {
+                myDatasets.push({
+                    backgroundColor: backgroundColors,
+                    data: tempData
+                });
+            }
+        }
+
+        document.getElementById("total-sum").innerHTML = (Math.round((totalCostsSum + Number.EPSILON) * 100) / 100).toString();
+
+        new Chart("pieChart", {
+            type: "pie",
+            data: {
+                labels: myLabels,
+                datasets: myDatasets
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: pieTitle,
+                        font: {
+                            size: 16
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, context) => {
+                            const datapoints = context.chart.data.datasets[0].data;
+
+                            function totalSum(total, datapoint) {
+                                return total + datapoint;
+                            }
+
+                            const totalPercentage = datapoints.reduce(totalSum, 0);
+                            const percentageValue = (value / totalPercentage * 100).toFixed(1);
+                            return `${value}; ${percentageValue}%`;
+                        },
+                        color: '#fff',
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    function drawCharts() {
+        drawPieChart();
+    }
+</script>
+</body>
+</html>

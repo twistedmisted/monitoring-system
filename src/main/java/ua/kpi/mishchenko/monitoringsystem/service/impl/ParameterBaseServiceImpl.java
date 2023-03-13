@@ -15,6 +15,7 @@ import ua.kpi.mishchenko.monitoringsystem.entity.ParameterBaseEntity;
 import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
+import ua.kpi.mishchenko.monitoringsystem.service.ParameterService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,8 +31,35 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
     private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS = """
             SELECT parameter_table.year, parameter_table.month, parameter_table.value, wd.amount
             FROM %s parameter_table
-                     LEFT JOIN working_days wd ON wd.month = parameter_table.month AND wd.year = parameter_table.year
+                     LEFT JOIN working_days wd ON wd.unit_id = parameter_table.unit_id AND wd.month = parameter_table.month AND wd.year = parameter_table.year
             WHERE parameter_table.unit_id = ?
+            ORDER BY year, month;""";
+    private static final String SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS_BY_YEAR = """
+            SELECT parameter_table.year,
+                   parameter_table.month,
+                   ROUND((t.price * parameter_table.value)::numeric, 2) AS value,
+                   wd.amount
+            FROM tariffs t
+                     INNER JOIN %s parameter_table ON parameter_table.unit_id = %s
+                     INNER JOIN parameters p on p.bean_name = '%s'
+                     LEFT JOIN working_days wd ON wd.unit_id = parameter_table.unit_id AND wd.month = parameter_table.month AND
+                                                  wd.year = parameter_table.year
+            WHERE parameter_table.unit_id = ?
+              AND t.parameter_id = p.id
+              AND parameter_table.year = ?
+            ORDER BY year, month;""";
+    private static final String SELECT_COSTS_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS = """
+            SELECT parameter_table.year,
+                   parameter_table.month,
+                   ROUND((t.price * parameter_table.value)::numeric, 2) AS value,
+                   wd.amount
+            FROM tariffs t
+                     INNER JOIN %s parameter_table ON parameter_table.unit_id = %s
+                     INNER JOIN parameters p on p.bean_name = '%s'
+                     LEFT JOIN working_days wd ON wd.unit_id = parameter_table.unit_id AND wd.month = parameter_table.month AND
+                                                  wd.year = parameter_table.year
+            WHERE parameter_table.unit_id = ?
+              AND t.parameter_id = p.id
             ORDER BY year, month;""";
     private static final String SELECT_VALUES_FOR_PARAMETER_BY_ENTERPRISE_ID_WITH_WORKING_DAYS = """
             SELECT parameter_table.value,
@@ -55,6 +83,7 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
 
     private final JdbcTemplate jdbcTemplate;
     private final UnitParameterRepository unitParameterRepository;
+    private final ParameterService parameterService;
 
     @Override
     public InputDataDTO getDataByParameterName(Long unitId, String parameterName) {
@@ -107,8 +136,66 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
         return tableData;
     }
 
+    @Override
+    public YearInfo getDataByParameterNameWithWorkingDaysByYear(Long unitId, String parameterName, Integer year) {
+        return getYearInfo(getParameterValuesWithWorkingDaysByYear(unitId, parameterName, year));
+    }
+
     private List<YearInfo> getYearInfosByDepartmentIdAndParameterBeanName(Long departmentId, String beanName) {
         List<ParameterWithWorkingDays> values = getParameterValuesWithWorkingDays(departmentId, beanName);
+        return getYearInfos(values);
+    }
+
+    private YearInfo getYearInfo(List<ParameterWithWorkingDays> values) {
+        if (values.isEmpty()) {
+            return new YearInfo();
+        }
+        YearInfo yearInfo = new YearInfo();
+        for (ParameterWithWorkingDays value : values) {
+            yearInfo.setYear(String.valueOf(value.getYear()));
+            mapValueByMonth(yearInfo, value);
+        }
+        return yearInfo;
+    }
+
+    private List<ParameterWithWorkingDays> getParameterValuesWithWorkingDays(Long unitId, String parameterName) {
+        return jdbcTemplate.query(format(SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS, parameterName),
+                (rs, rowNum) -> new ParameterWithWorkingDays(
+                        rs.getInt("year"),
+                        rs.getInt("month"),
+                        rs.getDouble("value"),
+                        rs.getInt("amount")),
+                unitId);
+    }
+
+    private List<ParameterWithWorkingDays> getParameterValuesWithWorkingDaysByYear(Long unitId, String parameterName, Integer year) {
+        return jdbcTemplate.query(format(SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS_BY_YEAR, parameterName, unitId, parameterName),
+                (rs, rowNum) -> new ParameterWithWorkingDays(
+                        rs.getInt("year"),
+                        rs.getInt("month"),
+                        rs.getDouble("value"),
+                        rs.getInt("amount")),
+                unitId, year);
+    }
+
+    @Override
+    public TableData getCostsDataByParameterNameWithWorkingDays(Long unitId, String parameterName) {
+        List<YearInfo> yearInfos = getCostsYearInfosByDepartmentIdAndParameterBeanName(unitId, parameterName);
+        if (yearInfos.isEmpty()) {
+            return createDefaultTableData();
+        }
+        TableData tableData = new TableData();
+        tableData.setYearInfos(yearInfos);
+        tableData.setParameterName(parameterName);
+        return tableData;
+    }
+
+    private List<YearInfo> getCostsYearInfosByDepartmentIdAndParameterBeanName(Long departmentId, String beanName) {
+        List<ParameterWithWorkingDays> values = getCostsParameterValuesWithWorkingDays(departmentId, beanName);
+        return getYearInfos(values);
+    }
+
+    private List<YearInfo> getYearInfos(List<ParameterWithWorkingDays> values) {
         if (values.isEmpty()) {
             return new ArrayList<>();
         }
@@ -126,8 +213,8 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
         return yearInfos;
     }
 
-    private List<ParameterWithWorkingDays> getParameterValuesWithWorkingDays(Long unitId, String parameterName) {
-        return jdbcTemplate.query(format(SELECT_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS, parameterName),
+    private List<ParameterWithWorkingDays> getCostsParameterValuesWithWorkingDays(Long unitId, String parameterName) {
+        return jdbcTemplate.query(format(SELECT_COSTS_VALUES_FOR_PARAMETER_BY_UNIT_ID_WITH_WORKINGS_DAYS, parameterName, unitId, parameterName),
                 (rs, rowNum) -> new ParameterWithWorkingDays(
                         rs.getInt("year"),
                         rs.getInt("month"),
@@ -158,6 +245,31 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
             }
         }
         return parameterYearsInfo;
+    }
+
+    @Override
+    public ParameterYearsInfo getCostsDataForEnterpriseByParameterName(Long unitId, String parameterName) {
+        ParameterYearsInfo parameterYearsInfo = new ParameterYearsInfo();
+        parameterYearsInfo.setParameterName(parameterName);
+        List<Long> departmentsId = getDepartmentsIdByEnterpriseIdAndParameterBeanName(unitId, parameterName);
+        for (Long departmentId : departmentsId) {
+            List<YearInfo> yearInfoByDepartment = getCostsYearInfosByDepartmentIdAndParameterBeanName(departmentId, parameterName);
+            for (YearInfo yearInfo : yearInfoByDepartment) {
+                parameterYearsInfo.addYearInfo(Integer.valueOf(yearInfo.getYear()), yearInfo);
+            }
+        }
+        return parameterYearsInfo;
+    }
+
+    @Override
+    public List<YearInfo> getYearCostsDataForEnterpriseByParameterName(Long unitId, String parameterName, Integer year) {
+        List<YearInfo> yearInfos = new ArrayList<>();
+        List<Long> departmentsId = getDepartmentsIdByEnterpriseIdAndParameterBeanName(unitId, parameterName);
+        for (Long departmentId : departmentsId) {
+            YearInfo tempYearInfo = getDataByParameterNameWithWorkingDaysByYear(departmentId, parameterName, year);
+            yearInfos.add(tempYearInfo);
+        }
+        return yearInfos;
     }
 
     private List<Long> getDepartmentsIdByEnterpriseIdAndParameterBeanName(Long unitId, String beanName) {
@@ -299,6 +411,33 @@ public class ParameterBaseServiceImpl implements ParameterBaseService {
                         "         INNER JOIN units u on u.id = parameter_table.unit_id\n" +
                         "WHERE u.parent_id = ? AND parameter_table.year = ?\n" +
                         "GROUP BY parameter_table.year, parameter_table.month;",
+                (rs, rowNum) -> new ParameterBaseDTO(
+                        rs.getInt("year"),
+                        rs.getInt("month"),
+                        rs.getDouble("value")),
+                unitId, year);
+        if (values.isEmpty()) {
+            TableData tableData = new TableData();
+            tableData.setYearInfos(new ArrayList<>(Collections.nCopies(1, new YearInfo())));
+            return tableData;
+        }
+        return getTableData(parameterName, values);
+    }
+
+    private static final String GET_COSTS_VALUE_FOR_ENTERPRISE_BY_YEAR_AND_PARAMETER_NAME = """
+            SELECT ROUND((SUM(parameter_table.value) * t.price)::numeric, 2) AS value, parameter_table.year, parameter_table.month
+            FROM %s parameter_table
+                     INNER JOIN parameters p ON p.bean_name = '%s'
+                     INNER JOIN tariffs t ON t.parameter_id = p.id
+                     INNER JOIN units u ON u.id = parameter_table.unit_id
+            WHERE u.parent_id = ?
+              AND parameter_table.year = ?
+            GROUP BY parameter_table.year, parameter_table.month, t.price
+            ORDER BY parameter_table.year, parameter_table.month;""";
+
+    @Override
+    public TableData getCostsDataForEnterpriseByParameterNameAndYear(Long unitId, String parameterName, Integer year) {
+        List<ParameterBaseDTO> values = jdbcTemplate.query(String.format(GET_COSTS_VALUE_FOR_ENTERPRISE_BY_YEAR_AND_PARAMETER_NAME, parameterName, parameterName),
                 (rs, rowNum) -> new ParameterBaseDTO(
                         rs.getInt("year"),
                         rs.getInt("month"),

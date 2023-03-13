@@ -11,7 +11,11 @@
     <ol class="myUL">
         <li th:each="enterprise : ${enterprises}">
             <a th:href="@{/units/enterprises/__${enterprise.id}__/output}" th:text="${enterprise.name}">Enterprise
-                name</a>
+                name</a> <a
+                th:href="@{/units/enterprises/{enterpriseId}/line-chart(enterpriseId=${enterprise.id})}"><img
+                class="calendar-img" th:src="@{/images/chart.png}"/></a><a
+                th:href="@{/units/enterprises/{enterpriseId}/pie-chart(enterpriseId=${enterprise.id})}"><img
+                class="calendar-img" th:src="@{/images/pie-chart.png}"/></a>
             <ul>
                 <li th:each="department : ${enterprise.departments}"><a
                         th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/output(enterpriseId=${enterprise.id}, departmentId=${department.id})}"
@@ -19,7 +23,11 @@
                         th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
                         class="setting-img" th:src="@{/images/settings.png}"/></a><a
                         th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/working-days(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
-                        class="calendar-img" th:src="@{/images/calendar.png}"/></a></li>
+                        class="calendar-img" th:src="@{/images/calendar.png}"/></a><a
+                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/line-chart(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
+                        class="calendar-img" th:src="@{/images/chart.png}"/></a><a
+                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/pie-chart(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
+                        class="calendar-img" th:src="@{/images/pie-chart.png}"/></a></li>
                 <li class="hide-bullet"><a th:href="@{/units/enterprises/{id}/departments(id=${enterprise.id})}"
                                            class="button">Додати відділ</a></li>
             </ul>

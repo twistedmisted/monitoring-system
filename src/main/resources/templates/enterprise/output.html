@@ -49,12 +49,12 @@
 <div>
     <label for="parameter-name">Показник</label>
     <select id="parameter-name">
-        <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
+        <option th:if="${consumptionTableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
         </option>
         <th:block th:each="parameter : ${departmentParameters}">
-            <option th:if="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+            <option th:if="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                     th:text="${parameter.name}" selected="selected"></option>
-            <option th:unless="${tableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                     th:text="${parameter.name}"></option>
         </th:block>
     </select>
@@ -63,8 +63,8 @@
     <a class="button" th:href="@{/units/enterprises/__${enterpriseId}__/output/year}">Загальна за роками</a>
     <a class="button" href="/units">На головну</a>
 </div>
-<table th:if="${!tableData.yearsInfo.isEmpty()}" id="data-table">
-    <tbody id="table-body">
+<table th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="consumption-data-table">
+    <tbody id="consumption-table-body">
     <tr>
         <th></th>
         <th>Січень</th>
@@ -98,38 +98,112 @@
         <th>Місяць</th>
         <th>Коефіцієнт нерівності</th>
     </tr>
-    <tr th:each="pr, stat : ${tableData.yearsInfo}">
+    <tr th:each="pr, stat : ${consumptionTableData.yearsInfo}">
         <td th:text="${pr.key}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 1)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 1)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 2)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 2)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 3)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 3)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 4)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 4)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 5)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 5)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 6)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 6)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 7)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 7)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 8)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 8)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 9)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 9)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 10)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 10)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 11)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 11)}"></td>
-        <td th:text="${tableData.monthValue(pr.key, 12)}"></td>
-        <td th:text="${tableData.monthAverage(pr.key, 12)}"></td>
-        <td th:text="${tableData.yearAverage(pr.key)}"></td>
-        <td th:text="${tableData.getMinValue(pr.key)}"></td>
-        <td th:text="${tableData.getMinMonth(pr.key)}"></td>
-        <td th:text="${tableData.getMaxValue(pr.key)}"></td>
-        <td th:text="${tableData.getMaxMonth(pr.key)}"></td>
-        <td th:text="${tableData.calcInequalityCoefficient(pr.key)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 1)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 1)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 2)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 2)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 3)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 3)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 4)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 4)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 5)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 5)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 6)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 6)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 7)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 7)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 8)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 8)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 9)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 9)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 10)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 10)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 11)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 11)}"></td>
+        <td th:text="${consumptionTableData.monthValue(pr.key, 12)}"></td>
+        <td th:text="${consumptionTableData.monthAverage(pr.key, 12)}"></td>
+        <td th:text="${consumptionTableData.yearAverage(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMinValue(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMinMonth(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMaxValue(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMaxMonth(pr.key)}"></td>
+        <td th:text="${consumptionTableData.calcInequalityCoefficient(pr.key)}"></td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<br>
+<br>
+<table th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-data-table">
+    <caption><h2>Витрати</h2></caption>
+    <tbody id="costs-table-body">
+    <tr>
+        <th></th>
+        <th>Січень</th>
+        <th>Середньодобове</th>
+        <th>Лютий</th>
+        <th>Середньодобове</th>
+        <th>Березень</th>
+        <th>Середньодобове</th>
+        <th>Квітень</th>
+        <th>Середньодобове</th>
+        <th>Травень</th>
+        <th>Середньодобове</th>
+        <th>Червень</th>
+        <th>Середньодобове</th>
+        <th>Липень</th>
+        <th>Середньодобове</th>
+        <th>Серпень</th>
+        <th>Середньодобове</th>
+        <th>Вересень</th>
+        <th>Середньодобове</th>
+        <th>Жовтень</th>
+        <th>Середньодобове</th>
+        <th>Листопад</th>
+        <th>Середньодобове</th>
+        <th>Грудень</th>
+        <th>Середньодобове</th>
+        <th>Середнє за рік</th>
+        <th>Мінімальне значення</th>
+        <th>Місяць</th>
+        <th>Максимальне значення</th>
+        <th>Місяць</th>
+        <th>Коефіцієнт нерівності</th>
+    </tr>
+    <tr th:each="pr, stat : ${costsTableData.yearsInfo}">
+        <td th:text="${pr.key}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 1)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 1)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 2)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 2)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 3)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 3)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 4)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 4)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 5)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 5)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 6)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 6)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 7)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 7)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 8)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 8)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 9)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 9)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 10)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 10)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 11)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 11)}"></td>
+        <td th:text="${costsTableData.monthValue(pr.key, 12)}"></td>
+        <td th:text="${costsTableData.monthAverage(pr.key, 12)}"></td>
+        <td th:text="${costsTableData.yearAverage(pr.key)}"></td>
+        <td th:text="${costsTableData.getMinValue(pr.key)}"></td>
+        <td th:text="${costsTableData.getMinMonth(pr.key)}"></td>
+        <td th:text="${costsTableData.getMaxValue(pr.key)}"></td>
+        <td th:text="${costsTableData.getMaxMonth(pr.key)}"></td>
+        <td th:text="${costsTableData.calcInequalityCoefficient(pr.key)}"></td>
     </tr>
     </tbody>
 </table>

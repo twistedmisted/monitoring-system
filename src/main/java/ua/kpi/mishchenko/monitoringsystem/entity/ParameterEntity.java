@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +33,16 @@ public class ParameterEntity {
     @Column(name = "bean_name", nullable = false)
     private String beanName;
 
+    @Column(name = "has_tariff", nullable = false)
+    private Boolean hasTariff;
+
+    @Column(name = "costs_name")
+    private String costsName;
+
     @OneToMany(mappedBy = "parameter", cascade = ALL)
     private List<UnitParameterEntity> units = new ArrayList<>();
+
+    @OneToOne(mappedBy = "parameter", cascade = ALL)
+    @PrimaryKeyJoinColumn
+    private TariffEntity tariff;
 }
