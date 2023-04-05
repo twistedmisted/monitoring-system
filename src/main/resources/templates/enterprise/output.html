@@ -12,7 +12,7 @@
             $('#parameter-name').change(() => {
                 const parameterName = $('#parameter-name').val()
                 const enterpriseId = /*[[${enterpriseId}]]*/ '0'
-                window.location = '/units/enterprises/' + enterpriseId + '/output?parameter-name=' + parameterName
+                window.location = '/sections/enterprises/' + enterpriseId + '/output?parameter-name=' + parameterName
             })
         })
 
@@ -31,7 +31,7 @@
         border: 1px solid black;
         overflow: hidden;
         max-width: 300px;
-        width: 100%;
+        /*width: 100%;*/
     }
 
     .button {
@@ -46,6 +46,9 @@
         border-left: 1px solid #CCCCCC;
     }
 </style>
+<div class="ent-name">
+    <h2 th:text="${enterpriseName}"></h2>
+</div>
 <div>
     <label for="parameter-name">Показник</label>
     <select id="parameter-name">
@@ -60,10 +63,11 @@
     </select>
 </div>
 <div>
-    <a class="button" th:href="@{/units/enterprises/__${enterpriseId}__/output/year}">Загальна за роками</a>
-    <a class="button" href="/units">На головну</a>
+    <a class="button" th:href="@{/sections/enterprises/__${enterpriseId}__/output/year}">Загальна за роками</a>
+    <a class="button" href="/sections">На головну</a>
 </div>
 <table th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="consumption-data-table">
+    <caption><h2 th:text="${parameter.consName}"></h2></caption>
     <tbody id="consumption-table-body">
     <tr>
         <th></th>
@@ -133,11 +137,31 @@
     </tr>
     </tbody>
 </table>
-<br>
-<br>
-<br>
+<table th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="consumption-par-data-table">
+    <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.consName + '`'}"></h2></caption>
+    <tbody id="consumption-par-table-body">
+    <tr>
+        <th></th>
+        <th>Середнє за рік</th>
+        <th>Мінімальне значення</th>
+        <th>Місяць</th>
+        <th>Максимальне значення</th>
+        <th>Місяць</th>
+        <th>Коефіцієнт нерівності</th>
+    </tr>
+    <tr th:each="pr, stat : ${consumptionTableData.yearsInfo}">
+        <td th:text="${pr.key}"></td>
+        <td th:text="${consumptionTableData.yearAverage(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMinValue(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMinMonth(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMaxValue(pr.key)}"></td>
+        <td th:text="${consumptionTableData.getMaxMonth(pr.key)}"></td>
+        <td th:text="${consumptionTableData.calcInequalityCoefficient(pr.key)}"></td>
+    </tr>
+    </tbody>
+</table>
 <table th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-data-table">
-    <caption><h2>Витрати</h2></caption>
+    <caption><h2 th:text="${parameter.costsName}"></h2></caption>
     <tbody id="costs-table-body">
     <tr>
         <th></th>
@@ -198,6 +222,29 @@
         <td th:text="${costsTableData.monthAverage(pr.key, 11)}"></td>
         <td th:text="${costsTableData.monthValue(pr.key, 12)}"></td>
         <td th:text="${costsTableData.monthAverage(pr.key, 12)}"></td>
+        <td th:text="${costsTableData.yearAverage(pr.key)}"></td>
+        <td th:text="${costsTableData.getMinValue(pr.key)}"></td>
+        <td th:text="${costsTableData.getMinMonth(pr.key)}"></td>
+        <td th:text="${costsTableData.getMaxValue(pr.key)}"></td>
+        <td th:text="${costsTableData.getMaxMonth(pr.key)}"></td>
+        <td th:text="${costsTableData.calcInequalityCoefficient(pr.key)}"></td>
+    </tr>
+    </tbody>
+</table>
+<table th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-par-data-table">
+    <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.costsName + '`'}"></h2></caption>
+    <tbody id="costs-par-table-body">
+    <tr>
+        <th></th>
+        <th>Середнє за рік</th>
+        <th>Мінімальне значення</th>
+        <th>Місяць</th>
+        <th>Максимальне значення</th>
+        <th>Місяць</th>
+        <th>Коефіцієнт нерівності</th>
+    </tr>
+    <tr th:each="pr, stat : ${costsTableData.yearsInfo}">
+        <td th:text="${pr.key}"></td>
         <td th:text="${costsTableData.yearAverage(pr.key)}"></td>
         <td th:text="${costsTableData.getMinValue(pr.key)}"></td>
         <td th:text="${costsTableData.getMinMonth(pr.key)}"></td>

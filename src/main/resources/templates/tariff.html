@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Тариф</title>
-
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript" type="text/javascript">
@@ -19,51 +21,66 @@
     </script>
 </head>
 <body>
-<style>
-    .button {
-        font-size: 12px;
-        text-decoration: none;
-        background-color: #EEEEEE;
-        color: #333333;
-        padding: 2px 6px 2px 6px;
-        border-top: 1px solid #CCCCCC;
-        border-right: 1px solid #333333;
-        border-bottom: 1px solid #333333;
-        border-left: 1px solid #CCCCCC;
-    }
-</style>
-<div>
-    <a class="button" href="/units">На головну</a>
-</div>
-<div>
-    <label for="parameter-name">Тариф для</label>
-    <select id="parameter-name">
-        <option th:if="${parameterWithTariff.tariff == null}" value="nothing" disabled selected>Оберіть показник
-        </option>
-        <th:block th:each="tempParameter : ${parametersWithTariff}">
-            <option th:if="${parameterWithTariff.parameter != null and parameterWithTariff.parameter.beanName == tempParameter.parameter.beanName}"
-                    th:value="${tempParameter.parameter.beanName}"
-                    th:text="${tempParameter.parameter.name}" selected="selected"></option>
-            <option th:unless="${parameterWithTariff.parameter != null and parameterWithTariff.parameter.beanName == tempParameter.parameter.beanName}"
-                    th:value="${tempParameter.parameter.beanName}"
-                    th:text="${tempParameter.parameter.name}"></option>
-        </th:block>
-    </select>
-    <th:block th:if="${param.get('name') == null}">
-        <form name="update-tariff" th:action="@{/tariffs}" method="post" th:object="${parameterWithTariff}">
-            <label for="price">Ціна</label>
-            <input type="text" name="price" id="price" th:field="*{tariff.price}">
-            <button class="button" type="submit">Зберегти</button>
-        </form>
-    </th:block>
-    <th:block th:unless="${param.get('name') == null}">
-        <form name="update-tariff" th:action="@{/tariffs(name=${param.get('name')})}" method="post"
-              th:object="${parameterWithTariff}">
-            <label for="price">Ціна</label>
-            <input type="text" name="price" id="price" th:field="*{tariff.price}">
-            <button class="button" type="submit">Зберегти</button>
-        </form>
-    </th:block>
-</div>
+<th:block th:if="${param.get('name') == null}">
+    <form name="update-tariff" th:action="@{/tariffs}" method="post" th:object="${parameterWithTariff}">
+        <ul data-role="listview" data-inset="true">
+            <li class="ui-field-contain">
+                <label for="parameter-name" class="select">Ресурс</label>
+                <select name="parameter-name" id="parameter-name">
+                    <option th:if="${parameterWithTariff.tariff == null}" value="nothing" disabled selected>Оберіть
+                        показник
+                    </option>
+                    <th:block th:each="tempParameter : ${parametersWithTariff}">
+                        <option th:if="${parameterWithTariff.parameter != null and parameterWithTariff.parameter.beanName == tempParameter.parameter.beanName}"
+                                th:value="${tempParameter.parameter.beanName}"
+                                th:text="${tempParameter.parameter.name}" selected="selected"></option>
+                        <option th:unless="${parameterWithTariff.parameter != null and parameterWithTariff.parameter.beanName == tempParameter.parameter.beanName}"
+                                th:value="${tempParameter.parameter.beanName}"
+                                th:text="${tempParameter.parameter.name}"></option>
+                    </th:block>
+                </select>
+            </li>
+            <li class="ui-field-contain">
+                <label for="price">Ціна</label>
+                <input type="text" name="price" id="price" th:field="*{tariff.price}">
+            </li>
+            <li class="ui-body ui-body-b">
+                <button type="submit" class="ui-btn ui-corner-all">Збергети</button>
+            </li>
+        </ul>
+    </form>
+</th:block>
+
+
+<th:block th:unless="${param.get('name') == null}">
+    <form name="update-tariff" th:action="@{/tariffs(name=${param.get('name')})}" method="post" th:object="${parameterWithTariff}">
+        <ul data-role="listview" data-inset="true">
+            <li class="ui-field-contain">
+                <label for="parameter-name" class="select">Ресурс</label>
+                <select name="parameter-name" id="parameter-name">
+                    <option th:if="${parameterWithTariff.tariff == null}" value="nothing" disabled selected>Оберіть
+                        показник
+                    </option>
+                    <th:block th:each="tempParameter : ${parametersWithTariff}">
+                        <option th:if="${parameterWithTariff.parameter != null and parameterWithTariff.parameter.beanName == tempParameter.parameter.beanName}"
+                                th:value="${tempParameter.parameter.beanName}"
+                                th:text="${tempParameter.parameter.name}" selected="selected"></option>
+                        <option th:unless="${parameterWithTariff.parameter != null and parameterWithTariff.parameter.beanName == tempParameter.parameter.beanName}"
+                                th:value="${tempParameter.parameter.beanName}"
+                                th:text="${tempParameter.parameter.name}"></option>
+                    </th:block>
+                </select>
+            </li>
+            <li class="ui-field-contain">
+                <label for="price">Ціна</label>
+                <input type="text" name="price" id="price" th:field="*{tariff.price}">
+            </li>
+            <li class="ui-body ui-body-b">
+                <button type="submit" class="ui-btn ui-corner-all">Збергети</button>
+            </li>
+        </ul>
+    </form>
+</th:block>
+<a class="ui-btn ui-shadow" href="/sections">На головну</a>
 </body>
 </html>

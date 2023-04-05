@@ -10,4 +10,5 @@ public class ParameterDTO {
     private String beanName;
     private Boolean hasTariff;
     private String costsName;
+    private String consName;
 }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Додавання західу</title>
+
+    <style>
+        table {
+            border: 1px solid black;
+            table-layout: fixed;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            overflow: hidden;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .button {
+            font-size: 12px;
+            text-decoration: none;
+            background-color: #EEEEEE;
+            color: #333333;
+            padding: 2px 6px 2px 6px;
+            border-top: 1px solid #CCCCCC;
+            border-right: 1px solid #333333;
+            border-bottom: 1px solid #333333;
+            border-left: 1px solid #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <a class="button" th:href="@{/sections/enterprises/__${enterpriseId}__/departments/__${departmentId}__/activities}">Список
+        заходів</a>
+    <a class="button" href="/sections">На головну</a>
+</div>
+<div>
+    <form th:action="@{/sections/enterprises/__${enterpriseId}__/departments/__${departmentId}__/activities/create}"
+            method="post" th:object="${activity}">
+        <div>
+            <label for="name">Назва заходу</label>
+            <input id="name" th:field="*{name}">
+        </div>
+
+        <div>
+            <label for="parameter">Вид ресурсу</label>
+            <select id="parameter" th:field="*{parameterId}">
+                <th:block th:each="parameter : ${parameters}">
+                    <option th:value="${parameter.id}" th:text="${parameter.name}"></option>
+                </th:block>
+            </select>
+        </div>
+
+        <div>
+            <label for="description">Очікуваний ефект від впровадження</label>
+            <input id="description" th:field="*{description}">
+        </div>
+
+        <div>
+            <label for="money">Кошти на впровадження, грн</label>
+            <input id="money" th:field="*{money}">
+        </div>
+
+        <div>
+            <label for="financialSource">Джерело фінансування</label>
+            <input id="financialSource" th:field="*{financialSource}">
+        </div>
+
+        <div>
+            <input class="button" type="submit">
+        </div>
+    </form>
+</div>
+</body>
+</html>

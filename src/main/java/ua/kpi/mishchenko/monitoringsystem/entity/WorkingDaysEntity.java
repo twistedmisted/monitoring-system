@@ -23,8 +23,8 @@ public class WorkingDaysEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "unit_id", nullable = false)
-    private UnitEntity unit;
+    @JoinColumn(name = "section_id", nullable = false)
+    private SectionEntity section;
 
     @Column(name = "year", nullable = false)
     private Integer year;

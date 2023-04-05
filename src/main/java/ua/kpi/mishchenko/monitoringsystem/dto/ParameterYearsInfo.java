@@ -30,6 +30,24 @@ public class ParameterYearsInfo {
         return aver == 0 ? "" : DECIMAL_FORMAT.format(aver);
     }
 
+    public String average() {
+        Double aver = calcAverage();
+        return aver == 0 ? "" : DECIMAL_FORMAT.format(aver);
+    }
+
+    public Double calcAverage() {
+        double sum = 0;
+        int amount = 0;
+        for (Integer year : yearsInfo.keySet()) {
+            Double yearAverage = calcYearAverage(year);
+            if (yearAverage > 0) {
+                sum += yearAverage;
+                amount++;
+            }
+        }
+        return sum == 0 ? 0.0 : sum / amount;
+    }
+
     public Double calcYearAverage(Integer year) {
         List<YearInfo> yearsInfo = this.yearsInfo.get(year);
         if (isNull(yearsInfo) || yearsInfo.isEmpty()) {

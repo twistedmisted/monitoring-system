@@ -8,5 +8,5 @@ public class CommentDTO {
     private Long id;
     private String text;
     private String parameterName;
-    private Long unitId;
+    private Long sectionId;
 }

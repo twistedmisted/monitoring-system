@@ -20,14 +20,14 @@ public class WorkingDaysServiceImpl implements WorkingDaysService {
     private final WorkingDaysRepository workingDaysRepository;
 
     @Override
-    public WorkingDaysByYear getAllWorkingDaysByUnitIdAndYear(Long unitId, Integer year) {
-        List<WorkingDaysDTO> workingDays = workingDaysMapper.entitiesToDtos(workingDaysRepository.findAllByUnitIdAndYearOrderByYearAscMonthAsc(unitId, year));
+    public WorkingDaysByYear getAllWorkingDaysBySectionIdAndYear(Long sectionId, Integer year) {
+        List<WorkingDaysDTO> workingDays = workingDaysMapper.entitiesToDtos(workingDaysRepository.findAllBySectionIdAndYearOrderByYearAscMonthAsc(sectionId, year));
         if (workingDays.isEmpty()) {
             return new WorkingDaysByYear(year);
         }
         WorkingDaysByYear workingDaysByYear = new WorkingDaysByYear();
         workingDaysByYear.setYear(workingDays.get(0).getYear());
-        workingDaysByYear.setUnitId(workingDays.get(0).getUnitId());
+        workingDaysByYear.setSectionId(workingDays.get(0).getSectionId());
         for (WorkingDaysDTO wd : workingDays) {
             switch (wd.getMonth()) {
                 case 1 -> workingDaysByYear.setJanuary(wd.getAmount());
@@ -52,8 +52,8 @@ public class WorkingDaysServiceImpl implements WorkingDaysService {
     @Override
     @Transactional
     public void saveWorkingDays(WorkingDaysByYear workingDaysByYear) {
-        jdbcTemplate.update("DELETE FROM working_days WHERE unit_id = ? and year = ?",
-                workingDaysByYear.getUnitId(), workingDaysByYear.getYear());
+        jdbcTemplate.update("DELETE FROM working_days WHERE section_id = ? and year = ?",
+                workingDaysByYear.getSectionId(), workingDaysByYear.getYear());
         workingDaysRepository.saveAll(workingDaysMapper.yearToEntities(workingDaysByYear));
     }
 }

@@ -1,9 +1,9 @@
-CREATE TABLE units
+CREATE TABLE sections
 (
     id        BIGINT GENERATED ALWAYS AS IDENTITY,
     parent_id BIGINT NOT NULL DEFAULT 0,
     name      VARCHAR(255)
 );
 
-ALTER TABLE units
-    ADD CONSTRAINT pk_units PRIMARY KEY (id);
+ALTER TABLE sections
+    ADD CONSTRAINT pk_sections PRIMARY KEY (id);

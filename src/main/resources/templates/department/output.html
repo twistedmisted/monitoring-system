@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Заповнення даних</title>
 
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript" type="text/javascript">
@@ -13,7 +16,7 @@
                 const parameterName = $('#parameter-name').val()
                 const enterpriseId = /*[[${enterpriseId}]]*/ '0'
                 const departmentId = /*[[${departmentId}]]*/ '0'
-                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
+                window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
             })
         })
 
@@ -22,9 +25,9 @@
             const enterpriseId = /*[[${enterpriseId}]]*/ '0'
             const departmentId = /*[[${departmentId}]]*/ '0'
             if (parameterName == null) {
-                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input'
+                window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input'
             } else {
-                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
+                window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
             }
         }
 
@@ -34,17 +37,21 @@
 <body>
 <style>
 
-    table {
-        border: 1px solid black;
-        table-layout: fixed;
-    }
+    /*table {*/
+    /*    table-layout: fixed;*/
+    /*}*/
 
-    th, td {
-        border: 1px solid black;
-        overflow: hidden;
-        max-width: 300px;
-        width: 100%;
-    }
+    /*td {*/
+    /*    overflow: hidden;*/
+    /*    max-width: 300px;*/
+    /*    !*width: 100%;*!*/
+    /*}*/
+
+    /*th {*/
+    /*    overflow: hidden;*/
+    /*    max-width: 300px;*/
+    /*    !*width: 100%;*!*/
+    /*}*/
 
     .button {
         font-size: 12px;
@@ -58,214 +65,258 @@
         border-left: 1px solid #CCCCCC;
     }
 </style>
-<div>
-    <label for="parameter-name">Показник</label>
-    <select id="parameter-name">
-        <option th:if="${consumptionTableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
-        </option>
+<div class="dep-name">
+    <h2 th:text="${departmentName}"></h2>
+</div>
+<div class="ui-field-contain">
+    <select name="parameter-name" id="parameter-name">
+        <th:block th:if="${consumptionTableData.parameterName == 'nothing'}">
+            <option value="nothing" disabled selected>Оберіть показник</option>
+        </th:block>
         <th:block th:each="parameter : ${departmentParameters}">
             <option th:if="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                     th:text="${parameter.name}" selected="selected"></option>
-            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}"
+                    th:value="${parameter.beanName}"
                     th:text="${parameter.name}"></option>
         </th:block>
     </select>
 </div>
-<div>
-    <input class="button" type="button" value="Редагувати" onclick="input()">
-    <a class="button" href="/units">На головну</a>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!consumptionTableData.yearInfos.isEmpty()}" id="cons-data-table"
+           data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${parameter.consName}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Січень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Лютий</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Березень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Квітень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Травень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Червень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Липень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Серпень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Вересень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Жовтень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Листопад</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Грудень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+        </tr>
+        </thead>
+        <tbody id="cons-table-body">
+        <tr th:each="row : ${consumptionTableData.yearInfos}">
+            <th th:text="${row.year}"></th>
+            <td th:text="${row.months.get(1).valueToStr()}"></td>
+            <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(2).valueToStr()}"></td>
+            <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(3).valueToStr()}"></td>
+            <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(4).valueToStr()}"></td>
+            <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(5).valueToStr()}"></td>
+            <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(6).valueToStr()}"></td>
+            <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(7).valueToStr()}"></td>
+            <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(8).valueToStr()}"></td>
+            <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(9).valueToStr()}"></td>
+            <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(10).valueToStr()}"></td>
+            <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(11).valueToStr()}"></td>
+            <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(12).valueToStr()}"></td>
+            <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
+        </tr>
+        </tbody>
+    </table>
 </div>
-<table th:if="${!consumptionTableData.yearInfos.isEmpty()}" id="consumption-data-table">
-    <tbody id="consumption-table-body">
-    <tr>
-        <th></th>
-        <th>Січень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Лютий</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Березень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Квітень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Травень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Червень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Липень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Серпень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Вересень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Жовтень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Листопад</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Грудень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Середнє за рік</th>
-        <th>Мінімальне значення</th>
-        <th>Місяць</th>
-        <th>Максимальне значення</th>
-        <th>Місяць</th>
-        <th>Коефіцієнт нерівності</th>
-    </tr>
-    <tr th:each="row : ${consumptionTableData.yearInfos}">
-        <td th:text="${row.year}"></td>
-        <td th:text="${row.months.get(1).valueToStr()}"></td>
-        <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(2).valueToStr()}"></td>
-        <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(3).valueToStr()}"></td>
-        <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(4).valueToStr()}"></td>
-        <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(5).valueToStr()}"></td>
-        <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(6).valueToStr()}"></td>
-        <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(7).valueToStr()}"></td>
-        <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(8).valueToStr()}"></td>
-        <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(9).valueToStr()}"></td>
-        <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(10).valueToStr()}"></td>
-        <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(11).valueToStr()}"></td>
-        <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(12).valueToStr()}"></td>
-        <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
-        <td th:text="${row.yearAverage()}"></td>
-        <td th:text="${row.getMinValue()}"></td>
-        <td th:text="${row.getMinMonth()}"></td>
-        <td th:text="${row.getMaxValue()}"></td>
-        <td th:text="${row.getMaxMonth()}"></td>
-        <td th:text="${row.calcInequalityCoefficient()}"></td>
-    </tr>
-    </tbody>
-</table>
-<br>
-<br>
-<br>
-<table th:if="${!costsTableData.yearInfos.isEmpty()}" id="costs-data-table">
-    <caption><h2>Витрати</h2></caption>
-    <tbody id="costs-table-body">
-    <tr>
-        <th></th>
-        <th>Січень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Лютий</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Березень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Квітень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Травень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Червень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Липень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Серпень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Вересень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Жовтень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Листопад</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Грудень</th>
-        <th>Робочі дні</th>
-        <th>Середньодобове</th>
-        <th>Середнє за рік</th>
-        <th>Мінімальне значення</th>
-        <th>Місяць</th>
-        <th>Максимальне значення</th>
-        <th>Місяць</th>
-        <th>Коефіцієнт нерівності</th>
-    </tr>
-    <tr th:each="row : ${costsTableData.yearInfos}">
-        <td th:text="${row.year}"></td>
-        <td th:text="${row.months.get(1).valueToStr()}"></td>
-        <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(2).valueToStr()}"></td>
-        <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(3).valueToStr()}"></td>
-        <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(4).valueToStr()}"></td>
-        <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(5).valueToStr()}"></td>
-        <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(6).valueToStr()}"></td>
-        <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(7).valueToStr()}"></td>
-        <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(8).valueToStr()}"></td>
-        <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(9).valueToStr()}"></td>
-        <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(10).valueToStr()}"></td>
-        <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(11).valueToStr()}"></td>
-        <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
-        <td th:text="${row.months.get(12).valueToStr()}"></td>
-        <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
-        <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
-        <td th:text="${row.yearAverage()}"></td>
-        <td th:text="${row.getMinValue()}"></td>
-        <td th:text="${row.getMinMonth()}"></td>
-        <td th:text="${row.getMaxValue()}"></td>
-        <td th:text="${row.getMaxMonth()}"></td>
-        <td th:text="${row.calcInequalityCoefficient()}"></td>
-    </tr>
-    </tbody>
-</table>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!consumptionTableData.yearInfos.isEmpty()}" id="cons-par-data-table"
+           data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.consName + '`'}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Середнє за рік</th>
+            <th>Мінімальне значення</th>
+            <th>Місяць</th>
+            <th>Максимальне значення</th>
+            <th>Місяць</th>
+            <th>Коефіцієнт нерівності</th>
+        </tr>
+        </thead>
+        <tbody id="consumption-par-table-body">
+        <tr th:each="row : ${consumptionTableData.yearInfos}">
+            <th th:text="${row.year}"></th>
+            <td th:text="${row.yearAverage()}"></td>
+            <td th:text="${row.getMinValue()}"></td>
+            <td th:text="${row.getMinMonth()}"></td>
+            <td th:text="${row.getMaxValue()}"></td>
+            <td th:text="${row.getMaxMonth()}"></td>
+            <td th:text="${row.calcInequalityCoefficient()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!costsTableData.yearInfos.isEmpty()}" id="costs-data-table" data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${parameter.costsName}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Січень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Лютий</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Березень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Квітень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Травень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Червень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Липень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Серпень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Вересень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Жовтень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Листопад</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+            <th>Грудень</th>
+            <th>Робочі дні</th>
+            <th>Середньодобове</th>
+        </tr>
+        </thead>
+        <tbody id="costs-table-body">
+        <tr th:each="row : ${costsTableData.yearInfos}">
+            <th th:text="${row.year}"></th>
+            <td th:text="${row.months.get(1).valueToStr()}"></td>
+            <td th:text="${row.months.get(1).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(1).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(2).valueToStr()}"></td>
+            <td th:text="${row.months.get(2).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(2).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(3).valueToStr()}"></td>
+            <td th:text="${row.months.get(3).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(3).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(4).valueToStr()}"></td>
+            <td th:text="${row.months.get(4).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(4).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(5).valueToStr()}"></td>
+            <td th:text="${row.months.get(5).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(5).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(6).valueToStr()}"></td>
+            <td th:text="${row.months.get(6).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(6).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(7).valueToStr()}"></td>
+            <td th:text="${row.months.get(7).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(7).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(8).valueToStr()}"></td>
+            <td th:text="${row.months.get(8).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(8).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(9).valueToStr()}"></td>
+            <td th:text="${row.months.get(9).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(9).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(10).valueToStr()}"></td>
+            <td th:text="${row.months.get(10).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(10).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(11).valueToStr()}"></td>
+            <td th:text="${row.months.get(11).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(11).dailyAverageToString()}"></td>
+            <td th:text="${row.months.get(12).valueToStr()}"></td>
+            <td th:text="${row.months.get(12).workingDaysToStr()}"></td>
+            <td th:text="${row.months.get(12).dailyAverageToString()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!costsTableData.yearInfos.isEmpty()}" id="costs-par-data-table" data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.costsName + '`'}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Середнє за рік</th>
+            <th>Мінімальне значення</th>
+            <th>Місяць</th>
+            <th>Максимальне значення</th>
+            <th>Місяць</th>
+            <th>Коефіцієнт нерівності</th>
+        </tr>
+        </thead>
+        <tbody id="costs-par-table-body">
+        <tr th:each="row : ${costsTableData.yearInfos}">
+            <th th:text="${row.year}"></th>
+            <td th:text="${row.yearAverage()}"></td>
+            <td th:text="${row.getMinValue()}"></td>
+            <td th:text="${row.getMinMonth()}"></td>
+            <td th:text="${row.getMaxValue()}"></td>
+            <td th:text="${row.getMaxMonth()}"></td>
+            <td th:text="${row.calcInequalityCoefficient()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<input class="ui-btn ui-shadow" type="button" value="Редагувати" onclick="input()">
+<a class="ui-btn ui-shadow" href="/sections">На головну</a>
 </body>
 </html>

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class WorkingDaysDTO {
 
     private Long id;
-    private Long unitId;
+    private Long sectionId;
     private Integer year;
     private Integer month;
     private Integer amount;

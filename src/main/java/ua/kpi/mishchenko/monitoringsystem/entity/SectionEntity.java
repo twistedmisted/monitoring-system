@@ -16,10 +16,10 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "units")
+@Table(name = "sections")
 @Setter
 @Getter
-public class UnitEntity {
+public class SectionEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -31,12 +31,15 @@ public class UnitEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "unit", cascade = ALL)
-    private List<UnitParameterEntity> parameters = new ArrayList<>();
+    @OneToMany(mappedBy = "section", cascade = ALL)
+    private List<SectionParameterEntity> parameters = new ArrayList<>();
 
-    @OneToMany(mappedBy = "unit", cascade = ALL)
+    @OneToMany(mappedBy = "section", cascade = ALL)
     private List<WorkingDaysEntity> workingDays = new ArrayList<>();
 
-    @OneToMany(mappedBy = "unit", cascade = ALL)
+    @OneToMany(mappedBy = "section", cascade = ALL)
     private List<CommentEntity> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "section", cascade = ALL)
+    private List<ActivityEntity> activities = new ArrayList<>();
 }

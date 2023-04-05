@@ -4,7 +4,7 @@ import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 
 public interface WorkingDaysService {
 
-    WorkingDaysByYear getAllWorkingDaysByUnitIdAndYear(Long unitId, Integer year);
+    WorkingDaysByYear getAllWorkingDaysBySectionIdAndYear(Long sectionId, Integer year);
 
     void saveWorkingDays(WorkingDaysByYear workingDays);
 }

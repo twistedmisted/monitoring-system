@@ -1,17 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Створити організацію</title>
+    <title>Створити відділ</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
 <body>
-<div>
-    <form name="create-enterprise" th:action="@{/units/enterprises}" method="post" th:object="${enterprise}">
-        <label for="name">Назва підприємства</label>
-        <input type="text" name="name" id="name" th:field="*{name}">
-        <button type="submit">Створити</button>
-    </form>
-</div>
+<form name="create-department" th:action="@{/sections/enterprises" method="post" th:object="${enterprise}">
+    <ul data-role="listview" data-inset="true">
+        <li class="ui-field-contain">
+            <label for="dep-name">Назва відділу</label>
+            <input type="text" name="dep-name" id="dep-name" th:field="*{name}">
+        </li>
+        <li class="ui-body ui-body-b">
+            <button type="submit" data-clear-btn="true" class="ui-btn ui-corner-all">Збергети</button>
+        </li>
+    </ul>
+</form>
+<a class="ui-btn ui-shadow" href="/sections">На головну</a>
 </body>
 </html>

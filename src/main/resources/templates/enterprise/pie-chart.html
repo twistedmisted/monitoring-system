@@ -11,7 +11,7 @@
         function showForYear() {
             const enterpriseId = /*[[${enterpriseId}]]*/ '0'
             const year = $('#year').val()
-            window.location = '/units/enterprises/' + enterpriseId + '/pie-chart?year=' + year
+            window.location = '/sections/enterprises/' + enterpriseId + '/pie-chart?year=' + year
         }
 
         $(function () {
@@ -75,7 +75,7 @@
 </div>
 <div>
     <input class="button" type="button" value="Оновити графік" onclick="updateChart()">
-    <a class="button" href="/units">На головну</a>
+    <a class="button" href="/sections">На головну</a>
 </div>
 <div>
     <canvas id="pieChart"></canvas>
@@ -169,8 +169,9 @@
                     title: {
                         display: true,
                         text: pieTitle,
+                        position: 'bottom',
                         font: {
-                            size: 16
+                            size: 20
                         }
                     },
                     datalabels: {

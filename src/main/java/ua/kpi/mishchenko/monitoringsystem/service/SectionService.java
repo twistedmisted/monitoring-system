@@ -1,18 +1,18 @@
 package ua.kpi.mishchenko.monitoringsystem.service;
 
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.SectionDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
-import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
 
 import java.util.List;
 
-public interface UnitService {
+public interface SectionService {
 
-    UnitDTO getUnitById(Long unitId);
+    SectionDTO getSectionById(Long sectionId);
 
-    UnitDTO createEnterprise(UnitDTO unitDTO);
+    SectionDTO createEnterprise(SectionDTO sectionDTO);
 
-    UnitDTO createDepartment(UnitDTO unitDTO);
+    SectionDTO createDepartment(SectionDTO sectionDTO);
 
     boolean isEnterpriseById(Long enterpriseId);
 

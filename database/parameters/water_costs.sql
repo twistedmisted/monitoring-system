@@ -1,7 +1,7 @@
 CREATE TABLE water_costs
 (
     id      BIGINT GENERATED ALWAYS AS IDENTITY,
-    unit_id BIGINT,
+    section_id BIGINT,
     year    INT NOT NULL,
     month   INT NOT NULL,
     value   FLOAT
@@ -10,4 +10,4 @@ CREATE TABLE water_costs
 ALTER TABLE water_costs
     ADD CONSTRAINT pk_water_costs PRIMARY KEY (id);
 ALTER TABLE water_costs
-    ADD CONSTRAINT fk_water_costs_units FOREIGN KEY (unit_id) REFERENCES units (id);
+    ADD CONSTRAINT fk_water_costs_sections FOREIGN KEY (section_id) REFERENCES sections (id);

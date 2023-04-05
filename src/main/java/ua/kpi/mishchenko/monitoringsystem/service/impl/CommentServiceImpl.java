@@ -21,18 +21,18 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void createComment(CommentDTO comment) {
-        Optional<CommentEntity> commentEntity = commentRepository.findByUnitIdAndParameterName(comment.getUnitId(), comment.getParameterName());
+        Optional<CommentEntity> commentEntity = commentRepository.findBySectionIdAndParameterName(comment.getSectionId(), comment.getParameterName());
         commentEntity.ifPresent(entity -> comment.setId(entity.getId()));
         commentRepository.save(commentMapper.dtoToEntity(comment));
     }
 
-    private boolean existsByUnitIdAndParameterName(Long unitId, String parameterName) {
-        return commentRepository.existsByUnitIdAndParameterName(unitId, parameterName);
+    private boolean existsBySectionIdAndParameterName(Long sectionId, String parameterName) {
+        return commentRepository.existsBySectionIdAndParameterName(sectionId, parameterName);
     }
 
     @Override
     public CommentDTO getCommentByDepartmentIdAndParameterName(Long departmentId, String parameterName) {
-        CommentEntity commentEntity = commentRepository.findByUnitIdAndParameterName(departmentId, parameterName).orElse(null);
+        CommentEntity commentEntity = commentRepository.findBySectionIdAndParameterName(departmentId, parameterName).orElse(null);
         if (isNull(commentEntity)) {
             return new CommentDTO();
         }

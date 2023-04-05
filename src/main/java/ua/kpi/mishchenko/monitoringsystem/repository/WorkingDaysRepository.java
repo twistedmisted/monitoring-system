@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface WorkingDaysRepository extends CrudRepository<WorkingDaysEntity, Long> {
 
-    List<WorkingDaysEntity> findAllByUnitIdAndYearOrderByYearAscMonthAsc(Long unitId, Integer year);
+    List<WorkingDaysEntity> findAllBySectionIdAndYearOrderByYearAscMonthAsc(Long sectionId, Integer year);
 }

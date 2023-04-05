@@ -2,8 +2,8 @@ package ua.kpi.mishchenko.monitoringsystem.mapper.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
-import ua.kpi.mishchenko.monitoringsystem.entity.UnitEntity;
+import ua.kpi.mishchenko.monitoringsystem.dto.SectionDTO;
+import ua.kpi.mishchenko.monitoringsystem.entity.SectionEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
 
 import java.util.ArrayList;
@@ -11,16 +11,16 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class UnitMapper implements Mapper<UnitEntity, UnitDTO> {
+public class SectionMapper implements Mapper<SectionEntity, SectionDTO> {
 
     private final ParameterMapper parameterMapper;
 
     @Override
-    public UnitEntity dtoToEntity(UnitDTO dto) {
+    public SectionEntity dtoToEntity(SectionDTO dto) {
         if (dto == null) {
             return null;
         }
-        UnitEntity entity = new UnitEntity();
+        SectionEntity entity = new SectionEntity();
         entity.setId(dto.getId());
         entity.setParentId(dto.getParentId());
         entity.setName(dto.getName());
@@ -29,11 +29,11 @@ public class UnitMapper implements Mapper<UnitEntity, UnitDTO> {
     }
 
     @Override
-    public UnitDTO entityToDto(UnitEntity entity) {
+    public SectionDTO entityToDto(SectionEntity entity) {
         if (entity == null) {
             return null;
         }
-        UnitDTO dto = new UnitDTO();
+        SectionDTO dto = new SectionDTO();
         dto.setId(entity.getId());
         dto.setParentId(entity.getParentId());
         dto.setName(entity.getName());
@@ -42,24 +42,24 @@ public class UnitMapper implements Mapper<UnitEntity, UnitDTO> {
     }
 
     @Override
-    public List<UnitEntity> dtosToEntities(List<UnitDTO> dtos) {
+    public List<SectionEntity> dtosToEntities(List<SectionDTO> dtos) {
         if (dtos == null || dtos.isEmpty()) {
             return new ArrayList<>();
         }
-        List<UnitEntity> entities = new ArrayList<>();
-        for (UnitDTO dto : dtos) {
+        List<SectionEntity> entities = new ArrayList<>();
+        for (SectionDTO dto : dtos) {
             entities.add(dtoToEntity(dto));
         }
         return entities;
     }
 
     @Override
-    public List<UnitDTO> entitiesToDtos(List<UnitEntity> entities) {
+    public List<SectionDTO> entitiesToDtos(List<SectionEntity> entities) {
         if (entities == null || entities.isEmpty()) {
             return new ArrayList<>();
         }
-        List<UnitDTO> dtos = new ArrayList<>();
-        for (UnitEntity entity : entities) {
+        List<SectionDTO> dtos = new ArrayList<>();
+        for (SectionEntity entity : entities) {
             dtos.add(entityToDto(entity));
         }
         return dtos;

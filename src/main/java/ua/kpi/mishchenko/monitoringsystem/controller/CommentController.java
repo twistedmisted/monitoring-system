@@ -23,10 +23,10 @@ public class CommentController {
                                                    @RequestParam Long enterpriseId,
                                                    @RequestParam String parameterName,
                                                    @ModelAttribute CommentDTO consumptionComment) {
-        consumptionComment.setUnitId(departmentId);
+        consumptionComment.setSectionId(departmentId);
         consumptionComment.setParameterName(parameterName);
         commentService.createComment(consumptionComment);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/line-chart?parameter-name=" + parameterName;
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/line-chart?parameter-name=" + parameterName;
     }
 
     @PostMapping("/costs")
@@ -34,30 +34,30 @@ public class CommentController {
                                              @RequestParam Long enterpriseId,
                                              @RequestParam String parameterName,
                                              @ModelAttribute CommentDTO costsComment) {
-        costsComment.setUnitId(departmentId);
+        costsComment.setSectionId(departmentId);
         costsComment.setParameterName(parameterName + "_costs");
         commentService.createComment(costsComment);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/line-chart?parameter-name=" + parameterName;
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/line-chart?parameter-name=" + parameterName;
     }
 
     @PostMapping("/consumption-enterprise")
     public String createCommentForConsumptionChart(@RequestParam Long enterpriseId,
                                                    @RequestParam String parameterName,
                                                    @ModelAttribute CommentDTO consumptionComment) {
-        consumptionComment.setUnitId(enterpriseId);
+        consumptionComment.setSectionId(enterpriseId);
         consumptionComment.setParameterName(parameterName);
         commentService.createComment(consumptionComment);
-        return "redirect:/units/enterprises/" + enterpriseId + "/line-chart?parameter-name=" + parameterName;
+        return "redirect:/sections/enterprises/" + enterpriseId + "/line-chart?parameter-name=" + parameterName;
     }
 
     @PostMapping("/costs-enterprise")
     public String createCommentForCostsChart(@RequestParam Long enterpriseId,
                                              @RequestParam String parameterName,
                                              @ModelAttribute CommentDTO costsComment) {
-        costsComment.setUnitId(enterpriseId);
+        costsComment.setSectionId(enterpriseId);
         costsComment.setParameterName(parameterName + "_costs");
         commentService.createComment(costsComment);
-        return "redirect:/units/enterprises/" + enterpriseId + "/line-chart?parameter-name=" + parameterName;
+        return "redirect:/sections/enterprises/" + enterpriseId + "/line-chart?parameter-name=" + parameterName;
     }
 
     @PostMapping("/pie-department")
@@ -65,19 +65,19 @@ public class CommentController {
                                                      @RequestParam Long enterpriseId,
                                                      @RequestParam Integer year,
                                                      @ModelAttribute CommentDTO comment) {
-        comment.setUnitId(departmentId);
+        comment.setSectionId(departmentId);
         comment.setParameterName(PIE_CHART + year);
         commentService.createComment(comment);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/pie-chart?year=" + year;
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/pie-chart?year=" + year;
     }
 
     @PostMapping("/pie-enterprise")
     public String createCommentForDepartmentPieChart(@RequestParam Long enterpriseId,
                                                      @RequestParam Integer year,
                                                      @ModelAttribute CommentDTO comment) {
-        comment.setUnitId(enterpriseId);
+        comment.setSectionId(enterpriseId);
         comment.setParameterName(PIE_CHART + year);
         commentService.createComment(comment);
-        return "redirect:/units/enterprises/" + enterpriseId + "/pie-chart?year=" + year;
+        return "redirect:/sections/enterprises/" + enterpriseId + "/pie-chart?year=" + year;
     }
 }

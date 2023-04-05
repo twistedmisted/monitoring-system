@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WorkingDaysByYear {
 
-    private Long unitId;
+    private Long sectionId;
     private Integer year;
     private Integer january;
     private Integer february;

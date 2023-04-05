@@ -19,11 +19,11 @@ public interface ParameterRepository extends CrudRepository<ParameterEntity, Lon
     @Query("""
             SELECT p
             FROM ParameterEntity p
-                     INNER JOIN UnitParameterEntity up on p.id = up.parameter.id
-                     INNER JOIN UnitEntity u on u.id = up.unit.id
+                     INNER JOIN SectionParameterEntity up on p.id = up.parameter.id
+                     INNER JOIN SectionEntity u on u.id = up.section.id
             WHERE u.parentId = :parentId
             GROUP BY p.id, p.name, p.beanName""")
-    List<ParameterEntity> findAllByUnitParentId(@Param("parentId") Long parentId);
+    List<ParameterEntity> findAllBySectionParentId(@Param("parentId") Long parentId);
 
     List<ParameterEntity> findAllByHasTariff(Boolean hasTariff);
 

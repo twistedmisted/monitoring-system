@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.monitoringsystem.dto.CommentDTO;
 import ua.kpi.mishchenko.monitoringsystem.entity.CommentEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
-import ua.kpi.mishchenko.monitoringsystem.repository.UnitRepository;
+import ua.kpi.mishchenko.monitoringsystem.repository.SectionRepository;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class CommentMapper implements Mapper<CommentEntity, CommentDTO> {
 
-    private final UnitRepository unitRepository;
+    private final SectionRepository sectionRepository;
 
     @Override
     public CommentEntity dtoToEntity(CommentDTO dto) {
@@ -26,7 +26,7 @@ public class CommentMapper implements Mapper<CommentEntity, CommentDTO> {
         entity.setId(dto.getId());
         entity.setText(dto.getText());
         entity.setParameterName(dto.getParameterName());
-        entity.setUnit(unitRepository.findById(dto.getUnitId()).get());
+        entity.setSection(sectionRepository.findById(dto.getSectionId()).get());
         return entity;
     }
 
@@ -39,7 +39,7 @@ public class CommentMapper implements Mapper<CommentEntity, CommentDTO> {
         dto.setId(entity.getId());
         dto.setText(entity.getText());
         dto.setParameterName(entity.getParameterName());
-        dto.setUnitId(entity.getUnit().getId());
+        dto.setSectionId(entity.getSection().getId());
         return dto;
     }
 

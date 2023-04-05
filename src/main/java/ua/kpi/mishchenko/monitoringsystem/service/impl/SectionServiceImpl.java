@@ -3,15 +3,15 @@ package ua.kpi.mishchenko.monitoringsystem.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.SectionDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
-import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
-import ua.kpi.mishchenko.monitoringsystem.entity.UnitEntity;
-import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
-import ua.kpi.mishchenko.monitoringsystem.mapper.impl.UnitMapper;
+import ua.kpi.mishchenko.monitoringsystem.entity.SectionEntity;
+import ua.kpi.mishchenko.monitoringsystem.entity.SectionParameterEntity;
+import ua.kpi.mishchenko.monitoringsystem.mapper.impl.SectionMapper;
 import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
-import ua.kpi.mishchenko.monitoringsystem.repository.UnitParameterRepository;
-import ua.kpi.mishchenko.monitoringsystem.repository.UnitRepository;
-import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
+import ua.kpi.mishchenko.monitoringsystem.repository.SectionParameterRepository;
+import ua.kpi.mishchenko.monitoringsystem.repository.SectionRepository;
+import ua.kpi.mishchenko.monitoringsystem.service.SectionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,54 +21,54 @@ import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
-public class UnitServiceImpl implements UnitService {
+public class SectionServiceImpl implements SectionService {
 
-    private final UnitRepository unitRepository;
-    private final UnitParameterRepository unitParameterRepository;
+    private final SectionRepository sectionRepository;
+    private final SectionParameterRepository sectionParameterRepository;
     private final ParameterRepository parameterRepository;
-    private final UnitMapper unitMapper;
+    private final SectionMapper sectionMapper;
 
     @Override
-    public UnitDTO getUnitById(Long id) {
-        return unitMapper.entityToDto(unitRepository.findById(id).orElse(null));
+    public SectionDTO getSectionById(Long sectionId) {
+        return sectionMapper.entityToDto(sectionRepository.findById(sectionId).orElse(null));
     }
 
     @Override
-    public UnitDTO createEnterprise(UnitDTO unitDTO) {
-        if (isNull(unitDTO) || existsByName(unitDTO.getName())) {
+    public SectionDTO createEnterprise(SectionDTO sectionDTO) {
+        if (isNull(sectionDTO) || existsByName(sectionDTO.getName())) {
             return null;
         }
-        return saveUnit(unitDTO);
+        return saveSection(sectionDTO);
     }
 
     @Override
-    public UnitDTO createDepartment(UnitDTO unitDTO) {
+    public SectionDTO createDepartment(SectionDTO sectionDTO) {
         // TODO: need to set parent id somewhere
-        if (isNull(unitDTO) || existsByParentIdAndName(unitDTO.getParentId(), unitDTO.getName())) {
+        if (isNull(sectionDTO) || existsByParentIdAndName(sectionDTO.getParentId(), sectionDTO.getName())) {
             return null;
         }
-        return saveUnit(unitDTO);
+        return saveSection(sectionDTO);
     }
 
     @Override
     public boolean isEnterpriseById(Long enterpriseId) {
-        UnitDTO unitDTO = getUnitById(enterpriseId);
-        return unitDTO != null && !hasParent(unitDTO);
+        SectionDTO sectionDTO = this.getSectionById(enterpriseId);
+        return sectionDTO != null && !hasParent(sectionDTO);
     }
 
     @Override
     public List<EnterpriseDTO> getAllEnterprises() {
         Long parentId = 0L;
-        List<UnitEntity> units = unitRepository.findAllByParentId(parentId);
-        if (units.isEmpty()) {
+        List<SectionEntity> sections = sectionRepository.findAllByParentId(parentId);
+        if (sections.isEmpty()) {
             return new ArrayList<>();
         }
         List<EnterpriseDTO> enterprises = new ArrayList<>();
-        for (UnitEntity unit : units) {
+        for (SectionEntity section : sections) {
             EnterpriseDTO enterprise = new EnterpriseDTO();
-            enterprise.setId(unit.getId());
-            enterprise.setName(unit.getName());
-            enterprise.setDepartments(unitMapper.entitiesToDtos(unitRepository.findAllByParentId(unit.getId())));
+            enterprise.setId(section.getId());
+            enterprise.setName(section.getName());
+            enterprise.setDepartments(sectionMapper.entitiesToDtos(sectionRepository.findAllByParentId(section.getId())));
             enterprises.add(enterprise);
         }
         return enterprises;
@@ -108,34 +108,34 @@ public class UnitServiceImpl implements UnitService {
     }
 
     private void setDepartmentParameter(Long departmentId, String beanName, Supplier<Boolean> isParameterChecked) {
-        if (unitParameterRepository.existsByUnitIdAndParameterBeanName(departmentId, beanName)) {
+        if (sectionParameterRepository.existsBySectionIdAndParameterBeanName(departmentId, beanName)) {
             if (!isParameterChecked.get()) {
-                unitParameterRepository.deleteByUnitIdAndParameterBeanName(departmentId, beanName);
+                sectionParameterRepository.deleteBySectionIdAndParameterBeanName(departmentId, beanName);
             }
         } else {
             if (isParameterChecked.get()) {
-                UnitParameterEntity up = new UnitParameterEntity();
-                up.setUnit(unitRepository.findById(departmentId).orElseThrow());
+                SectionParameterEntity up = new SectionParameterEntity();
+                up.setSection(sectionRepository.findById(departmentId).orElseThrow());
                 up.setParameter(parameterRepository.findByBeanName(beanName).orElseThrow());
                 up.setAmountYear(10);
-                unitParameterRepository.save(up);
+                sectionParameterRepository.save(up);
             }
         }
     }
 
-    private static boolean hasParent(UnitDTO unitDTO) {
-        return unitDTO.getParentId() != 0;
+    private static boolean hasParent(SectionDTO sectionDTO) {
+        return sectionDTO.getParentId() != 0;
     }
 
-    private UnitDTO saveUnit(UnitDTO unitDTO) {
-        return unitMapper.entityToDto(unitRepository.save(unitMapper.dtoToEntity(unitDTO)));
+    private SectionDTO saveSection(SectionDTO sectionDTO) {
+        return sectionMapper.entityToDto(sectionRepository.save(sectionMapper.dtoToEntity(sectionDTO)));
     }
 
     private boolean existsByName(String name) {
-        return unitRepository.existsByNameAndParentId(name, 0L);
+        return sectionRepository.existsByNameAndParentId(name, 0L);
     }
 
     private boolean existsByParentIdAndName(Long parentId, String name) {
-        return unitRepository.existsByParentIdAndName(parentId, name);
+        return sectionRepository.existsByParentIdAndName(parentId, name);
     }
 }

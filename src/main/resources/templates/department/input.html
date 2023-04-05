@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Заповнення даних</title>
 
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript" type="text/javascript">
@@ -13,64 +16,23 @@
                 const parameterName = $('#parameter-name').val()
                 const enterpriseId = /*[[${enterpriseId}]]*/ '0'
                 const departmentId = /*[[${departmentId}]]*/ '0'
-                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
+                window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/input?parameter-name=' + parameterName
             })
         })
 
-        function addRow() {
-            const parameterName = $('#parameter-name').val()
-            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
-            const departmentId = /*[[${departmentId}]]*/ '0'
-            const url = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/add-year?parameter-name=' + parameterName;
-
-            const settings = {
-                "url": "http://localhost:8080" + url,
-                "method": "POST",
-                "timeout": 0,
-                "headers": {
-                    "Content-Type": "application/json"
-                },
-            };
-
-            $.ajax(settings).done(function () {
-                window.location.reload();
-            });
-        }
-
-        function removeRow() {
-            const parameterName = $('#parameter-name').val()
-            const year = $('#year').val()
-            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
-            const departmentId = /*[[${departmentId}]]*/ '0'
-            const url = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/remove-year?parameter-name=' + parameterName + '&year=' + year;
-
-            const settings = {
-                "url": "http://localhost:8080" + url,
-                "method": "POST",
-                "timeout": 0,
-                "headers": {
-                    "Content-Type": "application/json"
-                },
-            };
-
-            $.ajax(settings).done(function () {
-                window.location.reload();
-            });
-        }
-
         function generate() {
-            const min = 0;
-            const max = 200;
+            const min = 2000;
+            const max = 10000;
             const decimals = 2;
             const table = document.getElementById("data-table");
             let year = 2013;
             for (let i = 1, row; row = table.rows[i]; i++) {
-                row.cells[0].children[0].value = year;
+                row.cells[0].children[0].children[0].value = year;
                 year = year + 1;
             }
             for (let i = 1, row; row = table.rows[i]; i++) {
                 for (let j = 1, col; col = row.cells[j]; j++) {
-                    col.children[0].value = getRandomFloat(min, max, decimals);
+                    col.children[0].children[0].value = getRandomFloat(min, max, decimals);
                 }
             }
         }
@@ -85,9 +47,9 @@
             const enterpriseId = /*[[${enterpriseId}]]*/ '0'
             const departmentId = /*[[${departmentId}]]*/ '0';
             if (parameterName == null) {
-                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output'
+                window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output'
             } else {
-                window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
+                window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/output?parameter-name=' + parameterName
             }
         }
 
@@ -110,25 +72,12 @@
         max-width: 300px;
         width: 100%;
     }
-
-    .button {
-        font-size: 12px;
-        text-decoration: none;
-        background-color: #EEEEEE;
-        color: #333333;
-        padding: 2px 6px 2px 6px;
-        border-top: 1px solid #CCCCCC;
-        border-right: 1px solid #333333;
-        border-bottom: 1px solid #333333;
-        border-left: 1px solid #CCCCCC;
-    }
 </style>
 <form name="input"
-      th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
+      th:action="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/input(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
       method="post" th:object="${tableData}">
-    <div>
-        <label for="parameter-name">Показник</label>
-        <select id="parameter-name" th:field="*{parameterName}">
+    <div class="ui-field-contain">
+        <select name="parameter-name" id="parameter-name" th:field="*{parameterName}">
             <option th:if="${tableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
             </option>
             <th:block th:each="parameter : ${departmentParameters}">
@@ -138,15 +87,6 @@
                         th:text="${parameter.name}"></option>
             </th:block>
         </select>
-    </div>
-    <div>
-        <input class="button" type="button" value="Відобразити дані" onclick="output()">
-        <input class="button" type="button" value="Згенерувати дані" onclick="generate()">
-        <input class="button" type="button" value="Додати рік" onclick="addRow()">
-        <label for="year">Рік для видалення</label>
-        <input type="text" id="year">
-        <input class="button" type="button" value="Видалити рік" onclick="removeRow()">
-        <a class="button" href="/units">На головну</a>
     </div>
     <table id="data-table">
         <tbody id="table-body">
@@ -182,7 +122,22 @@
         </tr>
         </tbody>
     </table>
-    <button class="button" type="submit">Зберегти</button>
+    <div class="ui-grid-a">
+        <div class="ui-block-a">
+            <input class="ui-btn ui-shadow" type="button" value="Згенерувати дані" onclick="generate()">
+        </div>
+        <div class="ui-block-b">
+            <button class="ui-btn ui-shadow" type="submit">Зберегти</button>
+        </div>
+    </div>
 </form>
+<div class="ui-grid-a">
+    <div class="ui-block-a">
+        <input class="ui-btn ui-shadow" type="button" value="Відобразити дані" onclick="output()">
+    </div>
+    <div class="ui-block-b">
+        <a class="ui-btn ui-shadow" href="/sections">На головну</a>
+    </div>
+</div>
 </body>
 </html>

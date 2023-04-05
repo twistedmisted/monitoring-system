@@ -10,5 +10,5 @@ public class EnterpriseDTO {
 
     private Long id;
     private String name;
-    private List<UnitDTO> departments = new ArrayList<>();
+    private List<SectionDTO> departments = new ArrayList<>();
 }

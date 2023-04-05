@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Оцінка ефективності</title>
+
+    <style>
+        table {
+            border: 1px solid black;
+            table-layout: fixed;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            overflow: hidden;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .button {
+            font-size: 12px;
+            text-decoration: none;
+            background-color: #EEEEEE;
+            color: #333333;
+            padding: 2px 6px 2px 6px;
+            border-top: 1px solid #CCCCCC;
+            border-right: 1px solid #333333;
+            border-bottom: 1px solid #333333;
+            border-left: 1px solid #CCCCCC;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        function calculate() {
+            const efficiencyList = /*[[${efficiencyList}]]*/ [];
+            const x = parseInt(document.getElementById("x").value);
+            const table = document.getElementById("data-table");
+            let sumEff = 0;
+            for (let i = 2, j = 0, row; row = table.rows[i]; i++, j++) {
+                if (i === table.rows.length - 1) {
+                    if (sumEff > 0) {
+                        row.cells[1].style.background = 'green';
+                    } else {
+                        row.cells[1].style.background = 'red';
+                    }
+                    row.cells[1].innerHTML = (Math.round((sumEff + Number.EPSILON) * 100) / 100).toString()
+                    break;
+                }
+                const nowCons = getFloat(row.cells[1].innerHTML);
+
+                const nowCosts = getFloat(row.cells[2].innerHTML);
+                const afterCosts = getFloat(row.cells[4].children[0].value);
+
+                let effMoney = 0;
+                try {
+                    effMoney = efficiencyList[j].money;
+                } catch (error) {
+                    effMoney = 0;
+                }
+
+                const tariff = nowCosts / nowCons;
+                row.cells[3].innerHTML = (Math.round(((afterCosts / tariff) + Number.EPSILON) * 100) / 100).toString();
+
+                const costsEff = nowCosts - (afterCosts + effMoney) / x;
+                const consEff = costsEff / tariff;
+
+                if (consEff > 0) {
+                    row.cells[5].style.background = 'green';
+                } else {
+                    row.cells[5].style.background = 'red';
+                }
+                if (costsEff > 0) {
+                    row.cells[6].style.background = 'green';
+                } else {
+                    row.cells[6].style.background = 'red';
+                }
+                row.cells[5].innerHTML = (Math.round((consEff + Number.EPSILON) * 100) / 100).toString();
+                row.cells[6].innerHTML = (Math.round((costsEff + Number.EPSILON) * 100) / 100).toString();
+                sumEff += costsEff;
+            }
+        }
+
+        function getFloat(value) {
+            if (value === "") {
+                return 0.0;
+            }
+            return parseFloat(value);
+        }
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+<div>
+    <label for="x">Кількість років</label>
+    <input id="x" type="text">
+    <button class="button" onclick="calculate()">Обрахувати</button>
+    <a class="button" href="/sections">На головну</a>
+</div>
+<div>
+    <table id="data-table">
+        <caption><h3 th:text="${'Оцінка ефективності для організації ' + enterpriseName}"></h3></caption>
+        <tbody>
+        <tr>
+            <th rowspan="2">Складові заощаджень щодо ресурсу</th>
+            <th colspan="2">Існуюча ситуація</th>
+            <th colspan="2">Після реалізації проекту</th>
+            <th colspan="2">Економія</th>
+        </tr>
+        <tr>
+            <th>кількість</th>
+            <th>грн</th>
+            <th>кількість</th>
+            <th>грн</th>
+            <th>кількість</th>
+            <th>грн</th>
+        </tr>
+        <tr th:each="efficiency : ${efficiencyList}">
+            <td th:text="${efficiency.parameterName}"></td>
+            <td th:text="${efficiency.cons()}"></td>
+            <td th:text="${efficiency.costs()}"></td>
+            <td></td>
+            <td><input type="text"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="6">Загальні заощадження</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

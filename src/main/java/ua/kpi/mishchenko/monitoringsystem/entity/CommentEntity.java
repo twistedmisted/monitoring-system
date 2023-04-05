@@ -29,6 +29,6 @@ public class CommentEntity {
     private String parameterName;
 
     @ManyToOne
-    @JoinColumn(name = "unit_id", nullable = false)
-    private UnitEntity unit;
+    @JoinColumn(name = "section_id", nullable = false)
+    private SectionEntity section;
 }

@@ -2,38 +2,44 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/styles/home.css}"/>
-    <title>Home</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <title>Головна меню</title>
 </head>
 <body>
-<div class="container">
-    <h2>Підприємства та відділи</h2>
-    <ol class="myUL">
-        <li th:each="enterprise : ${enterprises}">
-            <a th:href="@{/units/enterprises/__${enterprise.id}__/output}" th:text="${enterprise.name}">Enterprise
-                name</a> <a
-                th:href="@{/units/enterprises/{enterpriseId}/line-chart(enterpriseId=${enterprise.id})}"><img
-                class="calendar-img" th:src="@{/images/chart.png}"/></a><a
-                th:href="@{/units/enterprises/{enterpriseId}/pie-chart(enterpriseId=${enterprise.id})}"><img
-                class="calendar-img" th:src="@{/images/pie-chart.png}"/></a>
-            <ul>
-                <li th:each="department : ${enterprise.departments}"><a
-                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/output(enterpriseId=${enterprise.id}, departmentId=${department.id})}"
-                        th:text="${department.name}">Department name</a><a
-                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
-                        class="setting-img" th:src="@{/images/settings.png}"/></a><a
-                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/working-days(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
-                        class="calendar-img" th:src="@{/images/calendar.png}"/></a><a
-                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/line-chart(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
-                        class="calendar-img" th:src="@{/images/chart.png}"/></a><a
-                        th:href="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/pie-chart(enterpriseId=${enterprise.id}, departmentId=${department.id})}"><img
-                        class="calendar-img" th:src="@{/images/pie-chart.png}"/></a></li>
-                <li class="hide-bullet"><a th:href="@{/units/enterprises/{id}/departments(id=${enterprise.id})}"
-                                           class="button">Додати відділ</a></li>
-            </ul>
-        </li>
-        <li class="hide-bullet"><a href="/units/enterprises" class="button">Додати підприємство</a></li>
-    </ol>
+<div data-role="page" id="pageone">
+    <div data-role="header">
+        <h1>Підприємства та відділи</h1>
+    </div>
+
+    <div data-role="main" class="ui-content">
+        <div th:each="enterprise : ${enterprises}" data-role="collapsible">
+            <h1 th:text="${enterprise.name}">Enterprise</h1>
+            <div class="ui-grid-c">
+                <div class="ui-block-a"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterprise.id}__/output}">Вхідні дані</a></div>
+                <div class="ui-block-b"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/line-chart(enterpriseId=${enterprise.id})}" data-ajax="false">Графік витрат</a></div>
+                <div class="ui-block-c"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/pie-chart(enterpriseId=${enterprise.id})}" data-ajax="false">Графік енергобалансу</a></div>
+                <div class="ui-block-d"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/activities(enterpriseId=${enterprise.id})}" data-ajax="false">Заходи</a></div>
+            </div>
+            <div th:each="department : ${enterprise.departments}" data-role="collapsible">
+                <h1 th:text="${department.name}">Department</h1>
+                <div class="ui-grid-b">
+                    <div class="ui-block-a"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/parameters(enterpriseId=${enterprise.id}, departmentId=${department.id})}" data-ajax="false">Показники</a></div>
+                    <div class="ui-block-b"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/output(enterpriseId=${enterprise.id}, departmentId=${department.id})}" data-ajax="false">Вхідні дані</a></div>
+                    <div class="ui-block-c"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/working-days(enterpriseId=${enterprise.id}, departmentId=${department.id})}" data-ajax="false">Робочі дні</a></div>
+                </div>
+                <div class="ui-grid-b">
+                    <div class="ui-block-a"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/line-chart(enterpriseId=${enterprise.id}, departmentId=${department.id})}" data-ajax="false">Графік витрати</a></div>
+                    <div class="ui-block-b"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/pie-chart(enterpriseId=${enterprise.id}, departmentId=${department.id})}" data-ajax="false">Графік енергобалансу</a></div>
+                    <div class="ui-block-c"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/activities(enterpriseId=${enterprise.id}, departmentId=${department.id})}" data-ajax="false">Заходи</a></div>
+                </div>
+            </div>
+            <a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{id}/departments(id=${enterprise.id})}" data-ajax="false">Додати відділ</a>
+        </div>
+    </div>
+    <a class="ui-btn ui-shadow" href="/sections/enterprises" data-ajax="false">Додати підприємство</a>
+    <a class="ui-btn ui-shadow" href="/tariffs" data-ajax="false">Налаштувати тарифи</a>
 </div>
 </body>
 </html>

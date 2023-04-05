@@ -39,10 +39,16 @@ public class ParameterEntity {
     @Column(name = "costs_name")
     private String costsName;
 
+    @Column(name = "cons_name")
+    private String consName;
+
     @OneToMany(mappedBy = "parameter", cascade = ALL)
-    private List<UnitParameterEntity> units = new ArrayList<>();
+    private List<SectionParameterEntity> sections = new ArrayList<>();
 
     @OneToOne(mappedBy = "parameter", cascade = ALL)
     @PrimaryKeyJoinColumn
     private TariffEntity tariff;
+
+    @OneToMany(mappedBy = "parameter", cascade = ALL)
+    private List<ActivityEntity> activities = new ArrayList<>();
 }

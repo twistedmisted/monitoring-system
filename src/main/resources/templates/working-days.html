@@ -4,6 +4,9 @@
     <meta charset="UTF-8" xmlns="http://www.w3.org/1999/xhtml">
     <title>Налаштування робочих днів</title>
 
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript" type="text/javascript">
@@ -12,17 +15,17 @@
             const enterpriseId = /*[[${enterpriseId}]]*/ '0'
             const departmentId = /*[[${departmentId}]]*/ '0'
             const year = $('#year').val()
-            window.location = '/units/enterprises/' + enterpriseId + '/departments/' + departmentId + '/working-days?year=' + year
+            window.location = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/working-days?year=' + year
         }
 
         function generate(year) {
             const min = 10;
             const max = 23;
             const table = document.getElementById("data-table");
-            table.rows[1].cells[1].children[0].value = year;
+            table.rows[1].cells[1].children[0].children[0].value = year;
             for (let i = 3, row; row = table.rows[i], i < 15; i++) {
                 for (let j = 1, col; col = row.cells[j]; j++) {
-                    col.children[0].value = getRandomInt(min, max);
+                    col.children[0].children[0].value = getRandomInt(min, max);
                 }
             }
             $("#save-btn").click();
@@ -87,18 +90,18 @@
         margin-right: auto;
     }
 </style>
-<!--<input class="button" type="button" value="2013" onclick="generate(2013)">-->
-<!--<input class="button" type="button" value="2014" onclick="generate(2014)">-->
-<!--<input class="button" type="button" value="2015" onclick="generate(2015)">-->
-<!--<input class="button" type="button" value="2016" onclick="generate(2016)">-->
-<!--<input class="button" type="button" value="2017" onclick="generate(2017)">-->
-<!--<input class="button" type="button" value="2018" onclick="generate(2018)">-->
-<!--<input class="button" type="button" value="2019" onclick="generate(2019)">-->
-<!--<input class="button" type="button" value="2020" onclick="generate(2020)">-->
-<!--<input class="button" type="button" value="2021" onclick="generate(2021)">-->
-<!--<input class="button" type="button" value="2022" onclick="generate(2022)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2013" onclick="generate(2013)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2014" onclick="generate(2014)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2015" onclick="generate(2015)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2016" onclick="generate(2016)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2017" onclick="generate(2017)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2018" onclick="generate(2018)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2019" onclick="generate(2019)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2020" onclick="generate(2020)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2021" onclick="generate(2021)">-->
+<!--<input class="ui-btn ui-shadow" type="button" value="2022" onclick="generate(2022)">-->
 <form name="input"
-      th:action="@{/units/enterprises/{enterpriseId}/departments/{departmentId}/working-days(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
+      th:action="@{/sections/enterprises/{enterpriseId}/departments/{departmentId}/working-days(enterpriseId=${enterpriseId}, departmentId=${departmentId})}"
       method="post" th:object="${workingDays}">
     <table id="data-table" class="center">
         <tr>
@@ -160,14 +163,10 @@
             <th>Грудень</th>
             <td><input class="month-value" th:field="*{december}"></td>
         </tr>
-        <tr>
-            <th><button id="save-btn" class="button" type="submit">Зберегти</button></th>
-            <th><input class="button" type="button" onclick="showForYear()" value="Відобразити дані"></th>
-        </tr>
-        <tr>
-            <td colspan="2"><a class="button" href="/units">На головну</a></td>
-        </tr>
     </table>
+    <button class="ui-btn ui-shadow" id="save-btn" type="submit">Зберегти</button>
+    <input class="ui-btn ui-shadow" type="button" onclick="showForYear()" value="Відобразити дані">
+    <a class="ui-btn ui-shadow" href="/sections">На головну</a>
 </form>
 </body>
 </html>

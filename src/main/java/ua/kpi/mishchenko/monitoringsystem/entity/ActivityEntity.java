@@ -10,26 +10,37 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "units_parameters")
-@Setter
+@Table(name = "activities")
 @Getter
-public class UnitParameterEntity {
+@Setter
+public class ActivityEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "amount_year", nullable = false)
-    private Integer amountYear;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "unit_id", nullable = false)
-    private UnitEntity unit;
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "money", nullable = false)
+    private BigDecimal money;
+
+    @Column(name = "financial_source", nullable = false)
+    private String financialSource;
 
     @ManyToOne
     @JoinColumn(name = "parameter_id", nullable = false)
     private ParameterEntity parameter;
+
+    @ManyToOne
+    @JoinColumn(name = "section_id", nullable = false)
+    private SectionEntity section;
 }

@@ -12,7 +12,7 @@
             $('#parameter-name').change(() => {
                 const parameterName = $('#parameter-name').val()
                 const enterpriseId = /*[[${enterpriseId}]]*/ '0'
-                window.location = '/units/enterprises/' + enterpriseId + '/line-chart?parameter-name=' + parameterName
+                window.location = '/sections/enterprises/' + enterpriseId + '/line-chart?parameter-name=' + parameterName
             })
         })
 
@@ -102,7 +102,7 @@
 </div>
 <div>
     <input class="button" type="button" value="Оновити графік" onclick="updateChart()">
-    <a class="button" href="/units">На головну</a>
+    <a class="button" href="/sections">На головну</a>
 </div>
 <div>
     <canvas id="monthChart"></canvas>
@@ -257,8 +257,9 @@
                 title: {
                     display: true,
                     text: consTitle,
+                    position: 'bottom',
                     font: {
-                        size: 16
+                        size: 20
                     }
                 },
                 legend: {
@@ -337,8 +338,9 @@
                 title: {
                     display: true,
                     text: costsTitle,
+                    position: 'bottom',
                     font: {
-                        size: 16
+                        size: 20
                     }
                 },
                 legend: {

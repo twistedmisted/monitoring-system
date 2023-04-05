@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends CrudRepository<CommentEntity, Long> {
 
-    Optional<CommentEntity> findByUnitIdAndParameterName(Long unitId, String parameterName);
+    Optional<CommentEntity> findBySectionIdAndParameterName(Long sectionId, String parameterName);
 
-    boolean existsByUnitIdAndParameterName(Long unitId, String parameterName);
+    boolean existsBySectionIdAndParameterName(Long sectionId, String parameterName);
 }

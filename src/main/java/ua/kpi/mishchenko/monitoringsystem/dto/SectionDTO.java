@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class UnitDTO {
+public class SectionDTO {
 
     private Long id;
     private Long parentId;

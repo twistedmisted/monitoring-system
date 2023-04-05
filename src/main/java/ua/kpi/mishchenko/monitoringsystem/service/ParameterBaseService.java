@@ -9,23 +9,23 @@ import java.util.List;
 
 public interface ParameterBaseService {
 
-    InputDataDTO getDataByParameterName(Long unitId, String parameterName);
+    InputDataDTO getDataByParameterName(Long sectionId, String parameterName);
 
-    TableData getDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
+    TableData getDataByParameterNameWithWorkingDays(Long sectionId, String parameterName);
 
-    YearInfo getDataByParameterNameWithWorkingDaysByYear(Long unitId, String parameterName, Integer year);
+    YearInfo getDataByParameterNameWithWorkingDaysByYear(Long sectionId, String parameterName, Integer year);
 
-    TableData getCostsDataByParameterNameWithWorkingDays(Long unitId, String parameterName);
+    TableData getCostsDataByParameterNameWithWorkingDays(Long sectionId, String parameterName);
 
-    ParameterYearsInfo getDataForEnterpriseByParameterName(Long unitId, String parameterName);
+    ParameterYearsInfo getDataForEnterpriseByParameterName(Long sectionId, String parameterName);
 
-    ParameterYearsInfo getCostsDataForEnterpriseByParameterName(Long unitId, String parameterName);
+    ParameterYearsInfo getCostsDataForEnterpriseByParameterName(Long sectionId, String parameterName);
 
-    List<YearInfo> getYearCostsDataForEnterpriseByParameterName(Long unitId, String parameterName, Integer year);
+    List<YearInfo> getYearCostsDataForEnterpriseByParameterName(Long sectionId, String parameterName, Integer year);
 
     TableData getDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
 
     TableData getCostsDataForEnterpriseByParameterNameAndYear(Long enterpriseId, String beanName, Integer year);
 
-    void saveData(Long unitId, InputDataDTO tableData);
+    void saveData(Long sectionId, InputDataDTO tableData);
 }

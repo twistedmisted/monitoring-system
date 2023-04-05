@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заходи для відділу</title>
+
+    <style>
+        table {
+            border: 1px solid black;
+            table-layout: fixed;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            overflow: hidden;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .button {
+            font-size: 12px;
+            text-decoration: none;
+            background-color: #EEEEEE;
+            color: #333333;
+            padding: 2px 6px 2px 6px;
+            border-top: 1px solid #CCCCCC;
+            border-right: 1px solid #333333;
+            border-bottom: 1px solid #333333;
+            border-left: 1px solid #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <a class="button"
+       th:href="@{/sections/enterprises/__${enterpriseId}__/efficiency}">Ефективність</a>
+    <a class="button" href="/sections">На головну</a>
+</div>
+<div th:if="${activities.isEmpty()}">
+    <p>Для цього відділу ще не були встановлені заходи.</p>
+</div>
+<div th:unless="${activities.isEmpty()}">
+    <table>
+        <caption><h3 th:text="${'Таблиця заходів для підприємства ' + enterpriseName}"></h3></caption>
+        <tbody>
+        <tr>
+            <th>№ з/п</th>
+            <th>Назва відділу</th>
+            <th>Назва заходу</th>
+            <th>Вид ресурсу</th>
+            <th>Очікуваний ефект від впровадження</th>
+            <th>Кошти на впровадження, грн</th>
+            <th>Джерело фінансування</th>
+        </tr>
+        <tr th:each="activity, stat : ${activities}">
+            <td th:text="${stat.index + 1}"></td>
+            <td th:text="${activity.getDepartmentName()}"></td>
+            <td th:text="${activity.getName()}"></td>
+            <td th:text="${activity.getParameterName()}"></td>
+            <td th:text="${activity.getDescription()}"></td>
+            <td th:text="${activity.getMoney()}"></td>
+            <td th:text="${activity.getFinancialSource()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

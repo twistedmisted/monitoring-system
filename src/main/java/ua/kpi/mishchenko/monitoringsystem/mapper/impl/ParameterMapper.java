@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.ParameterWithTariff;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterEntity;
-import ua.kpi.mishchenko.monitoringsystem.entity.UnitParameterEntity;
+import ua.kpi.mishchenko.monitoringsystem.entity.SectionParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.mapper.Mapper;
 
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         entity.setBeanName(dto.getBeanName());
         entity.setHasTariff(dto.getHasTariff());
         entity.setCostsName(dto.getCostsName());
+        entity.setConsName(dto.getCostsName());
         return entity;
     }
 
@@ -44,10 +45,11 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         dto.setBeanName(entity.getBeanName());
         dto.setHasTariff(entity.getHasTariff());
         dto.setCostsName(entity.getCostsName());
+        dto.setConsName(entity.getConsName());
         return dto;
     }
 
-    public ParameterDTO entityToDto(UnitParameterEntity entity) {
+    public ParameterDTO entityToDto(SectionParameterEntity entity) {
         if (entity == null) {
             return null;
         }
@@ -57,6 +59,7 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         dto.setBeanName(entity.getParameter().getBeanName());
         dto.setHasTariff(entity.getParameter().getHasTariff());
         dto.setCostsName(entity.getParameter().getCostsName());
+        dto.setConsName(entity.getParameter().getConsName());
         return dto;
     }
 
@@ -84,23 +87,23 @@ public class ParameterMapper implements Mapper<ParameterEntity, ParameterDTO> {
         return dtos;
     }
 
-    public List<ParameterDTO> upEntitiesToParameterDto(List<UnitParameterEntity> entities) {
+    public List<ParameterDTO> upEntitiesToParameterDto(List<SectionParameterEntity> entities) {
         if (entities == null || entities.isEmpty()) {
             return null;
         }
         List<ParameterDTO> dtos = new ArrayList<>();
-        for (UnitParameterEntity entity : entities) {
+        for (SectionParameterEntity entity : entities) {
             dtos.add(entityToDto(entity));
         }
         return dtos;
     }
 
-    public List<String> upEntitiesToBeanNameString(List<UnitParameterEntity> entities) {
+    public List<String> upEntitiesToBeanNameString(List<SectionParameterEntity> entities) {
         if (entities == null || entities.isEmpty()) {
             return new ArrayList<>();
         }
         List<String> beanNames = new ArrayList<>();
-        for (UnitParameterEntity entity : entities) {
+        for (SectionParameterEntity entity : entities) {
             beanNames.add(entity.getParameter().getBeanName());
         }
         return beanNames;

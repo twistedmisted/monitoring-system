@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ua.kpi.mishchenko.monitoringsystem.dto.ActivityBO;
+import ua.kpi.mishchenko.monitoringsystem.dto.ActivityDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.CommentDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.CreateActivity;
+import ua.kpi.mishchenko.monitoringsystem.dto.EfficiencyBO;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterpriseDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.EnterprisePieChartDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.InputDataDTO;
@@ -19,16 +23,17 @@ import ua.kpi.mishchenko.monitoringsystem.dto.ParameterYearsInfo;
 import ua.kpi.mishchenko.monitoringsystem.dto.PieChartDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.SetParametersRequest;
 import ua.kpi.mishchenko.monitoringsystem.dto.TableData;
-import ua.kpi.mishchenko.monitoringsystem.dto.UnitDTO;
+import ua.kpi.mishchenko.monitoringsystem.dto.SectionDTO;
 import ua.kpi.mishchenko.monitoringsystem.dto.WorkingDaysByYear;
 import ua.kpi.mishchenko.monitoringsystem.dto.YearInfo;
 import ua.kpi.mishchenko.monitoringsystem.entity.ParameterEntity;
 import ua.kpi.mishchenko.monitoringsystem.repository.ParameterRepository;
+import ua.kpi.mishchenko.monitoringsystem.service.ActivityService;
 import ua.kpi.mishchenko.monitoringsystem.service.CommentService;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterBaseService;
 import ua.kpi.mishchenko.monitoringsystem.service.ParameterService;
-import ua.kpi.mishchenko.monitoringsystem.service.UnitParameterService;
-import ua.kpi.mishchenko.monitoringsystem.service.UnitService;
+import ua.kpi.mishchenko.monitoringsystem.service.SectionService;
+import ua.kpi.mishchenko.monitoringsystem.service.SectionParameterService;
 import ua.kpi.mishchenko.monitoringsystem.service.WorkingDaysService;
 
 import java.util.ArrayList;
@@ -39,45 +44,46 @@ import java.util.function.Consumer;
 import static ua.kpi.mishchenko.monitoringsystem.controller.CommentController.PIE_CHART;
 
 @Controller
-@RequestMapping("/units")
+@RequestMapping("/sections")
 @RequiredArgsConstructor
 public class MainController {
 
-    private final UnitService unitService;
-    private final UnitParameterService unitParameterService;
+    private final SectionService sectionService;
+    private final SectionParameterService sectionParameterService;
     private final ParameterBaseService parameterBaseService;
     private final WorkingDaysService workingDaysService;
     private final ParameterRepository parameterRepository;
     private final CommentService commentService;
     private final ParameterService parameterService;
+    private final ActivityService activityService;
 
     @GetMapping
     public String getHomePage(Model model) {
-        List<EnterpriseDTO> enterprises = unitService.getAllEnterprises();
+        List<EnterpriseDTO> enterprises = sectionService.getAllEnterprises();
         model.addAttribute("enterprises", enterprises);
         return "home";
     }
 
     @GetMapping("/enterprises")
     public String getCreateEnterprisePage(Model model) {
-        model.addAttribute("enterprise", new UnitDTO());
+        model.addAttribute("enterprise", new SectionDTO());
         return "create-enterprise";
     }
 
     @PostMapping("/enterprises")
-    public String createEnterprise(@ModelAttribute UnitDTO enterprise) {
+    public String createEnterprise(@ModelAttribute SectionDTO enterprise) {
         if (enterprise != null) {
             enterprise.setParentId(0L);
-            unitService.createEnterprise(enterprise);
+            sectionService.createEnterprise(enterprise);
         }
-        return "redirect:/units";
+        return "redirect:/sections";
     }
 
     @GetMapping("/enterprises/{id}/departments")
     public String getCreateDepartmentPage(@PathVariable(name = "id") Long enterpriseId, Model model) {
-        if (unitService.isEnterpriseById(enterpriseId)) {
+        if (sectionService.isEnterpriseById(enterpriseId)) {
             model.addAttribute("enterpriseId", enterpriseId);
-            model.addAttribute("department", new UnitDTO());
+            model.addAttribute("department", new SectionDTO());
         } else {
             model.addAttribute("message", "Організацію не знайдено!");
         }
@@ -85,18 +91,18 @@ public class MainController {
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments")
-    public String createDepartment(@PathVariable(name = "enterpriseId") Long enterpriseId, @ModelAttribute UnitDTO department) {
+    public String createDepartment(@PathVariable(name = "enterpriseId") Long enterpriseId, @ModelAttribute SectionDTO department) {
         department.setParentId(enterpriseId);
-        unitService.createDepartment(department);
-        return "redirect:/units";
+        sectionService.createDepartment(department);
+        return "redirect:/sections";
     }
 
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/parameters")
     public String getDepartmentParametersPage(@PathVariable Long enterpriseId,
                                               @PathVariable Long departmentId,
                                               Model model) {
-        UnitDTO department = unitService.getUnitById(departmentId);
-        List<String> parameters = unitParameterService.getAllBeanNameParametersByUnitId(departmentId);
+        SectionDTO department = sectionService.getSectionById(departmentId);
+        List<String> parameters = sectionParameterService.getAllBeanNameParametersBySectionId(departmentId);
         SetParametersRequest setParametersRequest = createSetParametersRequest(parameters);
         if (department == null) {
             model.addAttribute("message", "Відділу не знайдено!");
@@ -154,15 +160,15 @@ public class MainController {
     public String setParameters(@PathVariable Long enterpriseId,
                                 @PathVariable Long departmentId,
                                 @ModelAttribute SetParametersRequest setParameters) {
-        unitService.setDepartmentParameters(departmentId, setParameters);
-        return "redirect:/units";
+        sectionService.setDepartmentParameters(departmentId, setParameters);
+        return "redirect:/sections";
     }
 
     @GetMapping("/enterprises/{enterpriseId}/output")
     public String getInputPage(@PathVariable Long enterpriseId,
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
-        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersByEnterpriseId(enterpriseId);
         ParameterYearsInfo consumptionTableData = new ParameterYearsInfo();
         ParameterYearsInfo costsTableData = new ParameterYearsInfo();
         if (parameterName != null && !parameterName.isBlank()) {
@@ -174,6 +180,10 @@ public class MainController {
         model.addAttribute("consumptionTableData", consumptionTableData);
         model.addAttribute("costsTableData", costsTableData);
         model.addAttribute("departmentParameters", departmentParameters);
+        model.addAttribute("enterpriseName", sectionService.getSectionById(enterpriseId).getName());
+        if (parameterName != null) {
+            model.addAttribute("parameter", parameterService.getParameterByBeanName(parameterName));
+        }
         return "enterprise/output";
     }
 
@@ -184,15 +194,15 @@ public class MainController {
         if (year == null) {
             return "enterprise/output-by-year";
         }
-        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersByEnterpriseId(enterpriseId);
         List<TableData> tableDataList = new ArrayList<>();
-        for (ParameterDTO parameterName : departmentParameters) {
-            TableData tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
-            tableData.setParameterName(parameterName.getName());
+        for (ParameterDTO parameterDTO : departmentParameters) {
+            TableData tableData = parameterBaseService.getDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterDTO.getBeanName(), year);
+            tableData.setParameterName(parameterDTO.getConsName());
             tableDataList.add(tableData);
-            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName.getBeanName(), true)) {
-                TableData costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterName.getBeanName(), year);
-                costsTableData.setParameterName("Витрати");
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterDTO.getBeanName(), true)) {
+                TableData costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterNameAndYear(enterpriseId, parameterDTO.getBeanName(), year);
+                costsTableData.setParameterName(parameterDTO.getCostsName());
                 tableDataList.add(costsTableData);
             }
         }
@@ -210,7 +220,7 @@ public class MainController {
                                           @PathVariable Long departmentId,
                                           @RequestParam(value = "parameter-name", required = false) String parameterName,
                                           Model model) {
-        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersBySectionId(departmentId);
         TableData consumptionTableData = new TableData();
         TableData costsTableData = new TableData();
         if (parameterName != null && !parameterName.isBlank()) {
@@ -224,6 +234,10 @@ public class MainController {
         model.addAttribute("departmentParameters", departmentParameters);
         model.addAttribute("enterpriseId", enterpriseId);
         model.addAttribute("departmentId", departmentId);
+        model.addAttribute("departmentName", sectionService.getSectionById(departmentId).getName());
+        if (parameterName != null) {
+            model.addAttribute("parameter", parameterService.getParameterByBeanName(parameterName));
+        }
         return "department/output";
     }
 
@@ -232,7 +246,7 @@ public class MainController {
                                @PathVariable Long departmentId,
                                @RequestParam(value = "parameter-name", required = false) String parameterName,
                                Model model) {
-        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersBySectionId(departmentId);
         InputDataDTO tableData = new InputDataDTO();
         if (parameterName != null && !parameterName.isBlank()) {
             tableData = parameterBaseService.getDataByParameterName(departmentId, parameterName);
@@ -250,15 +264,15 @@ public class MainController {
                                      @PathVariable Long departmentId,
                                      @ModelAttribute InputDataDTO tableData) {
         parameterBaseService.saveData(departmentId, tableData);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + tableData.getParameterName();
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + tableData.getParameterName();
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/add-year")
     public String addYear(@PathVariable Long enterpriseId,
                           @PathVariable Long departmentId,
                           @RequestParam(value = "parameter-name") String parameterName) {
-        unitParameterService.addYear(departmentId, parameterName);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
+        sectionParameterService.addYear(departmentId, parameterName);
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
     }
 
     @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/remove-year")
@@ -266,8 +280,8 @@ public class MainController {
                              @PathVariable Long departmentId,
                              @RequestParam(value = "parameter-name") String parameterName,
                              @RequestParam(value = "year") Integer year) {
-        unitParameterService.removeYear(departmentId, parameterName, year);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
+        sectionParameterService.removeYear(departmentId, parameterName, year);
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/input?parameter-name=" + parameterName;
     }
 
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/working-days")
@@ -275,8 +289,8 @@ public class MainController {
                                      @PathVariable Long departmentId,
                                      @RequestParam(name = "year", required = false) Integer year,
                                      Model model) {
-        UnitDTO department = unitService.getUnitById(departmentId);
-        WorkingDaysByYear workingDays = workingDaysService.getAllWorkingDaysByUnitIdAndYear(departmentId, year);
+        SectionDTO department = sectionService.getSectionById(departmentId);
+        WorkingDaysByYear workingDays = workingDaysService.getAllWorkingDaysBySectionIdAndYear(departmentId, year);
         model.addAttribute("department", department);
         model.addAttribute("workingDays", workingDays);
         return "working-days";
@@ -287,13 +301,13 @@ public class MainController {
                                   @PathVariable Long departmentId,
                                   @RequestParam(name = "year", required = false) Integer year,
                                   @ModelAttribute WorkingDaysByYear workingDays) {
-//        UnitDTO department = unitService.getUnitById(departmentId);
-        workingDays.setUnitId(departmentId);
+//        SectionDTO department = sectionService.getSectionById(departmentId);
+        workingDays.setSectionId(departmentId);
         workingDaysService.saveWorkingDays(workingDays);
-//        WorkingDaysDTO workingDays = workingDaysService.getWorkingDaysByUnitIdAndYear(departmentId, year);
+//        WorkingDaysDTO workingDays = workingDaysService.getWorkingDaysBySectionIdAndYear(departmentId, year);
 //        model.addAttribute("department", department);
 //        model.addAttribute("workingDays", workingDays);
-        return "redirect:/units/enterprises/" + enterpriseId + "/departments/" + departmentId + "/working-days?year=" + workingDays.getYear();
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/working-days?year=" + workingDays.getYear();
     }
 
     @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/line-chart")
@@ -301,7 +315,7 @@ public class MainController {
                                 @PathVariable Long departmentId,
                                 @RequestParam(value = "parameter-name", required = false) String parameterName,
                                 Model model) {
-        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersBySectionId(departmentId);
         TableData consumptionTableData = new TableData();
         TableData costsTableData = new TableData();
         CommentDTO consumptionComment = new CommentDTO();
@@ -311,11 +325,11 @@ public class MainController {
         if (parameterName != null && !parameterName.isBlank()) {
             consumptionTableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
             consumptionComment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, parameterName);
-            consumptionTitle = "Середньодобове за місяць \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
+            consumptionTitle = departmentId + ".1." + parameterRepository.findByBeanName(parameterName).orElse(null).getId() + " Середньодобове за місяць \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
             if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
                 costsTableData = parameterBaseService.getCostsDataByParameterNameWithWorkingDays(departmentId, parameterName);
                 costsComment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, parameterName + "_costs");
-                costsTitle = "Середньодобове за рік \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getCostsName() + "\"";
+                costsTitle = departmentId + ".1." + parameterRepository.findByBeanName(parameterName).orElse(null).getId() + " Середньодобове за рік \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
             }
         }
         model.addAttribute("consumptionTableData", consumptionTableData);
@@ -334,7 +348,7 @@ public class MainController {
     public String getEnterpriseLineChart(@PathVariable Long enterpriseId,
                                          @RequestParam(value = "parameter-name", required = false) String parameterName,
                                          Model model) {
-        List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersByEnterpriseId(enterpriseId);
         ParameterYearsInfo consumptionTableData = new ParameterYearsInfo();
         ParameterYearsInfo costsTableData = new ParameterYearsInfo();
         CommentDTO consumptionComment = new CommentDTO();
@@ -344,11 +358,11 @@ public class MainController {
         if (parameterName != null && !parameterName.isBlank()) {
             consumptionTableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
             consumptionComment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, parameterName);
-            consumptionTitle = "Середньодобове за місяць \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
+            consumptionTitle = enterpriseId + ".1." + parameterRepository.findByBeanName(parameterName).orElse(null).getId() + " Середньодобове за місяць \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
             if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
                 costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterName(enterpriseId, parameterName);
                 costsComment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, parameterName + "_costs");
-                costsTitle = "Середньодобове за рік \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getCostsName() + "\"";
+                costsTitle = enterpriseId + ".1." + parameterRepository.findByBeanName(parameterName).orElse(null).getId() + " Середньодобове за рік \"" + parameterRepository.findByBeanName(parameterName).orElse(new ParameterEntity()).getName() + "\"";
             }
         }
         model.addAttribute("consumptionTableData", consumptionTableData);
@@ -370,7 +384,7 @@ public class MainController {
         CommentDTO comment = new CommentDTO();
         String chartTitle = null;
         if (year != null) {
-            List<ParameterDTO> departmentParameters = unitParameterService.getAllParametersByUnitId(departmentId);
+            List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersBySectionId(departmentId);
             for (ParameterDTO parameterDTO : departmentParameters) {
                 String parameterName = parameterDTO.getBeanName();
                 if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
@@ -379,7 +393,7 @@ public class MainController {
                     comment = commentService.getCommentByDepartmentIdAndParameterName(departmentId, PIE_CHART + year);
                 }
             }
-            chartTitle = "Енергобаланс по відділу \"" + unitService.getUnitById(departmentId).getName() + "\" за " + year + " рік";
+            chartTitle = departmentId + ".2 Енергобаланс по відділу \"" + sectionService.getSectionById(departmentId).getName() + "\" за " + year + " рік";
         }
         model.addAttribute("pieChart", pieChartDTO);
         model.addAttribute("enterpriseId", enterpriseId);
@@ -398,7 +412,7 @@ public class MainController {
         CommentDTO comment = new CommentDTO();
         String chartTitle = null;
         if (year != null) {
-            List<ParameterDTO> enterpriseParameters = unitParameterService.getAllParametersByEnterpriseId(enterpriseId);
+            List<ParameterDTO> enterpriseParameters = sectionParameterService.getAllParametersByEnterpriseId(enterpriseId);
             for (ParameterDTO parameterDTO : enterpriseParameters) {
                 String parameterName = parameterDTO.getBeanName();
                 if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
@@ -407,7 +421,7 @@ public class MainController {
                 }
             }
             comment = commentService.getCommentByDepartmentIdAndParameterName(enterpriseId, PIE_CHART + year);
-            chartTitle = "Енергобаланс по підприємству \"" + unitService.getUnitById(enterpriseId).getName() + "\" за " + year + " рік";
+            chartTitle = enterpriseId + ".2 Енергобаланс по підприємству \"" + sectionService.getSectionById(enterpriseId).getName() + "\" за " + year + " рік";
         }
         model.addAttribute("pieChart", pieChartDTO);
         model.addAttribute("enterpriseId", enterpriseId);
@@ -415,5 +429,102 @@ public class MainController {
         model.addAttribute("year", year);
         model.addAttribute("chartTitle", chartTitle);
         return "enterprise/pie-chart";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/activities")
+    public String getActivitiesPage(@PathVariable Long enterpriseId,
+                                    @PathVariable Long departmentId,
+                                    Model model) {
+        List<ActivityDTO> activities = activityService.getAllBySectionId(departmentId);
+        model.addAttribute("activities", activities);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("departmentId", departmentId);
+        return "department/activities";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/activities")
+    public String getEnterpriseActivitiesPage(@PathVariable Long enterpriseId,
+                                    Model model) {
+        List<ActivityBO> activities = activityService.getAllByEnterpriseId(enterpriseId);
+        model.addAttribute("activities", activities);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("enterpriseName", sectionService.getSectionById(enterpriseId).getName());
+        return "enterprise/activities";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/activities/create")
+    public String getCreateActivitiesFormPage(@PathVariable Long enterpriseId,
+                                              @PathVariable Long departmentId,
+                                              Model model) {
+        model.addAttribute("activity", new CreateActivity());
+        model.addAttribute("parameters", sectionParameterService.getAllParametersBySectionId(departmentId));
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("departmentId", departmentId);
+        return "department/create-activity";
+    }
+
+    @PostMapping("/enterprises/{enterpriseId}/departments/{departmentId}/activities/create")
+    public String createActivity(@PathVariable Long enterpriseId,
+                                 @PathVariable Long departmentId,
+                                 @ModelAttribute CreateActivity createActivity) {
+        activityService.createActivity(createActivity);
+        return "redirect:/sections/enterprises/" + enterpriseId + "/departments/" + departmentId + "/activities";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/departments/{departmentId}/efficiency")
+    public String getEfficiencyPage(@PathVariable Long enterpriseId,
+                                    @PathVariable Long departmentId,
+                                    Model model) {
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersBySectionId(departmentId);
+        List<EfficiencyBO> efficiencyList = new ArrayList<>();
+        for (ParameterDTO parameter : departmentParameters) {
+            EfficiencyBO tempEfficiency = new EfficiencyBO();
+            String parameterName = parameter.getBeanName();
+            TableData consumptionTableData = parameterBaseService.getDataByParameterNameWithWorkingDays(departmentId, parameterName);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                TableData costsTableData = parameterBaseService.getCostsDataByParameterNameWithWorkingDays(departmentId, parameterName);
+                tempEfficiency.setCosts(costsTableData.average());
+            } else {
+                continue;
+            }
+            tempEfficiency.setCons(consumptionTableData.average());
+            tempEfficiency.setParameterName(parameter.getName());
+            tempEfficiency.setMoney(activityService.getMoneyByParameterId(departmentId, parameter.getId()));
+            efficiencyList.add(tempEfficiency);
+        }
+        model.addAttribute("efficiencyList", efficiencyList);
+        model.addAttribute("departmentParameters", departmentParameters);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("departmentName", sectionService.getSectionById(departmentId).getName());
+        return "department/efficiency";
+    }
+
+    @GetMapping("/enterprises/{enterpriseId}/efficiency")
+    public String getEnterpriseEfficiencyPage(@PathVariable Long enterpriseId,
+                                              Model model) {
+        // TODO: what to do if parameter does not have costs
+        List<ParameterDTO> departmentParameters = sectionParameterService.getAllParametersByEnterpriseId(enterpriseId);
+        List<EfficiencyBO> efficiencyList = new ArrayList<>();
+        for (ParameterDTO parameter : departmentParameters) {
+            EfficiencyBO tempEfficiency = new EfficiencyBO();
+            String parameterName = parameter.getBeanName();
+            ParameterYearsInfo consumptionTableData = parameterBaseService.getDataForEnterpriseByParameterName(enterpriseId, parameterName);
+            if (parameterRepository.existsByBeanNameAndHasTariff(parameterName, true)) {
+                ParameterYearsInfo costsTableData = parameterBaseService.getCostsDataForEnterpriseByParameterName(enterpriseId, parameterName);
+                tempEfficiency.setCosts(costsTableData.calcAverage());
+            } else {
+                continue;
+            }
+            tempEfficiency.setCons(consumptionTableData.calcAverage());
+            tempEfficiency.setParameterName(parameter.getName());
+            tempEfficiency.setMoney(activityService.getMoneyByParameterIdForEnterprise(enterpriseId, parameter.getId()));
+            efficiencyList.add(tempEfficiency);
+        }
+        model.addAttribute("efficiencyList", efficiencyList);
+        model.addAttribute("departmentParameters", departmentParameters);
+        model.addAttribute("enterpriseId", enterpriseId);
+        model.addAttribute("enterpriseName", sectionService.getSectionById(enterpriseId).getName());
+        return "enterprise/efficiency";
     }
 }
