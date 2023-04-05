@@ -35,36 +35,6 @@
     </script>
 </head>
 <body>
-<style>
-
-    /*table {*/
-    /*    table-layout: fixed;*/
-    /*}*/
-
-    /*td {*/
-    /*    overflow: hidden;*/
-    /*    max-width: 300px;*/
-    /*    !*width: 100%;*!*/
-    /*}*/
-
-    /*th {*/
-    /*    overflow: hidden;*/
-    /*    max-width: 300px;*/
-    /*    !*width: 100%;*!*/
-    /*}*/
-
-    .button {
-        font-size: 12px;
-        text-decoration: none;
-        background-color: #EEEEEE;
-        color: #333333;
-        padding: 2px 6px 2px 6px;
-        border-top: 1px solid #CCCCCC;
-        border-right: 1px solid #333333;
-        border-bottom: 1px solid #333333;
-        border-left: 1px solid #CCCCCC;
-    }
-</style>
 <div class="dep-name">
     <h2 th:text="${departmentName}"></h2>
 </div>
@@ -316,7 +286,7 @@
         </tbody>
     </table>
 </div>
-<input class="ui-btn ui-shadow" type="button" value="Редагувати" onclick="input()">
-<a class="ui-btn ui-shadow" href="/sections">На головну</a>
+<input class="ui-btn ui-shadow" type="button" value="Редагувати" onclick="input()" data-ajax="false">
+<a class="ui-btn ui-shadow" href="/sections" data-ajax="false">На головну</a>
 </body>
 </html>

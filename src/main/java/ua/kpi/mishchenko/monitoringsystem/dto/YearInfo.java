@@ -19,6 +19,10 @@ public class YearInfo {
     private Integer maxMonthKey = null;
     private Map<Integer, MonthInfo> months = new HashMap<>();
 
+    public Map<Integer, MonthInfo> getMonths() {
+        return months;
+    }
+
     public YearInfo() {
         months.put(1, new MonthInfo());
         months.put(2, new MonthInfo());
@@ -35,11 +39,12 @@ public class YearInfo {
     }
 
     public String getTotalValue() {
-        return DECIMAL_FORMAT.format(months.values()
+        Double totalValue = months.values()
                 .stream()
                 .map(MonthInfo::getValue)
                 .reduce(Double::sum)
-                .orElse(0.0));
+                .orElse(0.0);
+        return totalValue == 0 ? "" : DECIMAL_FORMAT.format(totalValue);
     }
 
     public String yearAverage() {

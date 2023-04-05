@@ -22,6 +22,10 @@ public class MonthInfo {
         return value == 0.0 || workingDays == 0 ? "" : DECIMAL_FORMAT.format(value);
     }
 
+    public String valueToStrEnterprise() {
+        return value == 0.0 ? "" : DECIMAL_FORMAT.format(value);
+    }
+
     public String workingDaysToStr() {
         return value == 0.0 || workingDays == 0 ? "" : String.valueOf(workingDays);
     }

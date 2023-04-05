@@ -17,7 +17,7 @@
         <div th:each="enterprise : ${enterprises}" data-role="collapsible">
             <h1 th:text="${enterprise.name}">Enterprise</h1>
             <div class="ui-grid-c">
-                <div class="ui-block-a"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterprise.id}__/output}">Вхідні дані</a></div>
+                <div class="ui-block-a"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterprise.id}__/output}" data-ajax="false">Вхідні дані</a></div>
                 <div class="ui-block-b"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/line-chart(enterpriseId=${enterprise.id})}" data-ajax="false">Графік витрат</a></div>
                 <div class="ui-block-c"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/pie-chart(enterpriseId=${enterprise.id})}" data-ajax="false">Графік енергобалансу</a></div>
                 <div class="ui-block-d"><a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/{enterpriseId}/activities(enterpriseId=${enterprise.id})}" data-ajax="false">Заходи</a></div>

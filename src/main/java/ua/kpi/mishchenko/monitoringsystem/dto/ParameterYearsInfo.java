@@ -125,7 +125,7 @@ public class ParameterYearsInfo {
         }
         for (int i = 2; i < 13; i++) {
             double tempMin = calcMonthAverage(year, i);
-            if (min > tempMin && tempMin > 0) {
+            if (min > tempMin && tempMin > 0 || min == 0) {
                 min = tempMin;
                 minByYear.put(year, i);
             }

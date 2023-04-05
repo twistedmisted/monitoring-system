@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Заповнення даних</title>
 
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript" type="text/javascript">
@@ -20,239 +23,212 @@
     </script>
 </head>
 <body>
-<style>
-
-    table {
-        border: 1px solid black;
-        table-layout: fixed;
-    }
-
-    th, td {
-        border: 1px solid black;
-        overflow: hidden;
-        max-width: 300px;
-        /*width: 100%;*/
-    }
-
-    .button {
-        font-size: 12px;
-        text-decoration: none;
-        background-color: #EEEEEE;
-        color: #333333;
-        padding: 2px 6px 2px 6px;
-        border-top: 1px solid #CCCCCC;
-        border-right: 1px solid #333333;
-        border-bottom: 1px solid #333333;
-        border-left: 1px solid #CCCCCC;
-    }
-</style>
 <div class="ent-name">
     <h2 th:text="${enterpriseName}"></h2>
 </div>
-<div>
-    <label for="parameter-name">Показник</label>
-    <select id="parameter-name">
-        <option th:if="${consumptionTableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть показник
-        </option>
+<div class="ui-field-contain">
+    <select name="parameter-name" id="parameter-name">
+        <th:block th:if="${consumptionTableData.parameterName == 'nothing'}">
+            <option value="nothing" disabled selected>Оберіть показник</option>
+        </th:block>
         <th:block th:each="parameter : ${departmentParameters}">
             <option th:if="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
                     th:text="${parameter.name}" selected="selected"></option>
-            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}" th:value="${parameter.beanName}"
+            <option th:unless="${consumptionTableData.parameterName == parameter.beanName}"
+                    th:value="${parameter.beanName}"
                     th:text="${parameter.name}"></option>
         </th:block>
     </select>
 </div>
-<div>
-    <a class="button" th:href="@{/sections/enterprises/__${enterpriseId}__/output/year}">Загальна за роками</a>
-    <a class="button" href="/sections">На головну</a>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="cons-data-table"
+           data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${parameter.consName}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Січень</th>
+            <th>Середньодобове</th>
+            <th>Лютий</th>
+            <th>Середньодобове</th>
+            <th>Березень</th>
+            <th>Середньодобове</th>
+            <th>Квітень</th>
+            <th>Середньодобове</th>
+            <th>Травень</th>
+            <th>Середньодобове</th>
+            <th>Червень</th>
+            <th>Середньодобове</th>
+            <th>Липень</th>
+            <th>Середньодобове</th>
+            <th>Серпень</th>
+            <th>Середньодобове</th>
+            <th>Вересень</th>
+            <th>Середньодобове</th>
+            <th>Жовтень</th>
+            <th>Середньодобове</th>
+            <th>Листопад</th>
+            <th>Середньодобове</th>
+            <th>Грудень</th>
+            <th>Середньодобове</th>
+        </tr>
+        </thead>
+        <tbody id="cons-table-body">
+        <tr th:each="pr, stat : ${consumptionTableData.yearsInfo}">
+            <td th:text="${pr.key}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 1)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 1)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 2)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 2)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 3)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 3)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 4)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 4)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 5)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 5)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 6)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 6)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 7)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 7)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 8)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 8)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 9)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 9)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 10)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 10)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 11)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 11)}"></td>
+            <td th:text="${consumptionTableData.monthValue(pr.key, 12)}"></td>
+            <td th:text="${consumptionTableData.monthAverage(pr.key, 12)}"></td>
+        </tr>
+        </tbody>
+    </table>
 </div>
-<table th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="consumption-data-table">
-    <caption><h2 th:text="${parameter.consName}"></h2></caption>
-    <tbody id="consumption-table-body">
-    <tr>
-        <th></th>
-        <th>Січень</th>
-        <th>Середньодобове</th>
-        <th>Лютий</th>
-        <th>Середньодобове</th>
-        <th>Березень</th>
-        <th>Середньодобове</th>
-        <th>Квітень</th>
-        <th>Середньодобове</th>
-        <th>Травень</th>
-        <th>Середньодобове</th>
-        <th>Червень</th>
-        <th>Середньодобове</th>
-        <th>Липень</th>
-        <th>Середньодобове</th>
-        <th>Серпень</th>
-        <th>Середньодобове</th>
-        <th>Вересень</th>
-        <th>Середньодобове</th>
-        <th>Жовтень</th>
-        <th>Середньодобове</th>
-        <th>Листопад</th>
-        <th>Середньодобове</th>
-        <th>Грудень</th>
-        <th>Середньодобове</th>
-        <th>Середнє за рік</th>
-        <th>Мінімальне значення</th>
-        <th>Місяць</th>
-        <th>Максимальне значення</th>
-        <th>Місяць</th>
-        <th>Коефіцієнт нерівності</th>
-    </tr>
-    <tr th:each="pr, stat : ${consumptionTableData.yearsInfo}">
-        <td th:text="${pr.key}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 1)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 1)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 2)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 2)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 3)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 3)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 4)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 4)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 5)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 5)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 6)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 6)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 7)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 7)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 8)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 8)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 9)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 9)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 10)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 10)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 11)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 11)}"></td>
-        <td th:text="${consumptionTableData.monthValue(pr.key, 12)}"></td>
-        <td th:text="${consumptionTableData.monthAverage(pr.key, 12)}"></td>
-        <td th:text="${consumptionTableData.yearAverage(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMinValue(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMinMonth(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMaxValue(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMaxMonth(pr.key)}"></td>
-        <td th:text="${consumptionTableData.calcInequalityCoefficient(pr.key)}"></td>
-    </tr>
-    </tbody>
-</table>
-<table th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="consumption-par-data-table">
-    <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.consName + '`'}"></h2></caption>
-    <tbody id="consumption-par-table-body">
-    <tr>
-        <th></th>
-        <th>Середнє за рік</th>
-        <th>Мінімальне значення</th>
-        <th>Місяць</th>
-        <th>Максимальне значення</th>
-        <th>Місяць</th>
-        <th>Коефіцієнт нерівності</th>
-    </tr>
-    <tr th:each="pr, stat : ${consumptionTableData.yearsInfo}">
-        <td th:text="${pr.key}"></td>
-        <td th:text="${consumptionTableData.yearAverage(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMinValue(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMinMonth(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMaxValue(pr.key)}"></td>
-        <td th:text="${consumptionTableData.getMaxMonth(pr.key)}"></td>
-        <td th:text="${consumptionTableData.calcInequalityCoefficient(pr.key)}"></td>
-    </tr>
-    </tbody>
-</table>
-<table th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-data-table">
-    <caption><h2 th:text="${parameter.costsName}"></h2></caption>
-    <tbody id="costs-table-body">
-    <tr>
-        <th></th>
-        <th>Січень</th>
-        <th>Середньодобове</th>
-        <th>Лютий</th>
-        <th>Середньодобове</th>
-        <th>Березень</th>
-        <th>Середньодобове</th>
-        <th>Квітень</th>
-        <th>Середньодобове</th>
-        <th>Травень</th>
-        <th>Середньодобове</th>
-        <th>Червень</th>
-        <th>Середньодобове</th>
-        <th>Липень</th>
-        <th>Середньодобове</th>
-        <th>Серпень</th>
-        <th>Середньодобове</th>
-        <th>Вересень</th>
-        <th>Середньодобове</th>
-        <th>Жовтень</th>
-        <th>Середньодобове</th>
-        <th>Листопад</th>
-        <th>Середньодобове</th>
-        <th>Грудень</th>
-        <th>Середньодобове</th>
-        <th>Середнє за рік</th>
-        <th>Мінімальне значення</th>
-        <th>Місяць</th>
-        <th>Максимальне значення</th>
-        <th>Місяць</th>
-        <th>Коефіцієнт нерівності</th>
-    </tr>
-    <tr th:each="pr, stat : ${costsTableData.yearsInfo}">
-        <td th:text="${pr.key}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 1)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 1)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 2)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 2)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 3)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 3)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 4)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 4)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 5)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 5)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 6)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 6)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 7)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 7)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 8)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 8)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 9)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 9)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 10)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 10)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 11)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 11)}"></td>
-        <td th:text="${costsTableData.monthValue(pr.key, 12)}"></td>
-        <td th:text="${costsTableData.monthAverage(pr.key, 12)}"></td>
-        <td th:text="${costsTableData.yearAverage(pr.key)}"></td>
-        <td th:text="${costsTableData.getMinValue(pr.key)}"></td>
-        <td th:text="${costsTableData.getMinMonth(pr.key)}"></td>
-        <td th:text="${costsTableData.getMaxValue(pr.key)}"></td>
-        <td th:text="${costsTableData.getMaxMonth(pr.key)}"></td>
-        <td th:text="${costsTableData.calcInequalityCoefficient(pr.key)}"></td>
-    </tr>
-    </tbody>
-</table>
-<table th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-par-data-table">
-    <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.costsName + '`'}"></h2></caption>
-    <tbody id="costs-par-table-body">
-    <tr>
-        <th></th>
-        <th>Середнє за рік</th>
-        <th>Мінімальне значення</th>
-        <th>Місяць</th>
-        <th>Максимальне значення</th>
-        <th>Місяць</th>
-        <th>Коефіцієнт нерівності</th>
-    </tr>
-    <tr th:each="pr, stat : ${costsTableData.yearsInfo}">
-        <td th:text="${pr.key}"></td>
-        <td th:text="${costsTableData.yearAverage(pr.key)}"></td>
-        <td th:text="${costsTableData.getMinValue(pr.key)}"></td>
-        <td th:text="${costsTableData.getMinMonth(pr.key)}"></td>
-        <td th:text="${costsTableData.getMaxValue(pr.key)}"></td>
-        <td th:text="${costsTableData.getMaxMonth(pr.key)}"></td>
-        <td th:text="${costsTableData.calcInequalityCoefficient(pr.key)}"></td>
-    </tr>
-    </tbody>
-</table>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!consumptionTableData.yearsInfo.isEmpty()}" id="cons-par-data-table"
+           data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.consName + '`'}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Середнє за рік</th>
+            <th>Мінімальне значення</th>
+            <th>Місяць</th>
+            <th>Максимальне значення</th>
+            <th>Місяць</th>
+            <th>Коефіцієнт нерівності</th>
+        </tr>
+        </thead>
+        <tbody id="consumption-par-table-body">
+        <tr th:each="pr, stat : ${consumptionTableData.yearsInfo}">
+            <td th:text="${pr.key}"></td>
+            <td th:text="${consumptionTableData.yearAverage(pr.key)}"></td>
+            <td th:text="${consumptionTableData.getMinValue(pr.key)}"></td>
+            <td th:text="${consumptionTableData.getMinMonth(pr.key)}"></td>
+            <td th:text="${consumptionTableData.getMaxValue(pr.key)}"></td>
+            <td th:text="${consumptionTableData.getMaxMonth(pr.key)}"></td>
+            <td th:text="${consumptionTableData.calcInequalityCoefficient(pr.key)}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-data-table"
+           data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${parameter.costsName}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Січень</th>
+            <th>Середньодобове</th>
+            <th>Лютий</th>
+            <th>Середньодобове</th>
+            <th>Березень</th>
+            <th>Середньодобове</th>
+            <th>Квітень</th>
+            <th>Середньодобове</th>
+            <th>Травень</th>
+            <th>Середньодобове</th>
+            <th>Червень</th>
+            <th>Середньодобове</th>
+            <th>Липень</th>
+            <th>Середньодобове</th>
+            <th>Серпень</th>
+            <th>Середньодобове</th>
+            <th>Вересень</th>
+            <th>Середньодобове</th>
+            <th>Жовтень</th>
+            <th>Середньодобове</th>
+            <th>Листопад</th>
+            <th>Середньодобове</th>
+            <th>Грудень</th>
+            <th>Середньодобове</th>
+        </tr>
+        </thead>
+        <tbody id="costs-table-body">
+        <tr th:each="pr, stat : ${costsTableData.yearsInfo}">
+            <td th:text="${pr.key}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 1)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 1)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 2)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 2)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 3)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 3)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 4)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 4)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 5)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 5)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 6)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 6)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 7)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 7)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 8)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 8)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 9)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 9)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 10)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 10)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 11)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 11)}"></td>
+            <td th:text="${costsTableData.monthValue(pr.key, 12)}"></td>
+            <td th:text="${costsTableData.monthAverage(pr.key, 12)}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div style="width: 100%;  overflow: auto">
+    <table data-role="table" th:if="${!costsTableData.yearsInfo.isEmpty()}" id="costs-par-data-table"
+           data-mode="reflow"
+           class="ui-responsive table-stroke">
+        <caption><h2 th:text="${'Показники еко-енергоефективності для `' + parameter.costsName + '`'}"></h2></caption>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Середнє за рік</th>
+            <th>Мінімальне значення</th>
+            <th>Місяць</th>
+            <th>Максимальне значення</th>
+            <th>Місяць</th>
+            <th>Коефіцієнт нерівності</th>
+        </tr>
+        </thead>
+        <tbody id="costs-par-table-body">
+        <tr th:each="pr, stat : ${costsTableData.yearsInfo}">
+            <td th:text="${pr.key}"></td>
+            <td th:text="${costsTableData.yearAverage(pr.key)}"></td>
+            <td th:text="${costsTableData.getMinValue(pr.key)}"></td>
+            <td th:text="${costsTableData.getMinMonth(pr.key)}"></td>
+            <td th:text="${costsTableData.getMaxValue(pr.key)}"></td>
+            <td th:text="${costsTableData.getMaxMonth(pr.key)}"></td>
+            <td th:text="${costsTableData.calcInequalityCoefficient(pr.key)}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterpriseId}__/output/year}" data-ajax="false">Загальна за роками</a>
+<a class="ui-btn ui-shadow" href="/sections" data-ajax="false">На головну</a>
 </body>
 </html>

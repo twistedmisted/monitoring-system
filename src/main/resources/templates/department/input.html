@@ -53,6 +53,47 @@
             }
         }
 
+        function addRow() {
+            const parameterName = $('#parameter-name').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            const url = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/add-year?parameter-name=' + parameterName;
+
+            const settings = {
+                "url": "http://localhost:8080" + url,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+            };
+
+            $.ajax(settings).done(function () {
+                window.location.reload();
+            });
+        }
+
+        function removeRow() {
+            const parameterName = $('#parameter-name').val()
+            const year = $('#year').val()
+            const enterpriseId = /*[[${enterpriseId}]]*/ '0'
+            const departmentId = /*[[${departmentId}]]*/ '0'
+            const url = '/sections/enterprises/' + enterpriseId + '/departments/' + departmentId + '/remove-year?parameter-name=' + parameterName + '&year=' + year;
+
+            const settings = {
+                "url": "http://localhost:8080" + url,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+            };
+
+            $.ajax(settings).done(function () {
+                window.location.reload();
+            });
+        }
+
         /*]]>*/
     </script>
 </head>
@@ -122,21 +163,31 @@
         </tr>
         </tbody>
     </table>
+    <input class="ui-btn ui-shadow" type="button" value="Додати рік" onclick="addRow()" data-ajax="false">
+    <ul data-role="listview" data-inset="true">
+        <li class="ui-field-contain">
+            <label for="year">Рік для видалення</label>
+            <input type="text" id="year">
+        </li>
+        <li class="ui-body ui-body-b">
+            <button class="ui-btn ui-corner-all" onclick="removeRow()" data-ajax="false">Видалити рік</button>
+        </li>
+    </ul>
     <div class="ui-grid-a">
         <div class="ui-block-a">
-            <input class="ui-btn ui-shadow" type="button" value="Згенерувати дані" onclick="generate()">
+            <input class="ui-btn ui-shadow" type="button" value="Згенерувати дані" onclick="generate()" data-ajax="false">
         </div>
         <div class="ui-block-b">
-            <button class="ui-btn ui-shadow" type="submit">Зберегти</button>
+            <button class="ui-btn ui-shadow" type="submit" data-ajax="false">Зберегти</button>
         </div>
     </div>
 </form>
 <div class="ui-grid-a">
     <div class="ui-block-a">
-        <input class="ui-btn ui-shadow" type="button" value="Відобразити дані" onclick="output()">
+        <input class="ui-btn ui-shadow" type="button" value="Відобразити дані" onclick="output()" data-ajax="false">
     </div>
     <div class="ui-block-b">
-        <a class="ui-btn ui-shadow" href="/sections">На головну</a>
+        <a class="ui-btn ui-shadow" href="/sections" data-ajax="false">На головну</a>
     </div>
 </div>
 </body>

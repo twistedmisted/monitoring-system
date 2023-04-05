@@ -211,6 +211,7 @@ public class MainController {
         } else {
             model.addAttribute("tableDataList", tableDataList);
             model.addAttribute("year", year);
+            model.addAttribute("enterpriseName", sectionService.getSectionById(enterpriseId).getName());
         }
         return "enterprise/output-by-year";
     }
@@ -341,6 +342,7 @@ public class MainController {
         model.addAttribute("costsComment", costsComment);
         model.addAttribute("consumptionTitle", consumptionTitle);
         model.addAttribute("costsTitle", costsTitle);
+        model.addAttribute("departmentName", sectionService.getSectionById(departmentId).getName());
         return "department/month-chart";
     }
 
@@ -372,6 +374,7 @@ public class MainController {
         model.addAttribute("costsComment", costsComment);
         model.addAttribute("consumptionTitle", consumptionTitle);
         model.addAttribute("costsTitle", costsTitle);
+        model.addAttribute("enterpriseName", sectionService.getSectionById(enterpriseId).getName());
         return "enterprise/month-chart";
     }
 
@@ -401,6 +404,7 @@ public class MainController {
         model.addAttribute("comment", comment);
         model.addAttribute("year", year);
         model.addAttribute("chartTitle", chartTitle);
+        model.addAttribute("departmentName", sectionService.getSectionById(departmentId).getName());
         return "department/pie-chart";
     }
 
@@ -428,6 +432,7 @@ public class MainController {
         model.addAttribute("comment", comment);
         model.addAttribute("year", year);
         model.addAttribute("chartTitle", chartTitle);
+        model.addAttribute("enterpriseName", sectionService.getSectionById(enterpriseId).getName());
         return "enterprise/pie-chart";
     }
 
@@ -439,6 +444,7 @@ public class MainController {
         model.addAttribute("activities", activities);
         model.addAttribute("enterpriseId", enterpriseId);
         model.addAttribute("departmentId", departmentId);
+        model.addAttribute("departmentName", sectionService.getSectionById(departmentId).getName());
         return "department/activities";
     }
 

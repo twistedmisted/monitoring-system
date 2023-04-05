@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Заповнення даних</title>
 
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript" type="text/javascript">
@@ -17,67 +20,60 @@
     </script>
 </head>
 <body>
-<style>
-    table {
-        border: 1px solid black;
-        table-layout: fixed;
-        max-width: 1200px;
-        /*width: 100%;*/
-    }
-
-    th, td {
-        border: 1px solid black;
-        overflow: hidden;
-        max-width: 300px;
-        /*width: 100%;*/
-        word-wrap: break-word;
-    }
-</style>
-<label for="year">Введіть рік</label>
-<input type="text" id="year">
-<button onclick="showForYear()">Відобразити дані</button>
+<ul data-role="listview" data-inset="true">
+    <li class="ui-field-contain">
+        <label for="year">Введіть рік</label>
+        <input type="text" id="year">
+    </li>
+    <li class="ui-body ui-body-b">
+        <button class="ui-btn ui-corner-all" onclick="showForYear()">Відобразити дані</button>
+    </li>
+</ul>
 <p th:if="${tableDataList == null}" th:text="${message}"></p>
-<table th:unless="${tableDataList == null}" id="data-table">
-    <tbody id="table-body">
-    <tr>
-        <th>Рік</th>
-        <th>Показник</th>
-        <th>Січень</th>
-        <th>Лютий</th>
-        <th>Березень</th>
-        <th>Квітень</th>
-        <th>Травень</th>
-        <th>Червень</th>
-        <th>Липень</th>
-        <th>Серпень</th>
-        <th>Вересень</th>
-        <th>Жовтень</th>
-        <th>Листопад</th>
-        <th>Грудень</th>
-        <th>Усього за рік</th>
-    </tr>
-    <tr>
-        <th th:rowspan="${tableDataList.size() + 1}" th:text="${year}"></th>
-    </tr>
-    <th:block th:each="tableData : ${tableDataList}">
-        <tr th:each="row : ${tableData.yearInfos}">
-            <th th:text="${tableData.parameterName}"></th>
-            <td th:text="${row.months.get(1).value}"></td>
-            <td th:text="${row.months.get(2).value}"></td>
-            <td th:text="${row.months.get(3).value}"></td>
-            <td th:text="${row.months.get(4).value}"></td>
-            <td th:text="${row.months.get(5).value}"></td>
-            <td th:text="${row.months.get(6).value}"></td>
-            <td th:text="${row.months.get(7).value}"></td>
-            <td th:text="${row.months.get(8).value}"></td>
-            <td th:text="${row.months.get(9).value}"></td>
-            <td th:text="${row.months.get(10).value}"></td>
-            <td th:text="${row.months.get(11).value}"></td>
-            <td th:text="${row.months.get(12).value}"></td>
-            <td th:text="${row.getTotalValue()}"></td>
+<div th:unless="${tableDataList == null}" style="width: 100%;  overflow: auto">
+    <table data-role="table" id="data-table" data-mode="reflow" class="ui-responsive table-stroke">
+        <caption><h2 th:text="${'Загальна таблиця для підприємства `' + enterpriseName + '` за ' + year + ' рік'}"></h2></caption>
+        <thead>
+        <tr>
+            <th>Показник</th>
+            <th>Січень</th>
+            <th>Лютий</th>
+            <th>Березень</th>
+            <th>Квітень</th>
+            <th>Травень</th>
+            <th>Червень</th>
+            <th>Липень</th>
+            <th>Серпень</th>
+            <th>Вересень</th>
+            <th>Жовтень</th>
+            <th>Листопад</th>
+            <th>Грудень</th>
+            <th>Усього за рік</th>
         </tr>
-    </th:block>
-    </tbody>
-</table>
+        </thead>
+        <tbody id="table-data">
+        <th:block th:each="tableData : ${tableDataList}">
+            <tr th:each="row : ${tableData.yearInfos}">
+                <th th:text="${tableData.parameterName}"></th>
+                <td th:text="${row.months.get(1).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(2).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(3).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(4).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(5).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(6).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(7).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(8).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(9).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(10).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(11).valueToStrEnterprise()}"></td>
+                <td th:text="${row.months.get(12).valueToStrEnterprise()}"></td>
+                <td th:text="${row.getTotalValue()}"></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+<a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterpriseId}__/output}" data-ajax="false">Вхідні дані</a>
+<a class="ui-btn ui-shadow" href="/sections" data-ajax="false">На головну</a>
 </body>
 </html>

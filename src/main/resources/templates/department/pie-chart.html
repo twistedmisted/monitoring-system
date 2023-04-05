@@ -72,6 +72,9 @@
         height: 500px !important;
     }
 </style>
+<div data-role="header">
+    <h1 th:text="${'Графік енергоефективності для відділу `' + departmentName + '`'}"></h1>
+</div>
 <ul data-role="listview" data-inset="true">
     <li class="ui-field-contain">
         <label for="year">Введіть рік</label>
@@ -147,6 +150,7 @@
                 }
                 let tempValue = col.children[0].children[0].value;
                 if (tempValue === "") {
+                    tempData.push(0);
                     continue;
                 }
                 backgroundColors.push(randomColorGenerator());
@@ -190,6 +194,9 @@
 
                             const totalPercentage = datapoints.reduce(totalSum, 0);
                             const percentageValue = (value / totalPercentage * 100).toFixed(1);
+                            if (value === 0) {
+                                return '';
+                            }
                             return `${value}; ${percentageValue}%`;
                         },
                         color: '#fff',

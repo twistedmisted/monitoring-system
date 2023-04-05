@@ -80,6 +80,9 @@
         width: 140px;
     }
 </style>
+<div data-role="header">
+    <h1 th:text="${'Графік витрат для відділу `' + departmentName + '`'}"></h1>
+</div>
 <div>
     <select id="parameter-name">
         <option th:if="${consumptionTableData.parameterName == 'nothing'}" value="nothing" disabled selected>Оберіть
@@ -145,7 +148,6 @@
         <p><label for="review">Коментарій для графіку споживань:</label></p>
         <textarea id="review" name="review" rows="4" cols="50" th:field="*{text}"></textarea>
         <button class="ui-btn ui-shadow" id="save-btn" type="submit">Зберегти</button>
-<!--        <input type="submit" value="Зберегти">-->
     </form>
 </div>
 <div>

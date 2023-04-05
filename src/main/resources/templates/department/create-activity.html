@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>Додавання західу</title>
 
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <style>
         table {
             border: 1px solid black;
@@ -34,46 +39,53 @@
 </head>
 <body>
 <div>
-    <a class="button" th:href="@{/sections/enterprises/__${enterpriseId}__/departments/__${departmentId}__/activities}">Список
-        заходів</a>
-    <a class="button" href="/sections">На головну</a>
-</div>
-<div>
     <form th:action="@{/sections/enterprises/__${enterpriseId}__/departments/__${departmentId}__/activities/create}"
-            method="post" th:object="${activity}">
-        <div>
-            <label for="name">Назва заходу</label>
-            <input id="name" th:field="*{name}">
-        </div>
+          method="post" th:object="${activity}">
+        <ul data-role="listview" data-inset="true">
+            <li class="ui-field-contain">
+                <label for="name">Назва заходу</label>
+                <input type="text" id="name" th:field="*{name}">
+            </li>
 
-        <div>
-            <label for="parameter">Вид ресурсу</label>
-            <select id="parameter" th:field="*{parameterId}">
-                <th:block th:each="parameter : ${parameters}">
-                    <option th:value="${parameter.id}" th:text="${parameter.name}"></option>
-                </th:block>
-            </select>
-        </div>
+            <li class="ui-field-contain">
+                <div class="ui-field-contain">
+                    <label for="parameter">Вид ресурсу</label>
+                    <select id="parameter" th:field="*{parameterId}">
+                        <th:block th:each="parameter : ${parameters}">
+                            <option th:value="${parameter.id}" th:text="${parameter.name}"></option>
+                        </th:block>
+                    </select>
+                </div>
+            </li>
 
-        <div>
-            <label for="description">Очікуваний ефект від впровадження</label>
-            <input id="description" th:field="*{description}">
-        </div>
+            <li class="ui-field-contain">
+                <label for="description">Очікуваний ефект від впровадження</label>
+                <input type="text" id="description" th:field="*{description}">
+            </li>
 
-        <div>
-            <label for="money">Кошти на впровадження, грн</label>
-            <input id="money" th:field="*{money}">
-        </div>
+            <li class="ui-field-contain">
+                <label for="money">Кошти на впровадження, грн</label>
+                <input type="text" id="money" th:field="*{money}">
+            </li>
 
-        <div>
-            <label for="financialSource">Джерело фінансування</label>
-            <input id="financialSource" th:field="*{financialSource}">
-        </div>
+            <li class="ui-field-contain">
+                <label for="financialSource">Джерело фінансування</label>
+                <input type="text" id="financialSource" th:field="*{financialSource}">
+            </li>
 
-        <div>
-            <input class="button" type="submit">
-        </div>
+            <li class="ui-body ui-body-b">
+                <button class="ui-btn ui-corner-all" type="submit">Зберегти</button>
+            </li>
+        </ul>
     </form>
+</div>
+<div class="ui-grid-a">
+    <div class="ui-block-a">
+        <a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterpriseId}__/departments/__${departmentId}__/activities}" data-ajax="false">Список заходів</a>
+    </div>
+    <div class="ui-block-b">
+        <a class="ui-btn ui-shadow" href="/sections" data-ajax="false">На головну</a>
+    </div>
 </div>
 </body>
 </html>

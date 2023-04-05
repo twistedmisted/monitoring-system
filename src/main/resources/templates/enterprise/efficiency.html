@@ -4,33 +4,10 @@
     <meta charset="UTF-8">
     <title>Оцінка ефективності</title>
 
-    <style>
-        table {
-            border: 1px solid black;
-            table-layout: fixed;
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        th, td {
-            border: 1px solid black;
-            overflow: hidden;
-            max-width: 300px;
-            width: 100%;
-        }
-
-        .button {
-            font-size: 12px;
-            text-decoration: none;
-            background-color: #EEEEEE;
-            color: #333333;
-            padding: 2px 6px 2px 6px;
-            border-top: 1px solid #CCCCCC;
-            border-right: 1px solid #333333;
-            border-bottom: 1px solid #333333;
-            border-left: 1px solid #CCCCCC;
-        }
-    </style>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -47,13 +24,13 @@
                     } else {
                         row.cells[1].style.background = 'red';
                     }
-                    row.cells[1].innerHTML = (Math.round((sumEff + Number.EPSILON) * 100) / 100).toString()
+                    row.cells[1].innerText = (Math.round((sumEff + Number.EPSILON) * 100) / 100).toString();
                     break;
                 }
-                const nowCons = getFloat(row.cells[1].innerHTML);
+                const nowCons = getFloat(row.cells[1].innerText);
+                const afterCons = getFloat(row.cells[3].children[2].children[0].value);
 
-                const nowCosts = getFloat(row.cells[2].innerHTML);
-                const afterCosts = getFloat(row.cells[4].children[0].value);
+                const nowCosts = getFloat(row.cells[2].innerText);
 
                 let effMoney = 0;
                 try {
@@ -63,7 +40,8 @@
                 }
 
                 const tariff = nowCosts / nowCons;
-                row.cells[3].innerHTML = (Math.round(((afterCosts / tariff) + Number.EPSILON) * 100) / 100).toString();
+                const afterCosts = Math.round(((afterCons * tariff) + Number.EPSILON) * 100) / 100
+                row.cells[4].innerHTML = afterCosts.toString();
 
                 const costsEff = nowCosts - (afterCosts + effMoney) / x;
                 const consEff = costsEff / tariff;
@@ -78,8 +56,8 @@
                 } else {
                     row.cells[6].style.background = 'red';
                 }
-                row.cells[5].innerHTML = (Math.round((consEff + Number.EPSILON) * 100) / 100).toString();
-                row.cells[6].innerHTML = (Math.round((costsEff + Number.EPSILON) * 100) / 100).toString();
+                row.cells[5].innerText = (Math.round((consEff + Number.EPSILON) * 100) / 100).toString();
+                row.cells[6].innerText = (Math.round((costsEff + Number.EPSILON) * 100) / 100).toString();
                 sumEff += costsEff;
             }
         }
@@ -95,45 +73,61 @@
     </script>
 </head>
 <body>
+<ul data-role="listview" data-inset="true">
+    <li class="ui-field-contain">
+        <label for="x">Кількість років</label>
+        <input type="text" id="x">
+    </li>
+    <li class="ui-body ui-body-b">
+        <button class="ui-btn ui-corner-all" onclick="calculate()" data-ajax="false">Обрахувати</button>
+    </li>
+</ul>
 <div>
-    <label for="x">Кількість років</label>
-    <input id="x" type="text">
-    <button class="button" onclick="calculate()">Обрахувати</button>
-    <a class="button" href="/sections">На головну</a>
+    <div style="width: 100%;  overflow: auto">
+        <table data-role="table" id="data-table" data-mode="reflow"
+               class="ui-responsive table-stroke">
+            <caption><h2 th:text="${'Оцінка ефективності для організації ' + enterpriseName}"></h2></caption>
+            <thead>
+            <tr class="th-groups">
+                <th rowspan="2">Складові заощаджень щодо ресурсу</th>
+                <th colspan="2">Існуюча ситуація</th>
+                <th colspan="2">Після реалізації проекту</th>
+                <th colspan="2">Економія</th>
+            </tr>
+            <tr>
+                <th>кількість</th>
+                <th>грн</th>
+                <th>кількість</th>
+                <th>грн</th>
+                <th>кількість</th>
+                <th>грн</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="efficiency : ${efficiencyList}">
+                <td th:text="${efficiency.parameterName}"></td>
+                <td th:text="${efficiency.cons()}"></td>
+                <td th:text="${efficiency.costs()}"></td>
+                <td><input type="text" value="1"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="6">Загальні заощадження</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-<div>
-    <table id="data-table">
-        <caption><h3 th:text="${'Оцінка ефективності для організації ' + enterpriseName}"></h3></caption>
-        <tbody>
-        <tr>
-            <th rowspan="2">Складові заощаджень щодо ресурсу</th>
-            <th colspan="2">Існуюча ситуація</th>
-            <th colspan="2">Після реалізації проекту</th>
-            <th colspan="2">Економія</th>
-        </tr>
-        <tr>
-            <th>кількість</th>
-            <th>грн</th>
-            <th>кількість</th>
-            <th>грн</th>
-            <th>кількість</th>
-            <th>грн</th>
-        </tr>
-        <tr th:each="efficiency : ${efficiencyList}">
-            <td th:text="${efficiency.parameterName}"></td>
-            <td th:text="${efficiency.cons()}"></td>
-            <td th:text="${efficiency.costs()}"></td>
-            <td></td>
-            <td><input type="text"></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="6">Загальні заощадження</td>
-            <td></td>
-        </tr>
-        </tbody>
-    </table>
+<div class="ui-grid-a">
+    <div class="ui-block-a">
+        <a class="ui-btn ui-shadow" th:href="@{/sections/enterprises/__${enterpriseId}__/departments/__${departmentId}__/activities}" data-ajax="false">Список заходів</a>
+    </div>
+    <div class="ui-block-b">
+        <a class="ui-btn ui-shadow" href="/sections" data-ajax="false">На головну</a>
+    </div>
 </div>
 </body>
 </html>
